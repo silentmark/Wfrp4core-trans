@@ -1,0 +1,322 @@
+[
+  {
+    "Id": "Arterial Damage",
+    "Name": "Uszkodzenie tętnicy"
+  },
+  {
+    "Id": "Bad Cut",
+    "Name": "Paskudne cięcie"
+  },
+  {
+    "Id": "Badly Cut Toe",
+    "Name": "Paskudnie przecięty paluch"
+  },
+  {
+    "Id": "Badly Jarred Arm",
+    "Name": "Bardzo zdrętwiałe ramię"
+  },
+  {
+    "Id": "Badly Twisted Knee",
+    "Name": "Skręcone kolano"
+  },
+  {
+    "Id": "Black Eye",
+    "Name": "Podbite oko"
+  },
+  {
+    "Id": "Bleeding hand",
+    "Name": "Krwawiąca dłoń"
+  },
+  {
+    "Id": "Broken Collar Bone",
+    "Name": "Złamany obojczyk"
+  },
+  {
+    "Id": "Broken Jaw",
+    "Name": "Zmiażdżona żuchwa"
+  },
+  {
+    "Id": "Broken Knee",
+    "Name": "Strzaskane kolano"
+  },
+  {
+    "Id": "Broken Nose",
+    "Name": "Złamany nos"
+  },
+  {
+    "Id": "Bruised Ribs",
+    "Name": "Stłuczone żebra"
+  },
+  {
+    "Id": "Brutal Dismemberment",
+    "Name": "Odcięte ramię"
+  },
+  {
+    "Id": "Carved Shin",
+    "Name": "Rozerwana łydka"
+  },
+  {
+    "Id": "Clean Break",
+    "Name": "Czyste złamanie"
+  },
+  {
+    "Id": "Cleft Hand",
+    "Name": "Zmasakrowana dłoń"
+  },
+  {
+    "Id": "Concussive Blow",
+    "Name": "Wstrząśnienie mózgu"
+  },
+  {
+    "Id": "Cracked Ribs",
+    "Name": "Połamane żebra"
+  },
+  {
+    "Id": "Crushed Elbow",
+    "Name": "Zmiażdżony łokieć"
+  },
+  {
+    "Id": "Crushed Foot",
+    "Name": "Zmiażdżona stopa"
+  },
+  {
+    "Id": "Cut Tendon",
+    "Name": "Przecięte ścięgna"
+  },
+  {
+    "Id": "Damaged Artery",
+    "Name": "Uszkodzona tętnica"
+  },
+  {
+    "Id": "Decapitated",
+    "Name": "Dekapitacja"
+  },
+  {
+    "Id": "Deep Cut",
+    "Name": "Głębokie cięcie"
+  },
+  {
+    "Id": "Devastated Eye",
+    "Name": "Wybite oko"
+  },
+  {
+    "Id": "Disfiguring Blow",
+    "Name": "Oszpecający cios"
+  },
+  {
+    "Id": "Dislocated Knee",
+    "Name": "Zwichnięte kolano"
+  },
+  {
+    "Id": "Dislocated Shoulder",
+    "Name": "Wywichnięty bark"
+  },
+  {
+    "Id": "Dramatic Injury",
+    "Name": "Zawadiacka rana"
+  },
+  {
+    "Id": "Ear Bash",
+    "Name": "Prosto w ucho"
+  },
+  {
+    "Id": "Fractured Hip",
+    "Name": "Złamane biodro"
+  },
+  {
+    "Id": "Fractured Jaw",
+    "Name": "Złamana szczęka"
+  },
+  {
+    "Id": "Gaping Arm Wound",
+    "Name": "Ziejąca rana ramienia"
+  },
+  {
+    "Id": "Gaping Chest Wound",
+    "Name": "Ziejąca rana korpusu"
+  },
+  {
+    "Id": "Gut Blow",
+    "Name": "Cios w bebechy"
+  },
+  {
+    "Id": "Gut Wound",
+    "Name": "Rana brzucha"
+  },
+  {
+    "Id": "Hacked Leg",
+    "Name": "Porąbana noga"
+  },
+  {
+    "Id": "Internal Bleeding",
+    "Name": "Krwotok wewnętrzny"
+  },
+  {
+    "Id": "Jarred Arm",
+    "Name": "Zdrętwiałe ramię"
+  },
+  {
+    "Id": "Lost Footing",
+    "Name": "Utrata równowagi"
+  },
+  {
+    "Id": "Low Blow!",
+    "Name": "Poniżej pasa!"
+  },
+  {
+    "Id": "Major Chest Wound",
+    "Name": "Poważna rana klatki piersiowej"
+  },
+  {
+    "Id": "Major Ear Wound",
+    "Name": "Poważna rana ucha"
+  },
+  {
+    "Id": "Major Eye Wound",
+    "Name": "Poważna rana oka"
+  },
+  {
+    "Id": "Mangled Ear",
+    "Name": "Zgruchotane ucho"
+  },
+  {
+    "Id": "Mangled Hand",
+    "Name": "Zgruchotana dłoń"
+  },
+  {
+    "Id": "Mangled Jaw",
+    "Name": "Zgruchotana szczęka"
+  },
+  {
+    "Id": "Mauled Bicep",
+    "Name": "Rozszarpany biceps"
+  },
+  {
+    "Id": "Minor Arm Cut",
+    "Name": "Płytkie cięcie w ramię"
+  },
+  {
+    "Id": "Minor Head Cut",
+    "Name": "Płytkie cięcie w głowę"
+  },
+  {
+    "Id": "Minor Leg Cut",
+    "Name": "Płytkie cięcie w nogę"
+  },
+  {
+    "Id": "Painful Cut",
+    "Name": "Bolesne cięcie"
+  },
+  {
+    "Id": "Poked Eye",
+    "Name": "Spuchnięte oko"
+  },
+  {
+    "Id": "Pulled Back",
+    "Name": "Naderwane mięśnie pleców"
+  },
+  {
+    "Id": "Ragged Wound",
+    "Name": "Nierówne cięcie"
+  },
+  {
+    "Id": "Rattling Blow",
+    "Name": "Bolesne uderzenie"
+  },
+  {
+    "Id": "Ruptered Ligament",
+    "Name": "Zerwane więzadło"
+  },
+  {
+    "Id": "Ruptured Tendon",
+    "Name": "Zerwane ścięgno"
+  },
+  {
+    "Id": "Severed Finger",
+    "Name": "Odcięty palec"
+  },
+  {
+    "Id": "Severed Foot",
+    "Name": "Odcięta stopa"
+  },
+  {
+    "Id": "Shattered Pelvis",
+    "Name": "Strzaskana miednica"
+  },
+  {
+    "Id": "Sliced Ear",
+    "Name": "Rozcięte ucho"
+  },
+  {
+    "Id": "Sliced Tendons",
+    "Name": "Przecięte ścięgno"
+  },
+  {
+    "Id": "Smashed Mouth",
+    "Name": "Rozkwaszone usta"
+  },
+  {
+    "Id": "Smashed Rib Cage",
+    "Name": "Strzaskana klatka piersiowa"
+  },
+  {
+    "Id": "Sprain",
+    "Name": "Skręcenie"
+  },
+  {
+    "Id": "Sprained Ankle",
+    "Name": "Zwichnięta kostka"
+  },
+  {
+    "Id": "Struck Forehead",
+    "Name": "Uderzenie w czoło"
+  },
+  {
+    "Id": "Stubbed Toe",
+    "Name": "Stłuczony palec"
+  },
+  {
+    "Id": "Thigh Strike",
+    "Name": "Cios w udo"
+  },
+  {
+    "Id": "Tis But A Scratch!",
+    "Name": "Ledwie draśnięcie"
+  },
+  {
+    "Id": "Torn Apart",
+    "Name": "Rozpłatanie"
+  },
+  {
+    "Id": "Torn Muscles",
+    "Name": "Zerwane mięśnie"
+  },
+  {
+    "Id": "Torn Thigh",
+    "Name": "Poszarpane udo"
+  },
+  {
+    "Id": "Twisted Ankle",
+    "Name": "Skręcona kostka"
+  },
+  {
+    "Id": "Twisted Back",
+    "Name": "Cios w krzyż"
+  },
+  {
+    "Id": "Twisted Knee",
+    "Name": "Nadwyrężone kolano"
+  },
+  {
+    "Id": "Winded",
+    "Name": "Bez tchu"
+  },
+  {
+    "Id": "Wrenched Arm",
+    "Name": "Wybicie stawu"
+  },
+  {
+    "Id": "Wrenched Collar Bone",
+    "Name": "Stłuczony obojczyk"
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "Id": "Blood Rot",
+    "Name": "Zatrucie Krwi"
+  },
+  {
+    "Id": "Bronze Fever",
+    "Name": "Brązowa gorączka"
+  },
+  {
+    "Id": "Festering Wound",
+    "Name": "Ropiejąca Rana"
+  },
+  {
+    "Id": "Galloping Trots",
+    "Name": "Smrodliwe Wiatry"
+  },
+  {
+    "Id": "Itching Pox",
+    "Name": "Sierściawka"
+  },
+  {
+    "Id": "Minor Infection",
+    "Name": "Pomniejsza Infekcja"
+  },
+  {
+    "Id": "Packer's Pox",
+    "Name": "Vérole du Tanneur"
+  },
+  {
+    "Id": "Ratte Fever",
+    "Name": "Szczurza Gorączka"
+  },
+  {
+    "Id": "The Black Plague",
+    "Name": "Czarna Dżuma"
+  },
+  {
+    "Id": "The Bloody Flux",
+    "Name": "Czerwonka"
+  }
+]

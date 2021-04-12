@@ -1,0 +1,1046 @@
+[
+  {
+    "Id": "Abbess",
+    "Name": "Przeorysza"
+  },
+  {
+    "Id": "Advisor",
+    "Name": "Doradca"
+  },
+  {
+    "Id": "Agent",
+    "Name": "Agent"
+  },
+  {
+    "Id": "Agitator",
+    "Name": "Agitator"
+  },
+  {
+    "Id": "Aide",
+    "Name": "Asystent"
+  },
+  {
+    "Id": "Ambassador",
+    "Name": "Ambasador"
+  },
+  {
+    "Id": "Apothecary",
+    "Name": "Aptekarka"
+  },
+  {
+    "Id": "Apothecary's Apprentice",
+    "Name": "Uczennica Aptekarki"
+  },
+  {
+    "Id": "Apothecary-General",
+    "Name": "Mistrzyni Aptekarstwa"
+  },
+  {
+    "Id": "Apprentice Artisan",
+    "Name": "Czeladniczka"
+  },
+  {
+    "Id": "Apprentice Artist",
+    "Name": "Uczennica Artysty"
+  },
+  {
+    "Id": "Artisan",
+    "Name": "Rzemieślniczka"
+  },
+  {
+    "Id": "Artist",
+    "Name": "Artystka"
+  },
+  {
+    "Id": "Assassin",
+    "Name": "Skrytobójca"
+  },
+  {
+    "Id": "Attendant",
+    "Name": "Pokojowa"
+  },
+  {
+    "Id": "Bailiff",
+    "Name": "Zarządca"
+  },
+  {
+    "Id": "Bandit King",
+    "Name": "Król Banitów"
+  },
+  {
+    "Id": "Barge Master",
+    "Name": "Kapitan Barki"
+  },
+  {
+    "Id": "Bargeswain",
+    "Name": "Sternik"
+  },
+  {
+    "Id": "Barrister",
+    "Name": "Obrońca Prawny"
+  },
+  {
+    "Id": "Bawd",
+    "Name": "Rajfur"
+  },
+  {
+    "Id": "Beggar",
+    "Name": "Żebrak"
+  },
+  {
+    "Id": "Beggar King",
+    "Name": "Król Żebraków"
+  },
+  {
+    "Id": "Black Marketeer",
+    "Name": "Broker Informacji"
+  },
+  {
+    "Id": "Boat-hand",
+    "Name": "Chłopiec Pokładowy"
+  },
+  {
+    "Id": "Boatman",
+    "Name": "Przewoźnik"
+  },
+  {
+    "Id": "Boatswain",
+    "Name": "Bosman"
+  },
+  {
+    "Id": "Body Snatcher",
+    "Name": "Porywacz Zwłok"
+  },
+  {
+    "Id": "Bounty Hunter",
+    "Name": "Łowca Nagród"
+  },
+  {
+    "Id": "Bounty Hunter General",
+    "Name": "Legendarny Łowca Nagród"
+  },
+  {
+    "Id": "Braggart",
+    "Name": "Tani Drań"
+  },
+  {
+    "Id": "Brigand",
+    "Name": "Zbój"
+  },
+  {
+    "Id": "Broker",
+    "Name": "Pośrednik"
+  },
+  {
+    "Id": "Burgomeister",
+    "Name": "Burmistrz"
+  },
+  {
+    "Id": "Busker",
+    "Name": "Muzykant"
+  },
+  {
+    "Id": "Cargo Scavenger",
+    "Name": "Szabrownik"
+  },
+  {
+    "Id": "Cat Burglar",
+    "Name": "Włamywacz"
+  },
+  {
+    "Id": "Cavalryman",
+    "Name": "Kawalerzysta"
+  },
+  {
+    "Id": "Chancellor",
+    "Name": "Kanclerz"
+  },
+  {
+    "Id": "Charlatan",
+    "Name": "Szarlatan"
+  },
+  {
+    "Id": "Chartered Engineer",
+    "Name": "Mistrz Inżynierii"
+  },
+  {
+    "Id": "Clerk",
+    "Name": "Przekupka"
+  },
+  {
+    "Id": "Coach Master",
+    "Name": "Mistrz Woźniców"
+  },
+  {
+    "Id": "Coachman",
+    "Name": "Woźnica"
+  },
+  {
+    "Id": "Con Artist",
+    "Name": "Oszust"
+  },
+  {
+    "Id": "Councilor",
+    "Name": "Gospodarz"
+  },
+  {
+    "Id": "Counsellor",
+    "Name": "Radca"
+  },
+  {
+    "Id": "Courier",
+    "Name": "Kurier"
+  },
+  {
+    "Id": "Courier-Captain",
+    "Name": "Kapitan Kurierów"
+  },
+  {
+    "Id": "Court Physician",
+    "Name": "Nadworna Medyczka"
+  },
+  {
+    "Id": "Crime Lord",
+    "Name": "Król Półświatka"
+  },
+  {
+    "Id": "Custodian",
+    "Name": "Nadzorca"
+  },
+  {
+    "Id": "Daemon Slayer",
+    "Name": "Zabójca Demonów"
+  },
+  {
+    "Id": "Demagogue",
+    "Name": "Demagog"
+  },
+  {
+    "Id": "Detective",
+    "Name": "Detektyw"
+  },
+  {
+    "Id": "Diplomat",
+    "Name": "Dyplomata"
+  },
+  {
+    "Id": "Dock Master",
+    "Name": "Mistrz Dokerów"
+  },
+  {
+    "Id": "Dockhand",
+    "Name": "Pomocnik Dokera"
+  },
+  {
+    "Id": "Doktor",
+    "Name": "Doktor"
+  },
+  {
+    "Id": "Dragon Slayer",
+    "Name": "Zabójca Smoków"
+  },
+  {
+    "Id": "Duelist",
+    "Name": "Zwadźca"
+  },
+  {
+    "Id": "Duellist",
+    "Name": "Zwadźca"
+  },
+  {
+    "Id": "Duelmaster",
+    "Name": "Mistrz Pojedynków"
+  },
+  {
+    "Id": "Engineer",
+    "Name": "Inżynier"
+  },
+  {
+    "Id": "Entertainer",
+    "Name": "Kuglarz"
+  },
+  {
+    "Id": "Envoy",
+    "Name": "Poseł"
+  },
+  {
+    "Id": "Explorer",
+    "Name": "Odkrywca"
+  },
+  {
+    "Id": "Exterminator",
+    "Name": "Tępiciel"
+  },
+  {
+    "Id": "Fellow",
+    "Name": "Wykładowca"
+  },
+  {
+    "Id": "Fence",
+    "Name": "Paser"
+  },
+  {
+    "Id": "Fencer",
+    "Name": "Szermierz"
+  },
+  {
+    "Id": "First Knight",
+    "Name": "Pierwszy Rycerz"
+  },
+  {
+    "Id": "Flagellant",
+    "Name": "Biczownik"
+  },
+  {
+    "Id": "Foreman",
+    "Name": "Brygadzista"
+  },
+  {
+    "Id": "Fortune Teller",
+    "Name": "Wróż"
+  },
+  {
+    "Id": "Gang Boss",
+    "Name": "Głowa Gangu"
+  },
+  {
+    "Id": "Giant Slayer",
+    "Name": "Zabójca Gigantów"
+  },
+  {
+    "Id": "Governor",
+    "Name": "Gubernator"
+  },
+  {
+    "Id": "Grave Robber",
+    "Name": "Hiena Cmentarna"
+  },
+  {
+    "Id": "Greenfish",
+    "Name": "Rybak"
+  },
+  {
+    "Id": "Guard",
+    "Name": "Ochroniarz"
+  },
+  {
+    "Id": "Guard Officer",
+    "Name": "Oficer Gwardii"
+  },
+  {
+    "Id": "Guide",
+    "Name": "Przewodnik"
+  },
+  {
+    "Id": "Guildmaster",
+    "Name": "Mistrzyni Cechu"
+  },
+  {
+    "Id": "Hedge Apprentice",
+    "Name": "Uczeń Guślarza"
+  },
+  {
+    "Id": "Hedge Master",
+    "Name": "Starszy Guślarzy"
+  },
+  {
+    "Id": "Hedge Witch",
+    "Name": "Guślarz"
+  },
+  {
+    "Id": "Hedgewise",
+    "Name": "Wiedzący"
+  },
+  {
+    "Id": "Herald",
+    "Name": "Herold"
+  },
+  {
+    "Id": "Herb Gatherer",
+    "Name": "Zbieraczka Ziół"
+  },
+  {
+    "Id": "Herb Master",
+    "Name": "Mistrzyni Ziołolecznictwa"
+  },
+  {
+    "Id": "Herbalist",
+    "Name": "Zielarka"
+  },
+  {
+    "Id": "Herbwise",
+    "Name": "Arcyzielarka"
+  },
+  {
+    "Id": "Hexer",
+    "Name": "Szptun"
+  },
+  {
+    "Id": "High Priest",
+    "Name": "Arcykapłan"
+  },
+  {
+    "Id": "Hitman",
+    "Name": "Płatny Morderca"
+  },
+  {
+    "Id": "Honor Guard",
+    "Name": "Gwardzista"
+  },
+  {
+    "Id": "Horseman",
+    "Name": "Jeździec"
+  },
+  {
+    "Id": "Huffer",
+    "Name": "Pilot Rzeczny"
+  },
+  {
+    "Id": "Hunter",
+    "Name": "Łowca"
+  },
+  {
+    "Id": "Huntsmaster",
+    "Name": "Nadworny Łowczy"
+  },
+  {
+    "Id": "Hustler",
+    "Name": "Naganiacz"
+  },
+  {
+    "Id": "Informer",
+    "Name": "Informator"
+  },
+  {
+    "Id": "Initiate",
+    "Name": "Kleryk"
+  },
+  {
+    "Id": "Inquisitor",
+    "Name": "Inkwizytor"
+  },
+  {
+    "Id": "Interrogator",
+    "Name": "Oprawca"
+  },
+  {
+    "Id": "Investigator",
+    "Name": "Śledczy"
+  },
+  {
+    "Id": "Judge",
+    "Name": "Sędzia"
+  },
+  {
+    "Id": "Judicial Champion",
+    "Name": "Szampierz Sądowy"
+  },
+  {
+    "Id": "Knight",
+    "Name": "Rycerz"
+  },
+  {
+    "Id": "Knight of the Inner Circle",
+    "Name": "Rycerz Wewnętrznego Kręgu"
+  },
+  {
+    "Id": "Landsman",
+    "Name": "Szczur Lądowy"
+  },
+  {
+    "Id": "Lawyer",
+    "Name": "Prawniczka"
+  },
+  {
+    "Id": "Lector",
+    "Name": "Lektor"
+  },
+  {
+    "Id": "Light Cavalry Officer",
+    "Name": "Oficer Kawalerii"
+  },
+  {
+    "Id": "Light Cavalry Sergeant",
+    "Name": "Sierżant Kawalerii"
+  },
+  {
+    "Id": "Maestro",
+    "Name": "Maestro"
+  },
+  {
+    "Id": "Magistrate",
+    "Name": "Komornik"
+  },
+  {
+    "Id": "Magnate",
+    "Name": "Magnat"
+  },
+  {
+    "Id": "Master Apothecary",
+    "Name": "Farmaceutka"
+  },
+  {
+    "Id": "Master Artisan",
+    "Name": "Mistrzyni Rzemiosła"
+  },
+  {
+    "Id": "Master Artist",
+    "Name": "Mistrzyni Sztuki"
+  },
+  {
+    "Id": "Master Beggar",
+    "Name": "Mistrz Żebraków"
+  },
+  {
+    "Id": "Master Bounty Hunter",
+    "Name": "Doświadczony Łowca Nagród"
+  },
+  {
+    "Id": "Master Engineer",
+    "Name": "Renomowany Inżynier"
+  },
+  {
+    "Id": "Master Fence",
+    "Name": "Mistrz Paserów"
+  },
+  {
+    "Id": "Master Investigator",
+    "Name": "Starszy Śledczy"
+  },
+  {
+    "Id": "Master Merchant",
+    "Name": "Mistrz Kupiectwa"
+  },
+  {
+    "Id": "Master Miner",
+    "Name": "Sztygar"
+  },
+  {
+    "Id": "Master Pedlar",
+    "Name": "Doświadczony Domokrążca"
+  },
+  {
+    "Id": "Master Pilot",
+    "Name": "Legendarny Pilot"
+  },
+  {
+    "Id": "Master Smuggler",
+    "Name": "Doświadczony Przemytnik"
+  },
+  {
+    "Id": "Master Thief",
+    "Name": "Mistrz Złodziejski"
+  },
+  {
+    "Id": "Master Wizard",
+    "Name": "Mistrz Magii"
+  },
+  {
+    "Id": "Menial",
+    "Name": "Posługaczka"
+  },
+  {
+    "Id": "Merchant",
+    "Name": "Kupiec"
+  },
+  {
+    "Id": "Merchant Prince",
+    "Name": "Patrycjusz"
+  },
+  {
+    "Id": "Messenger",
+    "Name": "Posłaniec"
+  },
+  {
+    "Id": "Mine Foreman",
+    "Name": "Mistrz Górnictwa"
+  },
+  {
+    "Id": "Miner",
+    "Name": "Górnik"
+  },
+  {
+    "Id": "Mystic",
+    "Name": "Mistyk"
+  },
+  {
+    "Id": "Noble",
+    "Name": "Szlachcic"
+  },
+  {
+    "Id": "Noble Lord",
+    "Name": "Lord"
+  },
+  {
+    "Id": "Novitiate",
+    "Name": "Nowicjuszka"
+  },
+  {
+    "Id": "Novitiate",
+    "Name": "Nowicjusz Kapłanów Bitewnych"
+  },
+  {
+    "Id": "Nun",
+    "Name": "Mniszka"
+  },
+  {
+    "Id": "Novitiate (Nun)",
+    "Name": "Nowicjuszka"
+  },
+  {
+    "Id": "Novitiate (Warrior Priest)",
+    "Name": "Nowicjusz Kapłanów Bitewnych"
+  },
+  {
+    "Id": "Officer",
+    "Name": "Oficer"
+  },
+  {
+    "Id": "Outlaw",
+    "Name": "Banita"
+  },
+  {
+    "Id": "Outlaw Chief",
+    "Name": "Herszt Banitów"
+  },
+  {
+    "Id": "Pamphleteer",
+    "Name": "Pamflecista"
+  },
+  {
+    "Id": "Pathfinder",
+    "Name": "Przepatrywacz"
+  },
+  {
+    "Id": "Pauper",
+    "Name": "Biedak"
+  },
+  {
+    "Id": "Peasant",
+    "Name": "Wyrobnik"
+  },
+  {
+    "Id": "Pedlar",
+    "Name": "Kolporter"
+  },
+  {
+    "Id": "Penitent",
+    "Name": "Pokutnik"
+  },
+  {
+    "Id": "Physician",
+    "Name": "Medyczka"
+  },
+  {
+    "Id": "Physician's Apprentice",
+    "Name": "Studentka Medycyny"
+  },
+  {
+    "Id": "Pilot",
+    "Name": "Starszy Pilot"
+  },
+  {
+    "Id": "Pit Champion",
+    "Name": "Mistrz Areny"
+  },
+  {
+    "Id": "Pit Fighter",
+    "Name": "Gladiator"
+  },
+  {
+    "Id": "Pit Legend",
+    "Name": "Legenda Areny"
+  },
+  {
+    "Id": "Postilion",
+    "Name": "Foryś"
+  },
+  {
+    "Id": "Priest",
+    "Name": "Kapłan"
+  },
+  {
+    "Id": "Priest Captain",
+    "Name": "Kapłan-kapitan"
+  },
+  {
+    "Id": "Priest Sergeant",
+    "Name": "Kapłan-sierżant"
+  },
+  {
+    "Id": "Prioress General",
+    "Name": "Matka Przełożona"
+  },
+  {
+    "Id": "Procurer",
+    "Name": "Stręczyciel"
+  },
+  {
+    "Id": "Professor",
+    "Name": "Profesor"
+  },
+  {
+    "Id": "Prophet of Doom",
+    "Name": "Piewca Zagłady"
+  },
+  {
+    "Id": "Prospector",
+    "Name": "Poszukiwacz"
+  },
+  {
+    "Id": "Protagonist",
+    "Name": "Oprych"
+  },
+  {
+    "Id": "Prowler",
+    "Name": "Bandzior"
+  },
+  {
+    "Id": "Pugilist",
+    "Name": "Pięściarz"
+  },
+  {
+    "Id": "Rabble Rouser",
+    "Name": "Podżegacz"
+  },
+  {
+    "Id": "Racketeer",
+    "Name": "Rekieter"
+  },
+  {
+    "Id": "Rat Catcher",
+    "Name": "Szczurołap"
+  },
+  {
+    "Id": "Rat Hunter",
+    "Name": "Uczeń Szczurołapa"
+  },
+  {
+    "Id": "Recruit",
+    "Name": "Rekrut"
+  },
+  {
+    "Id": "Reeve",
+    "Name": "Włodarz"
+  },
+  {
+    "Id": "Ringleader",
+    "Name": "Herszt Rajfurów"
+  },
+  {
+    "Id": "River Elder",
+    "Name": "Starszy Rzeczny"
+  },
+  {
+    "Id": "River Pirate",
+    "Name": "Łupieżca"
+  },
+  {
+    "Id": "River Recruit",
+    "Name": "Rekrut Rzeczny"
+  },
+  {
+    "Id": "River Runner",
+    "Name": "Szmuglerka Rzeczny"
+  },
+  {
+    "Id": "Riverguide",
+    "Name": "Przewodnik Rzeczny"
+  },
+  {
+    "Id": "Riverwarden",
+    "Name": "Strażnik Rzeczny"
+  },
+  {
+    "Id": "Riverwise",
+    "Name": "Znawca Rzeki"
+  },
+  {
+    "Id": "Riverwoman",
+    "Name": "Flisak"
+  },
+  {
+    "Id": "Road Captain",
+    "Name": "Kapitan Strażników Dróg"
+  },
+  {
+    "Id": "Road Sergeant",
+    "Name": "Sierżant Strażników Dróg"
+  },
+  {
+    "Id": "Road Warden",
+    "Name": "Strażnik Dróg"
+  },
+  {
+    "Id": "Road warden",
+    "Name": "Strażnik Dróg"
+  },
+  {
+    "Id": "Route Master",
+    "Name": "Mistrz Szlaków"
+  },
+  {
+    "Id": "Runner",
+    "Name": "Goniec"
+  },
+  {
+    "Id": "Sage",
+    "Name": "Widzący"
+  },
+  {
+    "Id": "Scholar",
+    "Name": "Uczony"
+  },
+  {
+    "Id": "Scion",
+    "Name": "Dziedzic"
+  },
+  {
+    "Id": "Scoundrel",
+    "Name": "Łajdak"
+  },
+  {
+    "Id": "Scout",
+    "Name": "Zwiadowca"
+  },
+  {
+    "Id": "Seaman",
+    "Name": "Żeglarz"
+  },
+  {
+    "Id": "Seer",
+    "Name": "Prorok"
+  },
+  {
+    "Id": "Seneschal",
+    "Name": "Seneszal"
+  },
+  {
+    "Id": "Sentry",
+    "Name": "Stróż"
+  },
+  {
+    "Id": "Sergeant",
+    "Name": "Sierżant"
+  },
+  {
+    "Id": "Servant",
+    "Name": "Służąca"
+  },
+  {
+    "Id": "Sewer Jack",
+    "Name": "Strażnik Kanałów"
+  },
+  {
+    "Id": "Ship's Master",
+    "Name": "Kapitan Statku"
+  },
+  {
+    "Id": "Shipsword",
+    "Name": "Żołnierz Okrętowy"
+  },
+  {
+    "Id": "Shipsword Master",
+    "Name": "Mistrz Żołnierzy Okrętowych"
+  },
+  {
+    "Id": "Sleuth",
+    "Name": "Szpicel"
+  },
+  {
+    "Id": "Smuggler",
+    "Name": "Przemytnik"
+  },
+  {
+    "Id": "Smuggler King",
+    "Name": "Król Przemytników"
+  },
+  {
+    "Id": "Soldier",
+    "Name": "Żołnierz"
+  },
+  {
+    "Id": "Spy",
+    "Name": "Szpieg"
+  },
+  {
+    "Id": "Spymaster",
+    "Name": "Mistrz Szpiegów"
+  },
+  {
+    "Id": "Squire",
+    "Name": "Giermek"
+  },
+  {
+    "Id": "Stevedore",
+    "Name": "Doker"
+  },
+  {
+    "Id": "Steward",
+    "Name": "Ochmistrzyni"
+  },
+  {
+    "Id": "Student",
+    "Name": "Student"
+  },
+  {
+    "Id": "Student Engineer",
+    "Name": "Student Inżynierii"
+  },
+  {
+    "Id": "Student Lawyer",
+    "Name": "Studentka Prawa"
+  },
+  {
+    "Id": "Swindler",
+    "Name": "Kanciarz"
+  },
+  {
+    "Id": "Tax Collector",
+    "Name": "Poborca Podatków"
+  },
+  {
+    "Id": "Thief",
+    "Name": "Złodziej"
+  },
+  {
+    "Id": "Thief-taker",
+    "Name": "Pogromca Złodziei"
+  },
+  {
+    "Id": "Thug",
+    "Name": "Zakapior"
+  },
+  {
+    "Id": "Toll Keeper",
+    "Name": "Mytnik"
+  },
+  {
+    "Id": "Tomb Robber",
+    "Name": "Rabuś Grobowców"
+  },
+  {
+    "Id": "Town Councilor",
+    "Name": "Rajczyni Miejska"
+  },
+  {
+    "Id": "Townsman",
+    "Name": "Mieszczka"
+  },
+  {
+    "Id": "Tracker",
+    "Name": "Tropiciel"
+  },
+  {
+    "Id": "Trader",
+    "Name": "Handlarz"
+  },
+  {
+    "Id": "Trapper",
+    "Name": "Traper"
+  },
+  {
+    "Id": "Treasure Hunter",
+    "Name": "Łowca Skarbów"
+  },
+  {
+    "Id": "Troll Slayer",
+    "Name": "Zabójca Trolli"
+  },
+  {
+    "Id": "Slayer",
+    "Name": "Zabójca"
+  },
+  {
+    "Id": "Troubadour",
+    "Name": "Trubadur"
+  },
+  {
+    "Id": "Troupe Leader",
+    "Name": "Przywódca Trupy"
+  },
+  {
+    "Id": "Vagabond",
+    "Name": "Powsinoga"
+  },
+  {
+    "Id": "Village Elder",
+    "Name": "Starszy Wioski"
+  },
+  {
+    "Id": "Villager",
+    "Name": "Chłop"
+  },
+  {
+    "Id": "Wandering Trader",
+    "Name": "Wędrowny Handlarz"
+  },
+  {
+    "Id": "Warden",
+    "Name": "Namiestnik"
+  },
+  {
+    "Id": "Warlock",
+    "Name": "Arcyczarownik"
+  },
+  {
+    "Id": "Warrior Priest",
+    "Name": "Kapłan Bitewny"
+  },
+  {
+    "Id": "Watch Captain",
+    "Name": "Kapitan Straży"
+  },
+  {
+    "Id": "Watch Recruit",
+    "Name": "Rekrut Straży"
+  },
+  {
+    "Id": "Watch Sergeant",
+    "Name": "Sierżant Straży"
+  },
+  {
+    "Id": "Watchman",
+    "Name": "Strażnik"
+  },
+  {
+    "Id": "Witch",
+    "Name": "Czarownik"
+  },
+  {
+    "Id": "Witch Hunter",
+    "Name": "Łowca Czarownic"
+  },
+  {
+    "Id": "Witchfinder General",
+    "Name": "Generał Łowców Czarownic"
+  },
+  {
+    "Id": "Wizard",
+    "Name": "Czarodziej"
+  },
+  {
+    "Id": "Wizard Lord",
+    "Name": "Arcymag"
+  },
+  {
+    "Id": "Wizard's Apprentice",
+    "Name": "Uczeń Czarodzieja"
+  },
+  {
+    "Id": "Wrecker",
+    "Name": "Pirat Rzeczny"
+  },
+  {
+    "Id": "Wrecker Captain",
+    "Name": "Kapitan Łupieżców"
+  },
+  {
+    "Id": "Wyrd",
+    "Name": "Wiedźma"
+  },
+  {
+    "Id": "Zealot",
+    "Name": "Groliwiec"
+  }
+]
