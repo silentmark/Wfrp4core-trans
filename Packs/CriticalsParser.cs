@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using Pdf.Json;
+using WFRP4e.Translator.Json;
 
-namespace Pdf.Logic
+namespace WFRP4e.Translator.Packs
 {
     public class CriticalsParser  : GenericParser<Entry>
     {

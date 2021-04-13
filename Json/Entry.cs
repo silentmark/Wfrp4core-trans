@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-namespace Pdf.Json
+﻿namespace WFRP4e.Translator.Json
 {
     public class Entry
     {

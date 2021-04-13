@@ -4,9 +4,9 @@ using System.Linq;
 using org.pdfclown.documents.contents;
 using org.pdfclown.documents.contents.objects;
 using org.pdfclown.files;
-using Pdf.Json;
+using WFRP4e.Translator.Json;
 
-namespace Pdf.Logic
+namespace WFRP4e.Translator.Scanners
 {
     public class SkillsScanner
     {

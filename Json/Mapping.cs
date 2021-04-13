@@ -1,4 +1,4 @@
-﻿namespace Pdf.Json
+﻿namespace WFRP4e.Translator.Json
 {
     public class Mapping
     {

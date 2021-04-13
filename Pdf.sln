@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pdf", "Pdf.csproj", "{8F2D289A-4528-42FE-93CF-371F11010FF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WFRP4e.Translator", "WFRP4e.Translator.csproj", "{8F2D289A-4528-42FE-93CF-371F11010FF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

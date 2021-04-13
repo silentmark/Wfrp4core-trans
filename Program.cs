@@ -1,15 +1,16 @@
-﻿using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Pdf.Json;
-using Pdf.Logic;
-using Pdf.Tables;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using WFRP4e.Translator.Json;
+using WFRP4e.Translator.Packs;
+using WFRP4e.Translator.Scanners;
+using WFRP4e.Translator.Tables;
 
-namespace Pdf
+namespace WFRP4e.Translator
 {
     internal class Program
     {
