@@ -35,7 +35,7 @@ namespace WFRP4e.Translator.Tables
             }
 
             File.WriteAllText($@"{Program.Configuration.GetSection("OutputPath").Value}\career.json",
-                JsonConvert.SerializeObject(careersTable, Formatting.None));
+                JsonConvert.SerializeObject(careersTable, Formatting.Indented));
 
         }
     }
