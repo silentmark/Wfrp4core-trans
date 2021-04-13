@@ -1,15 +1,13 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.IO;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using org.pdfclown.documents.contents.entities;
 using Pdf.Json;
 using Pdf.Logic;
 using Pdf.Tables;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Pdf
 {
@@ -23,24 +21,36 @@ namespace Pdf
                 .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
                 .AddJsonFile("appsettings.json", false)
                 .Build();
-
-            ScanSkills();
-            ScanTalents();
-
-            new CareersTable().Translate();
-
-            ProcessTalents();
-            ProcessSkills();
-            ProcessCareers();
-            ProcessTraits();
-            ProcessBestiary();
-            ProcessCriticals();
-            ProcessInjuries();
-            ProcessMutations();
-            ProcessPrayers();
-            ProcessPsychologies();
-            ProcessSpells();
-            ProcessTrappings();
+            Console.WriteLine(
+                $"Konfiguracja:\nŚcieżka do podręcznika: {Configuration.GetSection("PdfPath").Value}\nŚcieżka do plików .db: {Configuration.GetSection("PacksPath").Value}\nŚcieżka do rolltables (.json): {Configuration.GetSection("TablesPath").Value}\nŚcieżka do plików wyjściowych: {Configuration.GetSection("OutputPath").Value}");
+            Console.WriteLine(
+                "Wciśnij 1. aby wygenerować pliki wyjściowe.\nWciśnij 2. aby zmodyfikować pliki .db na podstawie wyników z 1.\nWciśnij 3. aby zmodyfikować rolltables na podstawie wyników z 1.");
+            var input = Console.ReadKey();
+            if (input.KeyChar == '1')
+            {
+                ScanSkills();
+                ScanTalents();
+            }
+            else if (input.KeyChar == '2')
+            {
+                ProcessTalents();
+                ProcessSkills();
+                ProcessCareers();
+                ProcessTraits();
+                ProcessBestiary();
+                ProcessCriticals();
+                ProcessInjuries();
+                ProcessMutations();
+                ProcessPrayers();
+                ProcessPsychologies();
+                ProcessSpells();
+                ProcessTrappings();
+            }
+            else if(input.KeyChar == '3')
+            {
+                new CareersTable().Translate();
+            }
+            Console.WriteLine("Zakończono");
         }
 
         private static void ScanTalents()
@@ -63,83 +73,172 @@ namespace Pdf
 
             Console.WriteLine(@"Plik: wfrp4e.skills.desc.json z tłumaczeniami został wygenerowany, część wpisów wymaga ręcznej poprawy");
         }
-
+        
         private static void ProcessSkills()
         {
-            var parser = new SkillsParser();
-            var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.skills.desc.json"));
-            parser.Parse(descriptions);
+            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.skills.desc.json";
+            if (File.Exists(fileName))
+            {
+                var parser = new SkillsParser();
+                var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(fileName));
+                parser.Parse(descriptions);
+            }
+            else
+            {
+                Console.WriteLine($"Nie odnaleziono pliku {fileName}");
+            }
         }
 
         private static void ProcessTraits()
         {
-            var parser = new TraitsParser();
-            var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.traits.desc.json"));
-            parser.Parse( descriptions);
+            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.traits.desc.json";
+            if (File.Exists(fileName))
+            {
+                var parser = new TraitsParser();
+                var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(fileName));
+                parser.Parse(descriptions);
+            }
+            else
+            {
+                Console.WriteLine($"Nie odnaleziono pliku {fileName}");
+            }
         }
 
         private static void ProcessTalents()
         {
-            var parser = new TalentsParser();
-            var descriptions = JsonConvert.DeserializeObject<List<TalentEntry>>(File.ReadAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.talents.desc.json"));
-            parser.Parse(descriptions);
+            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.talents.desc.json";
+            if (File.Exists(fileName))
+            {
+                var parser = new TalentsParser();
+                var descriptions = JsonConvert.DeserializeObject<List<TalentEntry>>(File.ReadAllText(fileName));
+                parser.Parse(descriptions);
+            }
+            else
+            {
+                Console.WriteLine($"Nie odnaleziono pliku {fileName}");
+            }
         }
+
         private static void ProcessCriticals()
         {
-            var parser = new CriticalsParser();
-            var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.criticals.desc.json"));
-            parser.Parse(descriptions);
+            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.criticals.desc.json";
+            if (File.Exists(fileName))
+            {
+                var parser = new CriticalsParser();
+                var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(fileName));
+                parser.Parse(descriptions);
+            }
+            else
+            {
+                Console.WriteLine($"Nie odnaleziono pliku {fileName}");
+            }
         }
 
         private static void ProcessTrappings()
         {
-            var parser = new TrappingsParser();
-            var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.trappings.desc.json"));
-            parser.Parse(descriptions);
+            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.trappings.desc.json";
+            if (File.Exists(fileName))
+            {
+                var parser = new TrappingsParser();
+                var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(fileName));
+                parser.Parse(descriptions);
+            }
+            else
+            {
+                Console.WriteLine($"Nie odnaleziono pliku {fileName}");
+            }
         }
 
         private static void ProcessMutations()
         {
-            var parser = new MutationsParser();
-            var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.mutations.desc.json"));
-            parser.Parse(descriptions);
+            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.mutations.desc.json";
+            if (File.Exists(fileName))
+            {
+                var parser = new MutationsParser();
+                var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(fileName));
+                parser.Parse(descriptions);
+            }
+            else
+            {
+                Console.WriteLine($"Nie odnaleziono pliku {fileName}");
+            }
         }
 
         private static void ProcessPsychologies()
         {
-            var parser = new PsychologiesParser();
-            var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.psychologies.desc.json"));
-            parser.Parse(descriptions);
+            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.psychologies.desc.json";
+            if (File.Exists(fileName))
+            {
+                var parser = new PsychologiesParser();
+                var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(fileName));
+                parser.Parse(descriptions);
+            }
+            else
+            {
+                Console.WriteLine($"Nie odnaleziono pliku {fileName}");
+            }
         }
 
 
         private static void ProcessSpells()
         {
-            var parser = new SpellsParser();
-            var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.spells.desc.json"));
-            parser.Parse(descriptions);
+            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.spells.desc.json";
+            if (File.Exists(fileName))
+            {
+                var parser = new SpellsParser();
+                var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(fileName));
+                parser.Parse(descriptions);
+            }
+            else
+            {
+                Console.WriteLine($"Nie odnaleziono pliku {fileName}");
+            }
         }
 
         private static void ProcessPrayers()
         {
-            var parser = new PrayersParser();
-            var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.prayers.desc.json"));
-            parser.Parse(descriptions);
+            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.prayers.desc.json";
+            if (File.Exists(fileName))
+            {
+                var parser = new PrayersParser();
+                var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(fileName));
+                parser.Parse(descriptions);
+            }
+            else
+            {
+                Console.WriteLine($"Nie odnaleziono pliku {fileName}");
+            }
         }
 
         private static void ProcessInjuries()
         {
-            var parser = new InjuriesParser();
-            var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.injuries.desc.json"));
-            parser.Parse(descriptions);
+            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.injuries.desc.json";
+            if (File.Exists(fileName))
+            {
+                var parser = new InjuriesParser();
+                var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(fileName));
+                parser.Parse(descriptions);
+            }
+            else
+            {
+                Console.WriteLine($"Nie odnaleziono pliku {fileName}");
+            }
         }
 
 
         private static void ProcessBestiary()
         {
-            var parser = new BestiaryParser();
-            var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.bestiary.desc.json"));
-            parser.Parse(descriptions);
+            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.bestiary.desc.json";
+            if (File.Exists(fileName))
+            {
+                var parser = new BestiaryParser();
+                var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(fileName));
+                parser.Parse(descriptions);
+            }
+            else
+            {
+                Console.WriteLine($"Nie odnaleziono pliku {fileName}");
+            }
         }
 
         private static void ProcessCareers()
