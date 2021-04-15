@@ -14,7 +14,7 @@ namespace WFRP4e.Translator.Packs
             base.TranslatePack(pack, translations);
 
             var name = pack.Value<string>("name");
-            var trans = translations.FirstOrDefault(x => x.Name == name);
+            var trans = translations.FirstOrDefault(x => x.Id == name);
             if (trans != null)
             {
                 pack["data"]["contraction"]["value"] = trans.Contraction;

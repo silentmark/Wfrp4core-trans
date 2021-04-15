@@ -10,7 +10,6 @@ namespace WFRP4e.Translator.Packs
     {
         protected override void TranslatePack(JObject pack, List<Entry> translations)
         {
-            base.TranslatePack(pack, translations);
             if (pack["data"]["qualities"] != null && pack["data"]["qualities"]["value"] != null)
             {
                 var quals = pack["data"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
@@ -38,6 +37,7 @@ namespace WFRP4e.Translator.Packs
 
                 pack["data"]["flaws"]["value"] = string.Join(", ", newFlaws);
             }
+            base.TranslatePack(pack, translations);
         }
 
         protected override string DbName => "trappings.db";
