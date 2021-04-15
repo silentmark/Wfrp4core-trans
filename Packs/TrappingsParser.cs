@@ -10,6 +10,8 @@ namespace WFRP4e.Translator.Packs
     {
         protected override void TranslatePack(JObject pack, List<Entry> translations)
         {
+            var name = pack.Value<string>("name");
+            var trans = translations.FirstOrDefault(x => x.Id == name);
             if (pack["data"]["qualities"] != null && pack["data"]["qualities"]["value"] != null)
             {
                 var quals = pack["data"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
@@ -36,6 +38,17 @@ namespace WFRP4e.Translator.Packs
                 }
 
                 pack["data"]["flaws"]["value"] = string.Join(", ", newFlaws);
+            }
+
+            if (pack["effects"] != null)
+            {
+                foreach (var effect in (JArray) pack["effects"])
+                {
+                    if (effect["label"].Value<string>() == name)
+                    {
+                        effect["label"] = trans.Name;
+                    }
+                }
             }
             base.TranslatePack(pack, translations);
         }

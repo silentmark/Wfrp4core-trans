@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
@@ -11,15 +12,65 @@ namespace WFRP4e.Translator.Packs
         {
             var name = pack.Value<string>("name");
             var trans = translations.FirstOrDefault(x => x.Id == name);
-            foreach (var effect in (JArray)pack["effects"])
+            if (trans != null)
             {
-                if (effect["label"].Value<string>() == name && trans != null)
+                if (pack["effects"] != null)
                 {
-                    effect["label"] = trans.Name;
+                    foreach (var effect in (JArray)pack["effects"])
+                    {
+                        var el = effect["label"].ToString();
+                        if (el == name)
+                        {
+                            effect["label"] = trans.Name;
+                        }
+                        else if (el == "Bleeding")
+                        {
+                            effect["label"] = "Krwawienie";
+                        }
+                        else if (el == "Blinded")
+                        {
+                            effect["label"] = "Oślepienie";
+                        }
+                        else if (el == "Concussive Blow - Fatigued Effect")
+                        {
+                            effect["label"] = "Wstrząśnienie mózgu - Zmęczenie";
+                        }
+                        else if (el == "Deafened")
+                        {
+                            effect["label"] = "Ogłuszenie";
+                        }
+                        else if (el == "Fatigued")
+                        {
+                            effect["label"] = "Zmęczenie";
+                        }
+                        else if (el == "Movement Halved")
+                        {
+                            effect["label"] = "Szybkość zmniejszona o połowę";
+                        }
+                        else if (el == "Prone")
+                        {
+                            effect["label"] = "Powalenie";
+                        }
+                        else if (el == "Stunned")
+                        {
+                            effect["label"] = "Oszołomienie";
+                        }
+                        else if (el == "Unconscious")
+                        {
+                            effect["label"] = "Nieprzytomny";
+                        }
+                        else
+                        {
+                            Console.WriteLine("NIE ODNALEZIONO: " + effect["label"]);
+                        }
+                    }
                 }
             }
+
             base.TranslatePack(pack, translations);
         }
+        
+
 
         protected override string DbName => "criticals.db";
     }
