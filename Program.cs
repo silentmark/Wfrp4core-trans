@@ -46,6 +46,7 @@ namespace WFRP4e.Translator
                 ProcessPsychologies();
                 ProcessSpells();
                 ProcessTrappings();
+                ProcessDiseases();
             }
             else if(input.KeyChar == '3')
             {
@@ -74,7 +75,22 @@ namespace WFRP4e.Translator
 
             Console.WriteLine(@"Plik: wfrp4e.skills.desc.json z tłumaczeniami został wygenerowany, część wpisów wymaga ręcznej poprawy");
         }
-        
+
+        private static void ProcessDiseases()
+        {
+            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.diseases.desc.json";
+            if (File.Exists(fileName))
+            {
+                var parser = new DiseasesParser();
+                var descriptions = JsonConvert.DeserializeObject<List<DiseaseEntry>>(File.ReadAllText(fileName));
+                parser.Parse(descriptions);
+            }
+            else
+            {
+                Console.WriteLine($"Nie odnaleziono pliku {fileName}");
+            }
+        }
+
         private static void ProcessSkills()
         {
             var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.skills.desc.json";
