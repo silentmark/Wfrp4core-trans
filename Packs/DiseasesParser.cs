@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
@@ -11,12 +12,12 @@ namespace WFRP4e.Translator.Packs
 
         protected override void TranslatePack(JObject pack, List<DiseaseEntry> translations)
         {
-            base.TranslatePack(pack, translations);
-
             var name = pack.Value<string>("name");
             var trans = translations.FirstOrDefault(x => x.Id == name);
             if (trans != null)
             {
+                var newSymptoms = trans.Symptoms.Split(',').Select(x => x.Trim()).ToList();
+
                 pack["data"]["contraction"]["value"] = trans.Contraction;
                 pack["data"]["duration"]["value"] = trans.Duration;
                 pack["data"]["duration"]["unit"] = trans.DurationUnit;
@@ -24,7 +25,53 @@ namespace WFRP4e.Translator.Packs
                 pack["data"]["incubation"]["unit"] = trans.IncubationUnit;
                 pack["data"]["permanent"]["value"] = trans.Permanent;
                 pack["data"]["symptoms"]["value"] = trans.Symptoms;
+
+
+                if (pack["effects"] != null)
+                {
+                    foreach (var effect in (JArray) pack["effects"])
+                    {
+                        var symptom = effect["label"].Value<string>();
+                        var keyValue = SymptompsTrans.FirstOrDefault(x => symptom.ToLower().StartsWith(x.Key));
+                        if (keyValue.Key != null)
+                        {
+                            var newSymptom = newSymptoms.FirstOrDefault(x => x.ToLower().StartsWith(keyValue.Value.ToLower()));
+                            if (newSymptom != null)
+                            {
+                                effect["label"] = newSymptom;
+                            }
+                            else
+                            {
+                                Console.WriteLine("NIE ODNALEZIONO TŁUMACZENIA: " + keyValue.Value + " W: " + trans.Symptoms);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("NIE ODNALEZIONO: " + symptom);
+                        }
+                    }
+                }
             }
+
+            base.TranslatePack(pack, translations);
         }
+
+        private Dictionary<string, string> SymptompsTrans = new Dictionary<string, string>
+        {
+            {"blight", "Uwiąd"},
+            {"buboes", "Dymienica"},
+            {"convulsions", "Konwulsje"},
+            {"coughs and sneezes", "Kaszel i katar"},
+            {"fever", "Gorączka"},
+            {"flux", "Biegunka"},
+            {"gangrene", "Gangrena"},
+            {"lingering", "Nawroty"},
+            {"malaise", "Apatia"},
+            {"nausea", "Nudności"},
+            {"pox", "Wysypka"},
+            {"wounded", "Uciążliwa Rana"},
+            {"delirium", "Delirium"},
+            {"swelling", "Obrzęk"}
+        };
     }
 }
