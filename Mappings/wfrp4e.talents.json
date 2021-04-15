@@ -13,7 +13,7 @@
   },
   {
     "Id": "Alley Cat",
-    "Name": "Ulicznyk"
+    "Name": "Ulicznik"
   },
   {
     "Id": "Ambidextrous",
@@ -25,7 +25,7 @@
   },
   {
     "Id": "Arcane Magic",
-    "Name": "Magia Tajemna"
+    "Name": "Magia Tajemna (Tradycja)"
   },
   {
     "Id": "Argumentative",
@@ -53,7 +53,7 @@
   },
   {
     "Id": "Berserk Charge",
-    "Name": "Bersekerska Szarża"
+    "Name": "Berserkerska Szarża"
   },
   {
     "Id": "Blather",
@@ -61,11 +61,11 @@
   },
   {
     "Id": "Bless",
-    "Name": "Błogosławieństwo"
+    "Name": "Błogosławieństwo (Boska Tradycja)"
   },
   {
     "Id": "Bookish",
-    "Name": "Mól książkowy"
+    "Name": "Mól Książkowy"
   },
   {
     "Id": "Break and Enter",
@@ -89,7 +89,7 @@
   },
   {
     "Id": "Cat-tongued",
-    "Name": "Gładkie słówka"
+    "Name": "Gładkie Słówka"
   },
   {
     "Id": "Catfall",
@@ -97,7 +97,7 @@
   },
   {
     "Id": "Chaos Magic",
-    "Name": "Magia Chaosu"
+    "Name": "Magia Chaosu (Tradycja)"
   },
   {
     "Id": "Combat Aware",
@@ -125,7 +125,7 @@
   },
   {
     "Id": "Coolheaded",
-    "Name": "Zimna Krew"
+    "Name": "Zimna krew"
   },
   {
     "Id": "Crack the Whip",
@@ -141,7 +141,7 @@
   },
   {
     "Id": "Deadeye Shot",
-    "Name": "Prosto między Oczy"
+    "Name": "Prosto Między Oczy"
   },
   {
     "Id": "Dealmaker",
@@ -165,7 +165,7 @@
   },
   {
     "Id": "Distract",
-    "Name": "Rozporszenie Uwagi"
+    "Name": "Rozproszenie Uwagi"
   },
   {
     "Id": "Doomed",
@@ -185,15 +185,15 @@
   },
   {
     "Id": "Enclosed Fighter",
-    "Name": "Walka w ciasnocie"
+    "Name": "Walka w Ciasnocie"
   },
   {
     "Id": "Etiquette",
-    "Name": "Etykieta"
+    "Name": "Etykieta (Grupa Społeczna)"
   },
   {
     "Id": "Fast Hands",
-    "Name": "Ruchliwe Dłonie"
+    "Name": "Ruchliwe dłonie"
   },
   {
     "Id": "Fast Shot",
@@ -201,7 +201,7 @@
   },
   {
     "Id": "Fearless",
-    "Name": "Nieustraszony"
+    "Name": "Nieustraszony (typ wroga)"
   },
   {
     "Id": "Feint",
@@ -253,7 +253,7 @@
   },
   {
     "Id": "Hatred",
-    "Name": "Nienawiść"
+    "Name": "Nienawiść (Grupa)"
   },
   {
     "Id": "Holy Hatred",
@@ -277,7 +277,7 @@
   },
   {
     "Id": "In-fighter",
-    "Name": "Skrócenie dystansu"
+    "Name": "Skrócenie Dystansu"
   },
   {
     "Id": "Inspiring",
@@ -289,7 +289,7 @@
   },
   {
     "Id": "Invoke",
-    "Name": "Inwokacja"
+    "Name": "Inwokacja (Boska Tradycja)"
   },
   {
     "Id": "Iron Jaw",
@@ -317,7 +317,7 @@
   },
   {
     "Id": "Lip Reading",
-    "Name": "Czytanie z ruchu warg"
+    "Name": "Czytanie z Ruchu Warg"
   },
   {
     "Id": "Luck",
@@ -325,7 +325,7 @@
   },
   {
     "Id": "Magic Resistance",
-    "Name": "Odpornośc na Magię"
+    "Name": "Odporność na Magię"
   },
   {
     "Id": "Magical Sense",
@@ -341,11 +341,11 @@
   },
   {
     "Id": "Master Orator",
-    "Name": "Krasnomówstwo"
+    "Name": "Krasomówstwo"
   },
   {
     "Id": "Master Tradesman",
-    "Name": "Mistrz Rzemiosła"
+    "Name": "Mistrz Rzemiosła (Rzemiosło)"
   },
   {
     "Id": "Master of Disguise",
@@ -373,7 +373,7 @@
   },
   {
     "Id": "Nose for Trouble",
-    "Name": "Nos do kłopotów"
+    "Name": "Nos do Kłopotów"
   },
   {
     "Id": "Numismatics",
@@ -441,7 +441,7 @@
   },
   {
     "Id": "Reversal",
-    "Name": "Odwrócenie szans"
+    "Name": "Odwrócenie Szans"
   },
   {
     "Id": "Riposte",
@@ -457,7 +457,7 @@
   },
   {
     "Id": "Roughrider",
-    "Name": "Urodzony w siodle"
+    "Name": "Urodzony w Siodle"
   },
   {
     "Id": "Rover",
@@ -529,7 +529,7 @@
   },
   {
     "Id": "Speedreader",
-    "Name": "Szybkie czytanie"
+    "Name": "Szybkie Czytanie"
   },
   {
     "Id": "Sprinter",
@@ -545,11 +545,11 @@
   },
   {
     "Id": "Stout-hearted",
-    "Name": "Walczene Serce"
+    "Name": "Waleczne Serce"
   },
   {
     "Id": "Strider",
-    "Name": "Doświadczony Wędrowiec (Teren)"
+    "Name": "Doświadczony Wędrowiec (Wybrany Teren)"
   },
   {
     "Id": "Strike Mighty Blow",

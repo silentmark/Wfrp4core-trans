@@ -59,8 +59,8 @@ namespace WFRP4e.Translator
         {
             var scanner = new TalentsScanner();
             var descriptions = scanner.Run(Configuration.GetSection("PdfPath").Value);
-            var withDescription = JsonConvert.SerializeObject(descriptions, Formatting.Indented);
-            File.WriteAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.talents.desc.json", withDescription);
+            var withDescriptionText = JsonConvert.SerializeObject(descriptions, Formatting.Indented);
+            File.WriteAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.talents.desc.json", withDescriptionText);
 
             Console.WriteLine(@"Plik: wfrp4e.talents.desc.json z tłumaczeniami został wygenerowany, część wpisów wymaga ręcznej poprawy");
 
