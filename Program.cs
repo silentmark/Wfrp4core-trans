@@ -26,6 +26,7 @@ namespace WFRP4e.Translator
                 $"Konfiguracja:\nŚcieżka do podręcznika: {Configuration.GetSection("PdfPath").Value}\nŚcieżka do plików .db: {Configuration.GetSection("PacksPath").Value}\nŚcieżka do rolltables (.json): {Configuration.GetSection("TablesPath").Value}\nŚcieżka do plików wyjściowych: {Configuration.GetSection("OutputPath").Value}");
             Console.WriteLine(
                 "Wciśnij 1. aby wygenerować pliki wyjściowe.\nWciśnij 2. aby zmodyfikować pliki .db na podstawie wyników z 1.\nWciśnij 3. aby zmodyfikować rolltables na podstawie wyników z 1.");
+            
             var input = Console.ReadKey();
             if (input.KeyChar == '1')
             {

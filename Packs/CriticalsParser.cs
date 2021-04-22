@@ -14,6 +14,8 @@ namespace WFRP4e.Translator.Packs
             var trans = translations.FirstOrDefault(x => x.Id == name);
             if (trans != null)
             {
+                pack["data"]["location"]["value"] = InjuriesParser.TranslateLocation(pack["data"]["location"]["value"].ToString());
+
                 if (pack["effects"] != null)
                 {
                     foreach (var effect in (JArray)pack["effects"])

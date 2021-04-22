@@ -16,6 +16,8 @@ namespace WFRP4e.Translator.Packs
             var trans = translations.FirstOrDefault(x => x.Id == name);
             if (trans != null)
             {
+                pack["data"]["location"]["value"] = TranslateLocation(pack["data"]["location"]["value"].ToString());
+
                 if (pack["effects"] != null)
                 {
                     foreach (var effect in (JArray)pack["effects"])
@@ -96,5 +98,30 @@ namespace WFRP4e.Translator.Packs
             base.TranslatePack(pack, translations);
         }
 
+        public static string TranslateLocation(string location)
+        {
+            switch (location)
+            {
+                case "Arm": return "Ręka";
+                case "Leg": return "Noga";
+                case "Body": return "Korpus";
+                case "Head": return "Głowa";
+                case "Eye": return "Oko";
+                case "Ear": return "Ucho";
+                case "Nose": return "Nos";
+                case "Finger": return "Palec";
+                case "Toe": return "Palec u nogi";
+                case "Toes": return "Palce u nogi";
+                case "Teeth": return "Zęby";
+                case "Foot": return "Stopa";
+                case "Hand": return "Dłoń";
+                case "Tongue": return "Język";
+                default:
+                {
+                    Console.WriteLine("NIE ODNALEZIONO KLASY: " + location);
+                    return location;
+                }
+            }
+        }
     }
 }

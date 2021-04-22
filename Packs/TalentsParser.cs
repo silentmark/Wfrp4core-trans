@@ -41,6 +41,10 @@ namespace WFRP4e.Translator.Packs
                     }
                 }
             }
+            else
+            {
+                Console.WriteLine("NIE ODNALEZIONO: " + name);
+            }
             base.TranslatePack(pack, translations);
         }
 
