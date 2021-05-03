@@ -135,6 +135,10 @@ namespace WFRP4e.Translator.Packs
                 case "Very Hard": return "Bardzo Trudny";
                 case "War": return "Wojna";
                 case "Witch": return "Wiedźmy";
+
+                case "Rude People": return "Nieuprzejmi ludzie";
+                case "6+": return "6+";
+                case "9": return "9";
                 default:
                 {
                     Console.WriteLine("Nie odnaleziono effect data dla: " + spec);

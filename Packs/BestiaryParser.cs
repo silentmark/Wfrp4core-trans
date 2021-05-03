@@ -193,6 +193,28 @@ namespace WFRP4e.Translator.Packs
                                 Console.WriteLine($"NIE ODNALEZIONO UMIEJĘTNOŚCI: {transTalent}");
                             }
                         }
+                        else if (item["type"].Value<string>() == "money")
+                        {
+                            var money = item["name"].Value<string>().Trim();
+                            switch (money)
+                            {
+                                case "Brass Penny":
+                                    {
+                                        item["name"] = "Brązowy Pens";
+                                        break;
+                                    }
+                                case "Silver Shilling":
+                                    {
+                                        item["name"] = "Srebrny Szyling";
+                                        break;
+                                    }
+                                case "Gold Crown":
+                                    {
+                                        item["name"] = "Złota Korona";
+                                        break;
+                                    }
+                            }
+                        }
                         else
                         {
                             Console.WriteLine($"NIEZNANY PRZEDMIOT: {item["type"]}: {item["name"]}");
