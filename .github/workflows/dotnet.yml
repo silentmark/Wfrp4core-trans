@@ -20,9 +20,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet publish -r win-x64 /p:PublishSingleFile=true
+      run: dotnet publish /p:PublishSingleFile=true
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
         name: Tool
-        path: /home/runner/work/Wfrp4core-trans/Wfrp4core-trans/bin/Debug/net5.0/win-x64/*
+        path: /home/runner/work/Wfrp4core-trans/Wfrp4core-trans/bin/Debug/net5.0/win-x64/publish/*
