@@ -14,30 +14,33 @@ namespace WFRP4e.Translator.Packs
             var trans = translations.FirstOrDefault(x => x.Id == name);
             if (pack["data"]["qualities"] != null && pack["data"]["qualities"]["value"] != null)
             {
-                var quals = pack["data"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
-                var newQuals = new List<string>();
-                foreach (var qual in quals)
+                try
                 {
-                    if (!string.IsNullOrEmpty(qual))
+                    var quals = (JArray)pack["data"]["qualities"]["value"];
+                    foreach (JObject qual in quals)
                     {
-                        newQuals.Add(TranslateQualityFlaw(qual));
+                        qual["display"] = TranslateQualityFlaw(qual["name"].ToString());
                     }
                 }
-                pack["data"]["qualities"]["value"] = string.Join(", ", newQuals);
+                catch(Exception ex)
+                {
+                    Console.WriteLine($"Problem z cechami: {name}");
+                }
             }
             if (pack["data"]["flaws"] != null && pack["data"]["flaws"]["value"] != null)
             {
-                var flaws = pack["data"]["flaws"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
-                var newFlaws = new List<string>();
-                foreach (var qual in flaws)
+                try
                 {
-                    if (!string.IsNullOrEmpty(qual))
+                    var flaws = (JArray)pack["data"]["flaws"]["value"];
+                    foreach (var flaw in flaws)
                     {
-                        newFlaws.Add(TranslateQualityFlaw(qual));
+                        flaw["display"] = TranslateQualityFlaw(flaw["name"].ToString());
                     }
                 }
-
-                pack["data"]["flaws"]["value"] = string.Join(", ", newFlaws);
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Problem z cechami: {name}");
+                }
             }
 
             if (pack["effects"] != null)
@@ -56,50 +59,54 @@ namespace WFRP4e.Translator.Packs
         protected override string DbName => "trappings.db";
 
 
-        private string TranslateQualityFlaw(string qual)
+        public static string TranslateQualityFlaw(string qual)
         {
             Console.WriteLine($"Tłumaczę cechę: {qual}");
             switch (qual)
             {
-                case "Accurate": return "Celna";
-                case "Blackpowder": return "Prochowa";
-                case "Blast": return "Odłamkowa";
-                case "Damaging": return "Przebijająca";
-                case "Defensive": return "Parująca";
-                case "Entangle": return "Unieruchamiająca";
-                case "Fast": return "Szybka";
-                case "Hack": return "Rąbiąca";
-                case "Impact": return "Druzgocząca";
-                case "Impale": return "Nadziewająca";
-                case "Penetrating": return "Przekłuwająca";
-                case "Pistol": return "Pistolety";
-                case "Precise": return "Precyzyjna";
-                case "Pummel": return "Ogłuszająca";
-                case "Repeater": return "Wielostrzał";
-                case "Shield": return "Tarcza";
-                case "TrapBlade": return "Łamacz mieczy";
-                case "Trap Blade": return "Łamacz mieczy";
-                case "Unbreakable": return "Niełamliwa";
-                case "Wrap": return "Plącząca";
-                case "Dangerous": return "Niebezpieczna";
-                case "Imprecise": return "Nieprecyzyjna";
-                case "Reload": return "Przeładowanie";
-                case "Slow": return "Powolna";
-                case "Tiring": return "Ciężka";
-                case "Undamaging": return "Tępa";
-                case "Ugly": return "Brzydki";
-                case "Shoddy": return "Tandetny";
-                case "Unreliable": return "Zawodny";
-                case "Bulky": return "Nieporęczny";
-                case "Durable": return "Wytrzymały";
-                case "Fine": return "Wyśmienity";
-                case "Lightweight": return "Poręczny";
-                case "Practical": return "Praktyczny";
-                case "Distract": return "Rozpraszający";
-                case "Flexible": return "Giętki";
-                case "Impenetrable": return "Nieprzebijalny";
-                case "Partial": return "Częściowy";
-                case "Weakpoints": return "Wrażliwe punkty";
+                case "accurate": return "Celna";
+                case "blackpowder": return "Prochowa";
+                case "blast": return "Odłamkowa";
+                case "damaging": return "Przebijająca";
+                case "defensive": return "Parująca";
+                case "entangle": return "Unieruchamiająca";
+                case "fast": return "Szybka";
+                case "hack": return "Rąbiąca";
+                case "impact": return "Druzgocząca";
+                case "impale": return "Nadziewająca";
+                case "penetrating": return "Przekłuwająca";
+                case "pistol": return "Pistolety";
+                case "precise": return "Precyzyjna";
+                case "pummel": return "Ogłuszająca";
+                case "repeater": return "Wielostrzał";
+                case "shield": return "Tarcza";
+                case "trapblade": return "Łamacz mieczy";
+                case "unbreakable": return "Niełamliwa";
+                case "wrap": return "Plącząca";
+                case "dangerous": return "Niebezpieczna";
+                case "imprecise": return "Nieprecyzyjna";
+                case "reload": return "Przeładowanie";
+                case "slow": return "Powolna";
+                case "tiring": return "Ciężka";
+                case "undamaging": return "Tępa";
+                case "ugly": return "Brzydki";
+                case "shoddy": return "Tandetny";
+                case "unreliable": return "Zawodny";
+                case "bulky": return "Nieporęczny";
+                case "durable": return "Wytrzymały";
+                case "fine": return "Wyśmienity";
+                case "lightweight": return "Poręczny";
+                case "practical": return "Praktyczny";
+                case "distract": return "Rozpraszający";
+                case "flexible": return "Giętki";
+                case "impenetrable": return "Nieprzebijalny";
+                case "partial": return "Częściowy";
+                case "weakpoints": return "Wrażliwe punkty";
+                case "slashing": return "Tnący";
+                case "recoverable": return "Odzyskiwalny";
+                case "unrecoverable": return "Nieodzyskiwalny";
+                case "sturdy": return "Solidny";
+                case "frail": return "Kruchy";
                 default:
                 {
                     if (qual.StartsWith("Reload"))
@@ -125,6 +132,82 @@ namespace WFRP4e.Translator.Packs
                     Console.WriteLine($"NIE ODNALEZIONO CECHY: {qual}");
                     return qual;
                 }
+            }
+        }
+
+        public static string TranslateQualityFlawReverse(string qual)
+        {
+            Console.WriteLine($"Tłumaczę cechę: {qual}");
+            switch (qual)
+            {
+                case "Celna": return "Accurate";
+                case "Prochowa": return "Blackpowder";
+                case "Odłamkowa": return "Blast";
+                case "Przebijająca": return "Damaging";
+                case "Parująca": return "Defensive";
+                case "Unieruchamiająca": return "Entangle";
+                case "Szybka": return "Fast";
+                case "Rąbiąca": return "Hack";
+                case "Druzgocząca": return "Impact";
+                case "Nadziewająca": return "Impale";
+                case "Przekłuwająca": return "Penetrating";
+                case "Pistolety": return "Pistol";
+                case "Precyzyjna": return "Precise";
+                case "Ogłuszająca": return "Pummel";
+                case "Wielostrzał": return "Repeater";
+                case "Tarcza": return "Shield";
+                case "Łamacz mieczy": return "TrapBlade";
+                case "Niełamliwa": return "Unbreakable";
+                case "Plącząca": return "Wrap";
+                case "Niebezpieczna": return "Dangerous";
+                case "Nieprecyzyjna": return "Imprecise";
+                case "Przeładowanie": return "Reload";
+                case "Powolna": return "Slow";
+                case "Ciężka": return "Tiring";
+                case "Tępa": return "Undamaging";
+                case "Brzydki": return "Ugly";
+                case "Tandetny": return "Shoddy";
+                case "Zawodny": return "Unreliable";
+                case "Nieporęczny": return "Bulky";
+                case "Wytrzymały": return "Durable";
+                case "Wyśmienity": return "Fine";
+                case "Poręczny": return "Lightweight";
+                case "Praktyczny": return "Practical";
+                case "Rozpraszający": return "Distract";
+                case "Giętki": return "Flexible";
+                case "Nieprzebijalny": return "Impenetrable";
+                case "Częściowy": return "Partial";
+                case "Wrażliwe punkty": return "Weakpoints";
+                case "Tnący": return "Slashing";
+                case "Odzyskiwalny": return "Recoverable";
+                case "Nieodzyskiwalny": return "Unrecoverable";
+                case "Solidny": return "Sturdy";
+                case "Kruchy": return "Frail";
+                default:
+                    {
+                        if (qual.StartsWith("Przeładowanie"))
+                        {
+                            return qual.Replace("Przeładowanie", "Reload");
+                        }
+
+                        if (qual.StartsWith("Odłamkowa"))
+                        {
+                            return qual.Replace("Odłamkowa", "Blast");
+                        }
+
+                        if (qual.StartsWith("Wielostrzał"))
+                        {
+                            return qual.Replace("Wielostrzał", "Repeater");
+                        }
+
+                        if (qual.StartsWith("Tarcza"))
+                        {
+                            return qual.Replace("Tarcza", "Shield");
+                        }
+
+                        Console.WriteLine($"NIE ODNALEZIONO CECHY: {qual}");
+                        return qual;
+                    }
             }
         }
     }

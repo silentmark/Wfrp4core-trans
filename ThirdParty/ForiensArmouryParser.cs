@@ -46,11 +46,41 @@ namespace WFRP4e.Translator.Packs
                     pack["data"]["description"]["value"] = polish.Description;
                     if (pack["data"]["qualities"] != null)
                     {
-                        pack["data"]["qualities"]["value"] = polish.Qualities;
+                        var quals = pack["data"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
+                        var qualsArr = new JArray();
+                        foreach (var qualStr in quals)
+                        {
+                            if (!string.IsNullOrEmpty(qualStr))
+                            {
+                                var qual = qualStr;
+                                var jQual = new JObject();
+                                if (qual == "Trap Blade") qual = "TrapBlade";
+                                jQual["key"] = qual.ToLower().Split(' ')[0];
+                                jQual["name"] = qual.ToLower().Split(' ')[0];
+                                jQual["display"] = TrappingsParser.TranslateQualityFlaw(qual.Split(' ')[0]);
+                                jQual["value"] = qual.Contains(' ') ? qual.Split(' ')[1] : "";
+                                qualsArr.Add(jQual);
+                            }
+                        }
+                        pack["data"]["qualities"]["value"] = qualsArr;
                     }
                     if (pack["data"]["flaws"] != null)
                     {
-                        pack["data"]["flaws"]["value"] = polish.Flaws;
+                        var flaws = pack["data"]["flaws"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
+                        var flawsArr = new JArray();
+                        foreach (var flaw in flaws)
+                        {
+                            if (!string.IsNullOrEmpty(flaw))
+                            {
+                                var jFlaw = new JObject();
+                                jFlaw["key"] = flaw.ToLower().Split(' ')[0];
+                                jFlaw["name"] = flaw.ToLower().Split(' ')[0];
+                                jFlaw["display"] = TrappingsParser.TranslateQualityFlaw(flaw.Split(' ')[0]);
+                                jFlaw["value"] = flaw.Contains(' ') ? flaw.Split(' ')[1] : "";
+                                flawsArr.Add(jFlaw);
+                            }
+                        }
+                        pack["data"]["flaws"]["value"] = flawsArr;
                     }
                     if (pack["data"]["special"] != null)
                     {
@@ -63,95 +93,6 @@ namespace WFRP4e.Translator.Packs
             {
                 File.AppendAllLines($@"{Program.Configuration.GetSection("OutputPath").Value}\armoury.db",
                     new[] {JsonConvert.SerializeObject(pack, Formatting.None)});
-            }
-        }
-
-        private object TranslateTalentSpec(string searchSpec)
-        {
-            switch (searchSpec)
-            {
-                case "Any": return "Dowolny";
-                case "any": return "Dowolny";
-                case "Sight": return "Wzrok";
-                case "Taste or Touch": return "Wzrok lub Dotyk";
-                case "Taste": return "Smak";
-                case "Any Arcane Lore": return "Dowolny";
-                case "Celestial": return "Niebios";
-                case "Hedgecraft": return "Guślarstwo";
-                case "Witchery": return "Wiedźmy";
-                case "Apothecary": return "Aptekarstwo";
-                case "Boatbuilder": return "Szkutnictwo";
-                case "Engineer": return "Inżynieria";
-                case "Explosives": return "Materiały Wybuchowe";
-                case "Herbalist": return "Zielarstwo";
-                case "Criminals": return "Przestępcy";
-                case "Cultists": return "Kultyści";
-                case "Guilder": return "Gildia";
-                case "Guilders": return "Gildia";
-                case "Nobles": return "Szlachta";
-                case "Scholar": return "Uczeni";
-                case "Scholars": return "Uczeni";
-                case "Servants": return "Służący";
-                case "Soldiers": return "Żołnierze";
-                case "Animals": return "Zwierzęta";
-                case "Beastmen": return "Zwierzoludzie";
-                case "Bounties": return "Poszukiwani";
-                case "Everything": return "Wszystko!";
-                case "Heretics": return "Heretycy";
-                case "Intruders": return "Intruzi";
-                case "Monsters": return "Potwory";
-                case "Outlaws": return "Wyjęci spod Prawa";
-                case "Rats": return "Szczury";
-                case "Riverwardens": return "Strażnicy Rzeczni";
-                case "Road Wardens": return "Strażnicy Dróg";
-                case "Skaven": return "Skaveni";
-                case "Undead": return "Nieumarli";
-                case "Watchmen": return "Strażnicy Miejscy";
-                case "Witches": return "Wiedźmy";
-                case "Wreckers": return "Wraki";
-                case "Poisoner": return "Więźniowie";
-                case "Disease": return "Choroby";
-                case "Poison": return "Trucizny";
-                case "Engineering": return "Inżynieria";
-                case "Herbs": return "Zioła";
-                case "Law": return "Prawo";
-                case "Local": return "Lokalne";
-                case "local": return "Lokalne";
-                case "Medicine": return "Medycyna";
-                case "Riverways": return "Rzeki";
-                case "Theology": return "Teologia";
-                case "Coastal": return "Wybrzeże";
-                case "Marshes": return "Mokradła";
-                case "Rocky": return "Tereny Skaliste";
-                case "Woodlands": return "Tereny Leśne";
-                default:
-                {
-                    Console.WriteLine("NIE ODNALEZIONO: " + searchSpec);
-                    return searchSpec;
-                }
-            }
-        }
-
-        private string ReplaceCareer(string className)
-        {
-            switch (className)
-            {
-                case "Academic": return "Uczony";
-                case "Academics": return "Uczony";
-                case "Burgher": return "Mieszczanin";
-                case "Courtier": return "Dworzanin";
-                case "Peasant": return "Pospólstwo";
-                case "Peasants": return "Pospólstwo";
-                case "Ranger": return "Wędrowiec";
-                case "Riverfolk": return "Wodniak";
-                case "Rogue": return "Łotr";
-                case "Rogues": return "Łotr";
-                case "Warrior": return "Wojownik";
-                default:
-                {
-                    Console.WriteLine("NIE ODNALEZIONO KLASY: " + className);
-                    return className;
-                }
             }
         }
     }

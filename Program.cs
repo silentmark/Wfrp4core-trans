@@ -22,10 +22,14 @@ namespace WFRP4e.Translator
                 .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
                 .AddJsonFile("appsettings.json", false)
                 .Build();
+
+            //Wfrp08Update();
+           // Wfrp08UpdateData();
+
             Console.WriteLine(
                 $"Konfiguracja:\nŚcieżka do podręcznika: {Configuration.GetSection("PdfPath").Value}\nŚcieżka do plików .db: {Configuration.GetSection("PacksPath").Value}\nŚcieżka do rolltables (.json): {Configuration.GetSection("TablesPath").Value}\nŚcieżka do plików wyjściowych: {Configuration.GetSection("OutputPath").Value}");
             Console.WriteLine(
-                "Wciśnij 1. aby wygenerować pliki wyjściowe.\nWciśnij 2. aby zmodyfikować pliki .db na podstawie wyników z 1.\nWciśnij 3. aby zmodyfikować rolltables na podstawie wyników z 1.");
+                "Wciśnij 1. aby wygenerować pliki wyjściowe.\nWciśnij 2. aby zmodyfikować pliki .db na podstawie wyników z 1.\nWciśnij 3. aby zmodyfikować rolltables na podstawie wyników z 1.\nWciśnij 4. aby zmodyfikować Forien's Armoury.");
             
             var input = Console.ReadKey();
             if (input.KeyChar == '1')
@@ -52,6 +56,10 @@ namespace WFRP4e.Translator
             else if(input.KeyChar == '3')
             {
                 new CareersTable().Translate();
+            }
+            else if (input.KeyChar == '4')
+            {
+                new ForiensArmouryParser().Parse();
             }
             Console.WriteLine("Zakończono");
         }
@@ -266,7 +274,127 @@ namespace WFRP4e.Translator
         }
 
         #region Various
-        
+
+        private static void Wfrp08Update()
+        {
+            var file = File.ReadAllLines(@"C:\Users\ja\AppData\Local\FoundryVTT\Data\worlds\wfrp4\packs\oko-za-oko-aktorzy.db");
+            var data = new List<JObject>();
+            foreach (var line in file)
+            {
+                var actor = JObject.Parse(line);
+                data.Add(actor);
+                foreach (var item in (JArray)actor["items"])
+                {
+                    if (item["type"].Value<string>() == "weapon" || item["type"].Value<string>() == "armour" || item["type"].Value<string>() == "ammunition")
+                    {
+                        if (item["data"]["qualities"] != null && item["data"]["qualities"]["value"] != null)
+                        {
+                            var quals = item["data"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
+                            var qualsArr = new JArray();
+
+                            foreach (var qual in quals)
+                            {
+                                if (!string.IsNullOrEmpty(qual))
+                                {
+                                    var jQual = new JObject();
+                                    jQual["key"] = TrappingsParser.TranslateQualityFlawReverse(qual.Split(' ')[0]).ToLower();
+                                    jQual["name"] = TrappingsParser.TranslateQualityFlawReverse(qual.Split(' ')[0]).ToLower();
+                                    jQual["display"] = qual.Split(' ')[0];
+                                    jQual["value"] = qual.Contains(' ') ? qual.Split(' ')[1] : "";
+                                    qualsArr.Add(jQual);
+                                }
+                            }
+                            item["data"]["qualities"]["value"] = qualsArr;
+                        }
+                        if (item["data"]["flaws"] != null && item["data"]["flaws"]["value"] != null)
+                        {
+                            var flaws = item["data"]["flaws"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
+                            var flawsArr = new JArray();
+                            foreach (var flaw in flaws)
+                            {
+                                if (!string.IsNullOrEmpty(flaw))
+                                {
+                                    var jFlaw = new JObject();
+                                    jFlaw["key"] = TrappingsParser.TranslateQualityFlawReverse(flaw.Split(' ')[0]).ToLower();
+                                    jFlaw["name"] = TrappingsParser.TranslateQualityFlawReverse(flaw.Split(' ')[0]).ToLower();
+                                    jFlaw["display"] = flaw.Split(' ')[0];
+                                    jFlaw["value"] = flaw.Contains(' ') ? flaw.Split(' ')[1] : "";
+                                    flawsArr.Add(jFlaw);
+                                }
+                            }
+
+                            item["data"]["flaws"]["value"] = flawsArr;
+                        }
+                    }
+                }
+            }
+            foreach (var pack in data)
+            {
+                File.AppendAllLines(@"C:\Users\ja\AppData\Local\FoundryVTT\Data\worlds\wfrp4\packs\oko-za-oko-aktorzy-new.db",
+                    new[] { JsonConvert.SerializeObject(pack, Formatting.None) });
+            }
+        }
+
+        private static void Wfrp08UpdateData()
+        {
+            var file = File.ReadAllLines(@"C:\Users\ja\AppData\Local\FoundryVTT\Data\worlds\wfrp4\data\actors.db");
+            var data = new List<JObject>();
+            foreach (var line in file)
+            {
+                var actor = JObject.Parse(line);
+                data.Add(actor);
+                foreach (var item in (JArray)actor["items"])
+                {
+                    if (item["type"].Value<string>() == "weapon" || item["type"].Value<string>() == "armour" || item["type"].Value<string>() == "ammunition")
+                    {
+                        if (item["data"]["qualities"] != null && item["data"]["qualities"]["value"] != null)
+                        {
+                            var quals = item["data"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
+                            var qualsArr = new JArray();
+
+                            foreach (var qual in quals)
+                            {
+                                if (!string.IsNullOrEmpty(qual))
+                                {
+                                    var jQual = new JObject();
+                                    jQual["key"] = TrappingsParser.TranslateQualityFlawReverse(qual.Split(' ')[0]).ToLower();
+                                    jQual["name"] = TrappingsParser.TranslateQualityFlawReverse(qual.Split(' ')[0]).ToLower();
+                                    jQual["display"] = qual.Split(' ')[0];
+                                    jQual["value"] = qual.Contains(' ') ? qual.Split(' ')[1] : "";
+                                    qualsArr.Add(jQual);
+                                }
+                            }
+                            item["data"]["qualities"]["value"] = qualsArr;
+                        }
+                        if (item["data"]["flaws"] != null && item["data"]["flaws"]["value"] != null)
+                        {
+                            var flaws = item["data"]["flaws"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
+                            var flawsArr = new JArray();
+                            foreach (var flaw in flaws)
+                            {
+                                if (!string.IsNullOrEmpty(flaw))
+                                {
+                                    var jFlaw = new JObject();
+                                    jFlaw["key"] = TrappingsParser.TranslateQualityFlawReverse(flaw.Split(' ')[0]).ToLower();
+                                    jFlaw["name"] = TrappingsParser.TranslateQualityFlawReverse(flaw.Split(' ')[0]).ToLower();
+                                    jFlaw["display"] = flaw.Split(' ')[0];
+                                    jFlaw["value"] = flaw.Contains(' ') ? flaw.Split(' ')[1] : "";
+                                    flawsArr.Add(jFlaw);
+                                }
+                            }
+
+                            item["data"]["flaws"]["value"] = flawsArr;
+                        }
+                    }
+                }
+            }
+            foreach (var pack in data)
+            {
+                File.AppendAllLines(@"C:\Users\ja\AppData\Local\FoundryVTT\Data\worlds\wfrp4\data\actors-new.db",
+                    new[] { JsonConvert.SerializeObject(pack, Formatting.None) });
+            }
+        }
+
         private static void FixStyling()
         {
             foreach (var file in Directory.GetFiles("Final"))
