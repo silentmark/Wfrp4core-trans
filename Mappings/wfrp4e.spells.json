@@ -48,6 +48,10 @@
     "Name": "Pancerz Eteru (Cień)"
   },
   {
+    "Id": "Aethyric Armour (Witchcraft)",
+    "Name": "Pancerz Eteru (Czarownictwo)"
+  },
+  {
     "Id": "Aethyric Arms",
     "Name": "Magiczna broń"
   },
@@ -90,6 +94,10 @@
   {
     "Id": "Aethyric Arms (Shadow)",
     "Name": "Magiczna broń (Cień)"
+  },
+  {
+    "Id": "Aethyric Arms (Witchcraft)",
+    "Name": "Magiczna broń (Czarownictwo)"
   },
   {
     "Id": "Amber Talons",
@@ -146,6 +154,10 @@
   {
     "Id": "Arrow Shield (Shadow)",
     "Name": "Niszczyciel strzał (Cień)"
+  },
+  {
+    "Id": "Arrow Shield (Witchcraft)",
+    "Name": "Niszczyciel strzał (Czarownictwo)"
   },
   {
     "Id": "Banishment",
@@ -216,6 +228,10 @@
     "Name": "Wybuch (Cień)"
   },
   {
+    "Id": "Blast (Witchcraft)",
+    "Name": "Wybuch (Czarownictwo)"
+  },
+  {
     "Id": "Blight",
     "Name": "Nieurodzaj"
   },
@@ -268,6 +284,10 @@
     "Name": "Pocisk (Cień)"
   },
   {
+    "Id": "Bolt (Witchcraft)",
+    "Name": "Pocisk (Czarownictwo)"
+  },
+  {
     "Id": "Breath",
     "Name": "Zionięcie"
   },
@@ -312,6 +332,10 @@
     "Name": "Zionięcie (Cień)"
   },
   {
+    "Id": "Breath (Witchcraft)",
+    "Name": "Zionięcie (Czarownictwo)"
+  },
+  {
     "Id": "Bridge",
     "Name": "Most"
   },
@@ -354,6 +378,10 @@
   {
     "Id": "Bridge (Shadow)",
     "Name": "Most (Cień)"
+  },
+  {
+    "Id": "Bridge (Witchcraft)",
+    "Name": "Most (Czarownictwo)"
   },
   {
     "Id": "Careful Step",
@@ -416,6 +444,10 @@
     "Name": "Seria pocisków (Cień)"
   },
   {
+    "Id": "Chain Attack (Witchcraft)",
+    "Name": "Seria pocisków (Czarownictwo)"
+  },
+  {
     "Id": "Choking Shadows",
     "Name": "Dusiciel"
   },
@@ -474,6 +506,10 @@
   {
     "Id": "Corrosive Blood (Shadow)",
     "Name": "Żrąca krew (Cień)"
+  },
+  {
+    "Id": "Corrosive Blood (Witchcraft)",
+    "Name": "Żrąca krew (Czarownictwo)"
   },
   {
     "Id": "Creeping Menace",
@@ -544,6 +580,10 @@
     "Name": "Widzenie w ciemności (Cień)"
   },
   {
+    "Id": "Dark Vision (Witchcraft)",
+    "Name": "Widzenie w ciemności (Czarownictwo)"
+  },
+  {
     "Id": "Dart",
     "Name": "Magiczne żądło"
   },
@@ -604,6 +644,10 @@
     "Name": "Dekoncentracja (Cień)"
   },
   {
+    "Id": "Distracting (Witchcraft)",
+    "Name": "Dekoncentracja (Czarownictwo)"
+  },
+  {
     "Id": "Dome",
     "Name": "Dome"
   },
@@ -646,6 +690,10 @@
   {
     "Id": "Dome (Shadow)",
     "Name": "Kopuła (Cień)"
+  },
+  {
+    "Id": "Dome (Witchcraft)",
+    "Name": "Kopuła (Czarownictwo)"
   },
   {
     "Id": "Doppelganger",
@@ -698,6 +746,10 @@
   {
     "Id": "Drop (Shadow)",
     "Name": "Niezdarność (Cień)"
+  },
+  {
+    "Id": "Drop (Witchcraft)",
+    "Name": "Niezdarność (Czarownictwo)"
   },
   {
     "Id": "Dying Words",
@@ -764,6 +816,10 @@
     "Name": "Pochwycenie (Cień)"
   },
   {
+    "Id": "Entangle (Witchcraft)",
+    "Name": "Pochwycenie (Czarownictwo)"
+  },
+  {
     "Id": "Fat of the Land",
     "Name": "Ziemia karmicielka"
   },
@@ -814,6 +870,10 @@
   {
     "Id": "Fearsome (Shadow)",
     "Name": "Straszny wygląd (Cień)"
+  },
+  {
+    "Id": "Fearsome (Witchcraft)",
+    "Name": "Straszny wygląd (Czarownictwo)"
   },
   {
     "Id": "Feather of Lead",
@@ -874,6 +934,10 @@
   {
     "Id": "Flight (Shadow)",
     "Name": "Lot (Cień)"
+  },
+  {
+    "Id": "Flight (Witchcraft)",
+    "Name": "Straszny wygląd (Czarownictwo)"
   },
   {
     "Id": "Flock of Doom",
@@ -984,6 +1048,10 @@
     "Name": "Magiczna tarcza (Cień)"
   },
   {
+    "Id": "Magic Shield (Witchcraft)",
+    "Name": "Magiczna tarcza (Czarownictwo)"
+  },
+  {
     "Id": "Manifest Lesser Daemon",
     "Name": "Przyzwanie pomniejszego demona"
   },
@@ -1044,6 +1112,10 @@
     "Name": "Dotyk na odległość (Cień)"
   },
   {
+    "Id": "Move Object (Witchcraft)",
+    "Name": "Dotyk na odległość (Czarownictwo)"
+  },
+  {
     "Id": "Mundane Aura",
     "Name": "Aura codzienności"
   },
@@ -1086,6 +1158,10 @@
   {
     "Id": "Mundane Aura (Shadow)",
     "Name": "Aura codzienności (Cień)"
+  },
+  {
+    "Id": "Mundane Aura (Witchcraft)",
+    "Name": "Aura codzienności (Czarownictwo)"
   },
   {
     "Id": "Murmured Whisper",
@@ -1194,6 +1270,10 @@
   {
     "Id": "Push (Shadow)",
     "Name": "Odepchnięcie (Cień)"
+  },
+  {
+    "Id": "Push (Witchcraft)",
+    "Name": "Odepchnięcie (Czarownictwo)"
   },
   {
     "Id": "Raise Dead",
@@ -1328,6 +1408,10 @@
     "Name": "Przeskok (Cień)"
   },
   {
+    "Id": "Teleport (Witchcraft)",
+    "Name": "Przeskok (Czarownictwo)"
+  },
+  {
     "Id": "Terrifying",
     "Name": "Przerażający wygląd"
   },
@@ -1370,6 +1454,10 @@
   {
     "Id": "Terrifying (Shadow)",
     "Name": "Przerażający wygląd (Cień)"
+  },
+  {
+    "Id": "Terrifying (Witchcraft)",
+    "Name": "Przerażający wygląd (Czarownictwo)"
   },
   {
     "Id": "The Amber Spear",
@@ -1450,6 +1538,10 @@
   {
     "Id": "Ward (Shadow)",
     "Name": "Magiczna ochrona (Cień)"
+  },
+  {
+    "Id": "Ward (Witchcraft)",
+    "Name": "Magiczna ochrona (Czarownictwo)"
   },
   {
     "Id": "Warning",
