@@ -22,7 +22,7 @@ namespace WFRP4e.Translator.Packs
                         qual["display"] = TranslateQualityFlaw(qual["name"].ToString());
                     }
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     Console.WriteLine($"Problem z cechami: {name}");
                 }
@@ -37,7 +37,7 @@ namespace WFRP4e.Translator.Packs
                         flaw["display"] = TranslateQualityFlaw(flaw["name"].ToString());
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Console.WriteLine($"Problem z cechami: {name}");
                 }
