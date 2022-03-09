@@ -37,6 +37,10 @@ namespace WFRP4e.Translator.Packs
                         {
                             effect["label"] = "Zmęczenie";
                         }
+                        else if (effectLabel == "Uneven Horns AP")
+                        {
+                            effect["label"] = "Nierówne rogi";
+                        }
                         else
                         {
                             Console.WriteLine("NIE ODNALEZIONO: " + effect["label"]);

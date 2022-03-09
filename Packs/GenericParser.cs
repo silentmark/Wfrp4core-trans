@@ -8,7 +8,7 @@ using WFRP4e.Translator.Json;
 
 namespace WFRP4e.Translator.Packs
 {
-    public abstract class GenericParser<T> where  T : Entry
+    public abstract class GenericParser<T> where T : Entry
     {
         protected abstract string DbName { get; }
 

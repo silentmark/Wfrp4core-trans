@@ -39,6 +39,7 @@ namespace WFRP4e.Translator
             }
             else if (input.KeyChar == '2')
             {
+                ProcessRollTables();
                 ProcessTalents();
                 ProcessSkills();
                 ProcessCareers();
@@ -84,6 +85,12 @@ namespace WFRP4e.Translator
 
             Console.WriteLine(@"Plik: wfrp4e.skills.desc.json z tłumaczeniami został wygenerowany, część wpisów wymaga ręcznej poprawy");
         }
+
+        private static void ProcessRollTables()
+        {
+            new RollTableParser().Parse();
+        }
+
 
         private static void ProcessDiseases()
         {
