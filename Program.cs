@@ -294,9 +294,9 @@ namespace WFRP4e.Translator
                 {
                     if (item["type"].Value<string>() == "weapon" || item["type"].Value<string>() == "armour" || item["type"].Value<string>() == "ammunition")
                     {
-                        if (item["data"]["qualities"] != null && item["data"]["qualities"]["value"] != null)
+                        if (item["system"]["qualities"] != null && item["system"]["qualities"]["value"] != null)
                         {
-                            var quals = item["data"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
+                            var quals = item["system"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
                             var qualsArr = new JArray();
 
                             foreach (var qual in quals)
@@ -311,11 +311,11 @@ namespace WFRP4e.Translator
                                     qualsArr.Add(jQual);
                                 }
                             }
-                            item["data"]["qualities"]["value"] = qualsArr;
+                            item["system"]["qualities"]["value"] = qualsArr;
                         }
-                        if (item["data"]["flaws"] != null && item["data"]["flaws"]["value"] != null)
+                        if (item["system"]["flaws"] != null && item["system"]["flaws"]["value"] != null)
                         {
-                            var flaws = item["data"]["flaws"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
+                            var flaws = item["system"]["flaws"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
                             var flawsArr = new JArray();
                             foreach (var flaw in flaws)
                             {
@@ -330,7 +330,7 @@ namespace WFRP4e.Translator
                                 }
                             }
 
-                            item["data"]["flaws"]["value"] = flawsArr;
+                            item["system"]["flaws"]["value"] = flawsArr;
                         }
                     }
                 }
@@ -354,9 +354,9 @@ namespace WFRP4e.Translator
                 {
                     if (item["type"].Value<string>() == "weapon" || item["type"].Value<string>() == "armour" || item["type"].Value<string>() == "ammunition")
                     {
-                        if (item["data"]["qualities"] != null && item["data"]["qualities"]["value"] != null)
+                        if (item["system"]["qualities"] != null && item["system"]["qualities"]["value"] != null)
                         {
-                            var quals = item["data"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
+                            var quals = item["system"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
                             var qualsArr = new JArray();
 
                             foreach (var qual in quals)
@@ -371,11 +371,11 @@ namespace WFRP4e.Translator
                                     qualsArr.Add(jQual);
                                 }
                             }
-                            item["data"]["qualities"]["value"] = qualsArr;
+                            item["system"]["qualities"]["value"] = qualsArr;
                         }
-                        if (item["data"]["flaws"] != null && item["data"]["flaws"]["value"] != null)
+                        if (item["system"]["flaws"] != null && item["system"]["flaws"]["value"] != null)
                         {
-                            var flaws = item["data"]["flaws"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
+                            var flaws = item["system"]["flaws"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
                             var flawsArr = new JArray();
                             foreach (var flaw in flaws)
                             {
@@ -390,7 +390,7 @@ namespace WFRP4e.Translator
                                 }
                             }
 
-                            item["data"]["flaws"]["value"] = flawsArr;
+                            item["system"]["flaws"]["value"] = flawsArr;
                         }
                     }
                 }

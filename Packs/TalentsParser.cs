@@ -15,7 +15,7 @@ namespace WFRP4e.Translator.Packs
             var trans = translations.FirstOrDefault(x => x.Id == name);
             if (trans != null)
             {
-                pack["data"]["tests"]["value"] = trans.Tests;
+                pack["system"]["tests"]["value"] = trans.Tests;
                 if (pack["effects"] != null)
                 {
                     foreach (var effect in (JArray) pack["effects"])

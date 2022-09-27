@@ -12,11 +12,11 @@ namespace WFRP4e.Translator.Packs
         {
             var name = pack.Value<string>("name");
             var trans = translations.FirstOrDefault(x => x.Id == name);
-            if (pack["data"]["qualities"] != null && pack["data"]["qualities"]["value"] != null)
+            if (pack["system"]["qualities"] != null && pack["system"]["qualities"]["value"] != null)
             {
                 try
                 {
-                    var quals = (JArray)pack["data"]["qualities"]["value"];
+                    var quals = (JArray)pack["system"]["qualities"]["value"];
                     foreach (JObject qual in quals)
                     {
                         qual["display"] = TranslateQualityFlaw(qual["name"].ToString());
@@ -27,11 +27,11 @@ namespace WFRP4e.Translator.Packs
                     Console.WriteLine($"Problem z cechami: {name}");
                 }
             }
-            if (pack["data"]["flaws"] != null && pack["data"]["flaws"]["value"] != null)
+            if (pack["system"]["flaws"] != null && pack["system"]["flaws"]["value"] != null)
             {
                 try
                 {
-                    var flaws = (JArray)pack["data"]["flaws"]["value"];
+                    var flaws = (JArray)pack["system"]["flaws"]["value"];
                     foreach (var flaw in flaws)
                     {
                         flaw["display"] = TranslateQualityFlaw(flaw["name"].ToString());

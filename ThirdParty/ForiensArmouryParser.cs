@@ -43,10 +43,10 @@ namespace WFRP4e.Translator.Packs
                 {
                     Console.WriteLine($"Przedmiot {name.PadRight(30)} tłumaczę na: {polish.Name}");
                     pack["name"] = polish.Name;
-                    pack["data"]["description"]["value"] = polish.Description;
-                    if (pack["data"]["qualities"] != null)
+                    pack["system"]["description"]["value"] = polish.Description;
+                    if (pack["system"]["qualities"] != null)
                     {
-                        var quals = pack["data"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
+                        var quals = pack["system"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
                         var qualsArr = new JArray();
                         foreach (var qualStr in quals)
                         {
@@ -62,11 +62,11 @@ namespace WFRP4e.Translator.Packs
                                 qualsArr.Add(jQual);
                             }
                         }
-                        pack["data"]["qualities"]["value"] = qualsArr;
+                        pack["system"]["qualities"]["value"] = qualsArr;
                     }
-                    if (pack["data"]["flaws"] != null)
+                    if (pack["system"]["flaws"] != null)
                     {
-                        var flaws = pack["data"]["flaws"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
+                        var flaws = pack["system"]["flaws"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
                         var flawsArr = new JArray();
                         foreach (var flaw in flaws)
                         {
@@ -80,11 +80,11 @@ namespace WFRP4e.Translator.Packs
                                 flawsArr.Add(jFlaw);
                             }
                         }
-                        pack["data"]["flaws"]["value"] = flawsArr;
+                        pack["system"]["flaws"]["value"] = flawsArr;
                     }
-                    if (pack["data"]["special"] != null)
+                    if (pack["system"]["special"] != null)
                     {
-                        pack["data"]["special"]["value"] = polish.Special;
+                        pack["system"]["special"]["value"] = polish.Special;
                     }
                 }
             }

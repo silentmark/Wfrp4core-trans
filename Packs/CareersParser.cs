@@ -33,7 +33,7 @@ namespace WFRP4e.Translator.Packs
                 {
                     Console.WriteLine($"Profesję {name.PadRight(30)} tłumaczę na: {polishCareer.Name}");
 
-                    var careerGroup = pack["data"]["careergroup"]["value"].ToString();
+                    var careerGroup = pack["system"]["careergroup"]["value"].ToString();
 
                     var transCareerGroup = careers.FirstOrDefault(x => x.Id == careerGroup);
                     if (transCareerGroup == null)
@@ -42,14 +42,14 @@ namespace WFRP4e.Translator.Packs
                     }
                     else
                     {
-                        pack["data"]["careergroup"]["value"] = transCareerGroup.Name;
-                        pack["data"]["description"]["value"] = pack["data"]["description"]["value"].ToString().Replace(careerGroup, transCareerGroup.Name);
+                        pack["system"]["careergroup"]["value"] = transCareerGroup.Name;
+                        pack["system"]["description"]["value"] = pack["system"]["description"]["value"].ToString().Replace(careerGroup, transCareerGroup.Name);
                     }
 
-                    pack["data"]["class"]["value"] = ReplaceCareer(pack["data"]["class"]["value"].ToString());
+                    pack["system"]["class"]["value"] = ReplaceCareer(pack["system"]["class"]["value"].ToString());
 
                     var transSkills = new List<string>();
-                    foreach (var skill in pack["data"]["skills"].Values<string>())
+                    foreach (var skill in pack["system"]["skills"].Values<string>())
                     {
                         var searchSkill = skill.Trim();
                         if (skill.Contains("(Any)", StringComparison.InvariantCultureIgnoreCase))
@@ -68,14 +68,14 @@ namespace WFRP4e.Translator.Packs
                         }
                     }
 
-                    ((JArray)pack["data"]["skills"]).RemoveAll();
+                    ((JArray)pack["system"]["skills"]).RemoveAll();
                     foreach(var skill in transSkills)
                     {
-                        ((JArray)pack["data"]["skills"]).Add(skill);
+                        ((JArray)pack["system"]["skills"]).Add(skill);
                     }
 
                     var transTalents = new List<string>();
-                    foreach (var talent in pack["data"]["talents"].Values<string>())
+                    foreach (var talent in pack["system"]["talents"].Values<string>())
                     {
                         var transTalent = talents.FirstOrDefault(x => x.Id == talent.Trim());
                         if (transTalent != null)
@@ -107,10 +107,10 @@ namespace WFRP4e.Translator.Packs
                         }
                     }
 
-                    ((JArray)pack["data"]["talents"]).RemoveAll();
+                    ((JArray)pack["system"]["talents"]).RemoveAll();
                     foreach (var talent in transTalents)
                     {
-                        ((JArray)pack["data"]["talents"]).Add(talent);
+                        ((JArray)pack["system"]["talents"]).Add(talent);
                     }
 
                     pack["name"] = polishCareer.Name;

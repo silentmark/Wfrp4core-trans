@@ -26,7 +26,7 @@ namespace WFRP4e.Translator.Packs
             {
                 Console.WriteLine($"Obiekt {name.PadRight(30)} tłumaczę na: {mapping.Name}");
                 var trans = translations.FirstOrDefault(x => x.Name == mapping.Name || x.Id.StartsWith(name) || name.StartsWith(x.Id));
-                pack["data"]["description"]["value"] = trans.Description;
+                pack["system"]["description"]["value"] = trans.Description;
                 pack["name"] = mapping.Name;
             }
         }

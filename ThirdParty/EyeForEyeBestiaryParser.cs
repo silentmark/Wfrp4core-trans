@@ -29,26 +29,26 @@ namespace WFRP4e.Translator.Packs
                 var name = pack.Value<string>("name");
                 Console.WriteLine($"Potwora {name.PadRight(30)} tłumaczę");
 
-                pack["data"]["characteristics"]["ws"]["label"] = "Walka Wręcz";
-                pack["data"]["characteristics"]["ws"]["abrev"] = "WW";
-                pack["data"]["characteristics"]["bs"]["label"] = "Umiejętności Strzeleckie";
-                pack["data"]["characteristics"]["bs"]["abrev"] = "US";
-                pack["data"]["characteristics"]["s"]["label"] = "Siła";
-                pack["data"]["characteristics"]["s"]["abrev"] = "S";
-                pack["data"]["characteristics"]["t"]["label"] = "Wytrzymałość";
-                pack["data"]["characteristics"]["t"]["abrev"] = "Wt";
-                pack["data"]["characteristics"]["i"]["label"] = "Inicjatywa";
-                pack["data"]["characteristics"]["i"]["abrev"] = "I";
-                pack["data"]["characteristics"]["ag"]["label"] = "Zwinność";
-                pack["data"]["characteristics"]["ag"]["abrev"] = "Zw";
-                pack["data"]["characteristics"]["dex"]["label"] = "Zręczność";
-                pack["data"]["characteristics"]["dex"]["abrev"] = "Zr";
-                pack["data"]["characteristics"]["int"]["label"] = "Inteligencja";
-                pack["data"]["characteristics"]["int"]["abrev"] = "Int";
-                pack["data"]["characteristics"]["wp"]["label"] = "Siła Woli";
-                pack["data"]["characteristics"]["wp"]["abrev"] = "SW";
-                pack["data"]["characteristics"]["fel"]["label"] = "Ogłada";
-                pack["data"]["characteristics"]["fel"]["abrev"] = "Ogd";
+                pack["system"]["characteristics"]["ws"]["label"] = "Walka Wręcz";
+                pack["system"]["characteristics"]["ws"]["abrev"] = "WW";
+                pack["system"]["characteristics"]["bs"]["label"] = "Umiejętności Strzeleckie";
+                pack["system"]["characteristics"]["bs"]["abrev"] = "US";
+                pack["system"]["characteristics"]["s"]["label"] = "Siła";
+                pack["system"]["characteristics"]["s"]["abrev"] = "S";
+                pack["system"]["characteristics"]["t"]["label"] = "Wytrzymałość";
+                pack["system"]["characteristics"]["t"]["abrev"] = "Wt";
+                pack["system"]["characteristics"]["i"]["label"] = "Inicjatywa";
+                pack["system"]["characteristics"]["i"]["abrev"] = "I";
+                pack["system"]["characteristics"]["ag"]["label"] = "Zwinność";
+                pack["system"]["characteristics"]["ag"]["abrev"] = "Zw";
+                pack["system"]["characteristics"]["dex"]["label"] = "Zręczność";
+                pack["system"]["characteristics"]["dex"]["abrev"] = "Zr";
+                pack["system"]["characteristics"]["int"]["label"] = "Inteligencja";
+                pack["system"]["characteristics"]["int"]["abrev"] = "Int";
+                pack["system"]["characteristics"]["wp"]["label"] = "Siła Woli";
+                pack["system"]["characteristics"]["wp"]["abrev"] = "SW";
+                pack["system"]["characteristics"]["fel"]["label"] = "Ogłada";
+                pack["system"]["characteristics"]["fel"]["abrev"] = "Ogd";
 
                 foreach (var item in (JArray)pack["items"])
                 {
@@ -63,13 +63,13 @@ namespace WFRP4e.Translator.Packs
                         {
                             var desc = traitsDesc.First(x => x.Name == "Strzelanie (Zasięg)");
                             item["name"] = "Strzelanie" + searchTrait.Replace("Ranged", "");
-                            item["data"]["description"]["value"] = desc.Description;
+                            item["system"]["description"]["value"] = desc.Description;
                         }
                         else if (searchTrait.StartsWith("Tongue Attack"))
                         {
                             var desc = traitsDesc.First(x => x.Name == "Atak Językiem (Zasięg)");
                             item["name"] = "Atak Językiem" + searchTrait.Replace("Tongue Attack", "");
-                            item["data"]["description"]["value"] = desc.Description;
+                            item["system"]["description"]["value"] = desc.Description;
 
                             traitDb = traitsDb.First(x => x["name"].ToString().StartsWith("Atak Językiem"));
 
@@ -80,7 +80,7 @@ namespace WFRP4e.Translator.Packs
                             {
                                 var desc = traitsDesc.First(x => x.Name == transTrait.Name);
                                 item["name"] = desc.Name;
-                                item["data"]["description"]["value"] = desc.Description;
+                                item["system"]["description"]["value"] = desc.Description;
 
                                 if (desc.Name.Contains("Macki"))
                                 {
@@ -91,10 +91,10 @@ namespace WFRP4e.Translator.Packs
                                     traitDb = traitsDb.First(x =>
                                         x["name"].ToString().StartsWith(desc.Name.Split('(').First().Trim()));
                                 }
-                                if (!string.IsNullOrEmpty(item["data"]["specification"]?["value"]?.ToString()))
+                                if (!string.IsNullOrEmpty(item["system"]["specification"]?["value"]?.ToString()))
                                 {
-                                    item["data"]["specification"]["value"] =
-                                       TraitsParser.TranslateSpecification(item["data"]["specification"]["value"].ToString());
+                                    item["system"]["specification"]["value"] =
+                                       TraitsParser.TranslateSpecification(item["system"]["specification"]["value"].ToString());
                                 }
                             }
                             else
@@ -157,7 +157,7 @@ namespace WFRP4e.Translator.Packs
                         {
                             var desc = skillsDesc.First(x => x.Name == transSkill.Name || transSkill.Name.StartsWith(x.Name));
                             item["name"] = transSkill.Name;
-                            item["data"]["description"]["value"] = desc.Description;
+                            item["system"]["description"]["value"] = desc.Description;
                         }
                         else
                         {
@@ -173,7 +173,7 @@ namespace WFRP4e.Translator.Packs
                         {
                             var desc = talentsDesc.First(x => x.Name == transTalent.Name || transTalent.Name.StartsWith(x.Name));
                             item["name"] = transTalent.Name;
-                            item["data"]["description"]["value"] = desc.Description;
+                            item["system"]["description"]["value"] = desc.Description;
                         }
                         else
                         {

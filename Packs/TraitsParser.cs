@@ -31,10 +31,10 @@ namespace WFRP4e.Translator.Packs
                     }
                 }
 
-                if (!string.IsNullOrEmpty(pack["data"]["specification"]["value"].ToString()))
+                if (!string.IsNullOrEmpty(pack["system"]["specification"]["value"].ToString()))
                 {
-                    pack["data"]["specification"]["value"] =
-                        TranslateSpecification(pack["data"]["specification"]["value"].ToString());
+                    pack["system"]["specification"]["value"] =
+                        TranslateSpecification(pack["system"]["specification"]["value"].ToString());
                 }
             }
 

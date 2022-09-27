@@ -18,13 +18,13 @@ namespace WFRP4e.Translator.Packs
             {
                 var newSymptoms = trans.Symptoms.Split(',').Select(x => x.Trim()).ToList();
 
-                pack["data"]["contraction"]["value"] = trans.Contraction;
-                pack["data"]["duration"]["value"] = trans.Duration;
-                pack["data"]["duration"]["unit"] = trans.DurationUnit;
-                pack["data"]["incubation"]["value"] = trans.Incubation;
-                pack["data"]["incubation"]["unit"] = trans.IncubationUnit;
-                pack["data"]["permanent"]["value"] = trans.Permanent;
-                pack["data"]["symptoms"]["value"] = trans.Symptoms;
+                pack["system"]["contraction"]["value"] = trans.Contraction;
+                pack["system"]["duration"]["value"] = trans.Duration;
+                pack["system"]["duration"]["unit"] = trans.DurationUnit;
+                pack["system"]["incubation"]["value"] = trans.Incubation;
+                pack["system"]["incubation"]["unit"] = trans.IncubationUnit;
+                pack["system"]["permanent"]["value"] = trans.Permanent;
+                pack["system"]["symptoms"]["value"] = trans.Symptoms;
 
 
                 if (pack["effects"] != null)
