@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Packs;
 using WFRP4e.Translator.Scanners;
-using WFRP4e.Translator.Tables;
+using WFRP4e.Translator.Effects;
 
 namespace WFRP4e.Translator
 {
@@ -23,10 +23,11 @@ namespace WFRP4e.Translator
                 .AddJsonFile("appsettings.json", false)
                 .Build();
 
+
             Console.WriteLine(
                 $"Konfiguracja:\nŚcieżka do podręcznika: {Configuration.GetSection("PdfPath").Value}\nŚcieżka do plików .db: {Configuration.GetSection("PacksPath").Value}\nŚcieżka do rolltables (.json): {Configuration.GetSection("TablesPath").Value}\nŚcieżka do plików wyjściowych: {Configuration.GetSection("OutputPath").Value}");
             Console.WriteLine(
-                "Wciśnij 1. aby wygenerować pliki wyjściowe.\nWciśnij 2. aby zmodyfikować pliki .db na podstawie wyników z 1.\nWciśnij 3. aby zmodyfikować rolltables na podstawie wyników z 1.\nWciśnij 4. aby zmodyfikować Forien's Armoury.");
+                "Wciśnij 1. aby wygenerować pliki wyjściowe.\nWciśnij 2. aby zmodyfikować pliki .db na podstawie wyników z 1.\nWciśnij 3. aby wyciągnąć skrypty efektów z wygenerowanych plików .db .\nWciśnij 4. aby zmodyfikować Forien's Armoury.");
             
             var input = Console.ReadKey();
             if (input.KeyChar == '1')
@@ -53,7 +54,18 @@ namespace WFRP4e.Translator
             }
             else if(input.KeyChar == '3')
             {
-                new CareersTable().Translate();
+                EffectsExtractor.ExtractEffects("skills.db");
+                EffectsExtractor.ExtractEffects("talents.db");
+                EffectsExtractor.ExtractEffects("diseases.db");
+                EffectsExtractor.ExtractEffects("spells.db");
+                EffectsExtractor.ExtractEffects("trappings.db");
+                EffectsExtractor.ExtractEffects("careers.db");
+                EffectsExtractor.ExtractEffects("criticals.db");
+                EffectsExtractor.ExtractEffects("injuries.db");
+                EffectsExtractor.ExtractEffects("mutations.db");
+                EffectsExtractor.ExtractEffects("prayers.db");
+                EffectsExtractor.ExtractEffects("psychologies.db");
+                EffectsExtractor.ExtractEffects("traits.db");
             }
             else if (input.KeyChar == '4')
             {
