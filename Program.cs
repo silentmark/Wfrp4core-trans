@@ -23,9 +23,6 @@ namespace WFRP4e.Translator
                 .AddJsonFile("appsettings.json", false)
                 .Build();
 
-            //Wfrp08Update();
-           // Wfrp08UpdateData();
-
             Console.WriteLine(
                 $"Konfiguracja:\nŚcieżka do podręcznika: {Configuration.GetSection("PdfPath").Value}\nŚcieżka do plików .db: {Configuration.GetSection("PacksPath").Value}\nŚcieżka do rolltables (.json): {Configuration.GetSection("TablesPath").Value}\nŚcieżka do plików wyjściowych: {Configuration.GetSection("OutputPath").Value}");
             Console.WriteLine(

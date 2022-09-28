@@ -20,7 +20,7 @@ namespace WFRP4e.Translator.Packs
                 File.Delete($@"{outputPath}\tables.db");
             }
 
-            var originalPacks = File.ReadAllLines(Path.Combine(outputPath, "tables-original.db"));
+            var originalPacks = File.ReadAllLines(Path.Combine(Program.Configuration.GetSection("PacksPath").Value, "tables.db"));
             var polishPack = File.ReadAllLines(Path.Combine(outputPath, "tables-polish.db"));
             var originalPackEntries = originalPacks.Select(pack => JObject.Parse(pack)).ToList();
             var polishPackEntries = polishPack.Select(pack => JObject.Parse(pack)).ToList();
