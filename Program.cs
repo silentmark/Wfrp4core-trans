@@ -27,9 +27,15 @@ namespace WFRP4e.Translator
             Console.WriteLine(
                 $"Konfiguracja:\nŚcieżka do podręcznika: {Configuration.GetSection("PdfPath").Value}\nŚcieżka do plików .db: {Configuration.GetSection("PacksPath").Value}\nŚcieżka do rolltables (.json): {Configuration.GetSection("TablesPath").Value}\nŚcieżka do plików wyjściowych: {Configuration.GetSection("OutputPath").Value}");
             Console.WriteLine(
-                "Wciśnij 1. aby wygenerować pliki wyjściowe.\nWciśnij 2. aby zmodyfikować pliki .db na podstawie wyników z 1.\nWciśnij 3. aby wyciągnąć skrypty efektów z wygenerowanych plików .db .\nWciśnij 4. aby zmodyfikować Forien's Armoury.");
+                @"
+                    Wciśnij 1. aby wygenerować pliki wyjściowe.
+                  Wciśnij 2. aby zmodyfikować pliki .db na podstawie wyników z 1.
+                  Wciśnij 3. aby wyciągnąć skrypty efektów z wygenerowanych plików .db
+                  Wciśnij 4. aby zmodyfikować skrypty efektów w kompendium i świecie. 
+                  Wciśnij 5. aby zmodyfikować Forien's Armoury.");
             
             var input = Console.ReadKey();
+            Console.WriteLine();
             if (input.KeyChar == '1')
             {
                 ScanSkills();
@@ -68,6 +74,23 @@ namespace WFRP4e.Translator
                 EffectsExtractor.ExtractEffects("traits.db");
             }
             else if (input.KeyChar == '4')
+            {
+                EffectsUpdater.BuildEffectsDictionary();
+                EffectsUpdater.EffectsUpdate("talents.db");
+                EffectsUpdater.EffectsUpdate("diseases.db");
+                EffectsUpdater.EffectsUpdate("spells.db");
+                EffectsUpdater.EffectsUpdate("trappings.db");
+                EffectsUpdater.EffectsUpdate("criticals.db");
+                EffectsUpdater.EffectsUpdate("injuries.db");
+                EffectsUpdater.EffectsUpdate("mutations.db");
+                EffectsUpdater.EffectsUpdate("prayers.db");
+                EffectsUpdater.EffectsUpdate("psychologies.db");
+                EffectsUpdater.EffectsUpdate("traits.db");
+                EffectsUpdater.EffectsUpdate("items.db");
+                EffectsUpdater.EffectsUpdate("actors.db", true);
+                EffectsUpdater.EffectsUpdate("bestiary.db", true);
+            }
+            else if (input.KeyChar == '5')
             {
                 new ForiensArmouryParser().Parse();
             }
