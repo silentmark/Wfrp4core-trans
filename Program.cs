@@ -23,16 +23,19 @@ namespace WFRP4e.Translator
                 .AddJsonFile("appsettings.json", false)
                 .Build();
 
+            System.Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", @"C:\Code\Wfrp4core-trans\signinkey.json");
+
 
             Console.WriteLine(
                 $"Konfiguracja:\nŚcieżka do podręcznika: {Configuration.GetSection("PdfPath").Value}\nŚcieżka do plików .db: {Configuration.GetSection("PacksPath").Value}\nŚcieżka do rolltables (.json): {Configuration.GetSection("TablesPath").Value}\nŚcieżka do plików wyjściowych: {Configuration.GetSection("OutputPath").Value}");
             Console.WriteLine(
                 @"
-                    Wciśnij 1. aby wygenerować pliki wyjściowe.
+                  Wciśnij 1. aby wygenerować pliki wyjściowe.
                   Wciśnij 2. aby zmodyfikować pliki .db na podstawie wyników z 1.
                   Wciśnij 3. aby wyciągnąć skrypty efektów z wygenerowanych plików .db
                   Wciśnij 4. aby zmodyfikować skrypty efektów w kompendium i świecie. 
-                  Wciśnij 5. aby zmodyfikować Forien's Armoury.");
+                  Wciśnij 5. aby przetłumaczyć journal entries. 
+                  Wciśnij 6. aby zmodyfikować Forien's Armoury.");
             
             var input = Console.ReadKey();
             Console.WriteLine();
@@ -86,11 +89,15 @@ namespace WFRP4e.Translator
                 EffectsUpdater.EffectsUpdate("prayers.db");
                 EffectsUpdater.EffectsUpdate("psychologies.db");
                 EffectsUpdater.EffectsUpdate("traits.db");
-                EffectsUpdater.EffectsUpdate("items.db");
-                EffectsUpdater.EffectsUpdate("actors.db", true);
                 EffectsUpdater.EffectsUpdate("bestiary.db", true);
+                //                EffectsUpdater.EffectsUpdate("items.db");
+                //                EffectsUpdater.EffectsUpdate("actors.db", true);
             }
             else if (input.KeyChar == '5')
+            {
+                new JournalParser().Parse();
+            }
+            else if (input.KeyChar == '6')
             {
                 new ForiensArmouryParser().Parse();
             }
