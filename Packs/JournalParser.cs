@@ -8,13 +8,13 @@ using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
+using WFRP4e.Translator.Utilities;
 
 namespace WFRP4e.Translator.Packs
 {
     public class JournalParser
     {
 
-        //TODO: translate effects in traits and talents + parameters in traits names (like Size (Large)).
         public void Parse()
         {
             var packs = File.ReadAllLines(Path.Combine(Program.Configuration.GetSection("PacksPath").Value, "journal-entries.db"));
@@ -22,38 +22,20 @@ namespace WFRP4e.Translator.Packs
 
             Console.WriteLine($@"Przetwarzam Kompendium, znaleziono {packsJournal.Count} wpisów w db");
 
-            TranslationServiceClient client = TranslationServiceClient.Create();
-
             foreach (var pack in packsJournal)
             {
                 var name = pack.Value<string>("name");
-                TranslateTextRequest request = new TranslateTextRequest
-                {
-                    Contents = { name },
-                    TargetLanguageCode = "pl-PL",
-                    SourceLanguageCode = "en-GB",
-                    Parent = new ProjectName("turnkey-brook-365022").ToString()
-                };
-                TranslateTextResponse response = client.TranslateText(request);
-                // response.Translations will have one entry, because request.Contents has one entry.
-                Translation translation = response.Translations[0];
+                var translation = GoogleTranslator.Translate(name);
 
-                Console.WriteLine($"Wpis: {name.PadRight(30)} tłumaczę na: {translation.TranslatedText}");
-                pack["name"] = translation.TranslatedText;
+                Console.WriteLine($"Wpis: {name.PadRight(30)} tłumaczę na: {translation}");
+                pack["name"] = translation;
                 foreach (var item in (JArray)pack["pages"])
                 {
                     var pageName = item.Value<string>("name");
-                    request = new TranslateTextRequest
-                    {
-                        Contents = { pageName },
-                        TargetLanguageCode = "pl-PL",
-                        SourceLanguageCode = "en-GB",
-                        Parent = new ProjectName("turnkey-brook-365022").ToString()
-                    };
-                    response = client.TranslateText(request);
-                    translation = response.Translations[0];
-                    Console.WriteLine($"Stronę: {pageName.PadRight(40)} tłumaczę na: {translation.TranslatedText}");
-                    item["name"] = translation.TranslatedText;
+                    translation = GoogleTranslator.Translate(pageName);
+
+                    Console.WriteLine($"Stronę: {pageName.PadRight(40)} tłumaczę na: {translation}");
+                    item["name"] = translation;
 
                     var pageContent = item["text"].Value<string>("content");
                     var htmlDoc = new HtmlDocument();
@@ -62,17 +44,9 @@ namespace WFRP4e.Translator.Packs
                     var result = string.Empty;
                     foreach (var node in htmlDoc.DocumentNode.ChildNodes[0].ChildNodes)
                     {
-                        request = new TranslateTextRequest
-                        {
-                            Contents = { node.OuterHtml },
-                            TargetLanguageCode = "pl-PL",
-                            SourceLanguageCode = "en-GB",
-                            Parent = new ProjectName("turnkey-brook-365022").ToString()
-                        };
-                        response = client.TranslateText(request);
-                        translation = response.Translations[0];
-                        Console.WriteLine($"Content: {node.OuterHtml.PadRight(10)} tłumaczę na: {translation.TranslatedText}");
-                        result += translation.TranslatedText;
+                        translation = GoogleTranslator.Translate(node.OuterHtml);
+                        Console.WriteLine($"Content: {node.OuterHtml.PadRight(10)} tłumaczę na: {translation}");
+                        result += translation;
                     }
 
                     item["text"]["content"] = result;
