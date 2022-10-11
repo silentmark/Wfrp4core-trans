@@ -15,6 +15,18 @@ namespace WFRP4e.Translator.Utilities
         private static Regex _linkRegex = new Regex(@"@UUID\[([\p{L}\d\.\-#]*)\]\{([\p{L}\d\.\-\s']*)\}");
         private static Regex _linkRegexNoText = new Regex(@"@UUID\[([\p{L}\d\.\-#]*)\]");
         private static Regex _linkCompendiumRegex = new Regex(@"@Compendium\[([\p{L}\d\.\-#]*)\]\{([\p{L}\d\.\-\s']*)\}");
+        private static Regex _linkTableRegex = new Regex(@"@Table\[([\p{L}\d\.\-#]*)\]");
+        private static Regex _linkCorruptionRegex = new Regex(@"@Corruption\[([\p{L}\d\.\-#]*)\]");
+        private static Regex _linkConditionRegex = new Regex(@"@Condition\[([\p{L}\d\.\-#]*)\]");
+
+        private static List<Regex> regices = new List<Regex> {
+            _linkRegex,
+            _linkCompendiumRegex,
+            _linkTableRegex,
+            _linkCorruptionRegex,
+            _linkRegexNoText,
+            _linkConditionRegex
+        };
 
         private static TranslationServiceClient Client
         {
@@ -31,33 +43,20 @@ namespace WFRP4e.Translator.Utilities
 
         public static string Translate(string entry)
         { 
-            var uuidMatches = _linkRegex.Matches(entry);
-            var replacements = new Dictionary<string, string>();
-            
-            for (var i = 0; i < uuidMatches.Count; i++)
+            var dictionaryLsits = new List<Dictionary<string, string>>();
+            for (int k = 0; k < regices.Count; k++)
             {
-                var match = uuidMatches[i];
-                replacements[match.Value] = $"@DUMMYUUID[{i}]";
-                entry = entry.Replace(match.Value, replacements[match.Value]);
-            }
+                Regex regex = regices[k];
+                var uuidMatches = regex.Matches(entry);
+                var dictionary = new Dictionary<string, string>();
+                for (var i = 0; i < uuidMatches.Count; i++)
+                {
+                    var match = uuidMatches[i];
+                    dictionary[match.Value] = $"@UUIDX{k}[{i}]";
+                    entry = entry.Replace(match.Value, dictionary[match.Value]);
+                }
+                dictionaryLsits.Add(dictionary);
 
-            var replacementsNoText = new Dictionary<string, string>();
-            uuidMatches = _linkRegexNoText.Matches(entry);
-            for (var i = 0; i < uuidMatches.Count; i++)
-            {
-                var match = uuidMatches[i];
-                replacementsNoText[match.Value] = $"@DUMMYUUIDNOTEXT[{i}]";
-                entry = entry.Replace(match.Value, replacementsNoText[match.Value]);
-            }
-
-
-            var replacementsCompendium = new Dictionary<string, string>();
-            uuidMatches = _linkCompendiumRegex.Matches(entry);
-            for (var i = 0; i < uuidMatches.Count; i++)
-            {
-                var match = uuidMatches[i];
-                replacementsCompendium[match.Value] = $"@DUMMYCOMPENDIUMUUID[{i}]";
-                entry = entry.Replace(match.Value, replacementsCompendium[match.Value]);
             }
 
             TranslateTextRequest request = new TranslateTextRequest
@@ -70,35 +69,27 @@ namespace WFRP4e.Translator.Utilities
             TranslateTextResponse response = Client.TranslateText(request);
             // response.Translations will have one entry, because request.Contents has one entry.
             var translation = response.Translations[0].TranslatedText;
-            foreach(var uuidLink in replacements)
+            foreach(var replacements in dictionaryLsits)
             {
-                request = new TranslateTextRequest
+                foreach (var uuidLink in replacements)
                 {
-                    Contents = { uuidLink.Key.Substring(uuidLink.Key.IndexOf("{") + 1).TrimEnd('}') },
-                    TargetLanguageCode = "pl-PL",
-                    SourceLanguageCode = "en-GB",
-                    Parent = new ProjectName("turnkey-brook-365022").ToString()
-                };
-                response = Client.TranslateText(request);
-                translation = translation.Replace(uuidLink.Value, uuidLink.Key.Substring(0, uuidLink.Key.IndexOf("{")) + "{" + response.Translations[0].TranslatedText + "}");
-            }
-
-            foreach (var uuidLink in replacementsCompendium)
-            {
-                request = new TranslateTextRequest
-                {
-                    Contents = { uuidLink.Key.Substring(uuidLink.Key.IndexOf("{") + 1).TrimEnd('}') },
-                    TargetLanguageCode = "pl-PL",
-                    SourceLanguageCode = "en-GB",
-                    Parent = new ProjectName("turnkey-brook-365022").ToString()
-                };
-                response = Client.TranslateText(request);
-                translation = translation.Replace(uuidLink.Value, uuidLink.Key.Substring(0, uuidLink.Key.IndexOf("{")) + "{" + response.Translations[0].TranslatedText + "}");
-            }
-
-            foreach (var uuidLink in replacementsNoText)
-            {
-                translation = translation.Replace(uuidLink.Value, uuidLink.Key);
+                    if (uuidLink.Key.Contains("{"))
+                    {
+                        request = new TranslateTextRequest
+                        {
+                            Contents = { uuidLink.Key.Substring(uuidLink.Key.IndexOf("{") + 1).TrimEnd('}') },
+                            TargetLanguageCode = "pl-PL",
+                            SourceLanguageCode = "en-GB",
+                            Parent = new ProjectName("turnkey-brook-365022").ToString()
+                        };
+                        response = Client.TranslateText(request);
+                        translation = translation.Replace(uuidLink.Value, uuidLink.Key.Substring(0, uuidLink.Key.IndexOf("{")) + "{" + response.Translations[0].TranslatedText + "}");
+                    }
+                    else
+                    {
+                        translation = translation.Replace(uuidLink.Value, uuidLink.Key);
+                    }
+                }
             }
             return translation;
         }
