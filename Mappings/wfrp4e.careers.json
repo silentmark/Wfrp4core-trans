@@ -1042,5 +1042,21 @@
   {
     "Id": "Zealot",
     "Name": "Groliwiec"
+  },
+  {
+    "Id": "Chosen of Tzeentch",
+    "Name": "Akolitka Kultu"
+  },
+  {
+    "Id": "Cult Acolyte",
+    "Name": "Wtajemniczona Kultu"
+  },
+  {
+    "Id": "Cult Magus",
+    "Name": "Wybranka Tzeentcha"
+  },
+  {
+    "Id": "Master Magus",
+    "Name": "Mistrzyni Wtajemniczonych"
   }
 ]

@@ -358,5 +358,41 @@
   {
     "Id": "Web",
     "Name": "Sieć"
+  },
+  {
+    "Id": "Absorb",
+    "Name": "Wchłanianie"
+  },
+  {
+    "Id": "Amorphous",
+    "Name": "Bezkształtny"
+  },
+  {
+    "Id": "Blighted",
+    "Name": "Siewca Zarazy (Typ)"
+  },
+  {
+    "Id": "Fleshthief",
+    "Name": "Złodziej Ciał"
+  },
+  {
+    "Id": "Mark of Tzeentch",
+    "Name": "Piętno Tzeentcha"
+  },
+  {
+    "Id": "Mindless",
+    "Name": "Bezrozumny"
+  },
+  {
+    "Id": "Shapeshifter",
+    "Name": "Zmiennokształtny"
+  },
+  {
+    "Id": "Split",
+    "Name": "Podział"
+  },
+  {
+    "Id": "Tzeentch's Fire",
+    "Name": "Ogień Tzeentcha"
   }
 ]

@@ -38,5 +38,17 @@
   {
     "Id": "The Bloody Flux",
     "Name": "Czerwonka"
+  },
+  {
+    "Id": "Common Cold",
+    "Name": "Przeziębienie"
+  },
+  {
+    "Id": "Pneumonia",
+    "Name": "Zapalenie Płuc"
+  },
+  {
+    "Id": "Purple Brain Fever",
+    "Name": "Purpurowa Gorączka Mózgowa"
   }
 ]

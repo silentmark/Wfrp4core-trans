@@ -666,5 +666,21 @@
   {
     "Id": "Witch!",
     "Name": "Czarownica!"
+  },
+  {
+    "Id": "Disciple of Change",
+    "Name": "Wyznawca Zmiany"
+  },
+  {
+    "Id": "Double Life",
+    "Name": "Podwójne Życie"
+  },
+  {
+    "Id": "Suffused with Magic",
+    "Name": "Nasycenie Magią",
+  },
+  {
+    "Id": "Tzeentch's Blessing",
+    "Name": "Łaska Tzeentcha"
   }
 ]
