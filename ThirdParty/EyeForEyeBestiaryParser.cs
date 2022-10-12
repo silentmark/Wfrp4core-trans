@@ -13,11 +13,11 @@ namespace WFRP4e.Translator.Packs
         //TODO: translate effects in traits and talents + parameters in traits names (like Size (Large)).
         public void Parse()
         {
-            var traitsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Program.Configuration.GetSection("OutputPath").Value + @"\wfrp4e.traits.desc.json"));
-            var skillsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Program.Configuration.GetSection("OutputPath").Value + @"\wfrp4e.skills.desc.json"));
-            var talentsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Program.Configuration.GetSection("OutputPath").Value + @"\wfrp4e.talents.desc.json"));
+            var traitsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.traits.desc.json"));
+            var skillsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.skills.desc.json"));
+            var talentsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.talents.desc.json"));
 
-            var packsTraits = File.ReadAllLines(Path.Combine(Program.Configuration.GetSection("OutputPath").Value, "traits.db"));
+            var packsTraits = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "traits.db"));
             var traitsDb = packsTraits.Select(pack => JObject.Parse(pack)).ToList();
 
             var packs = File.ReadAllLines(@"C:\Code\WFRP\wfrp4e-eye-for-eye\packs\eye-for-an-eye-actors.db");
@@ -189,7 +189,7 @@ namespace WFRP4e.Translator.Packs
 
             foreach (var pack in packsBestiary.OrderBy(x => x["name"].ToString()))
             {
-                File.AppendAllLines($@"{Program.Configuration.GetSection("OutputPath").Value}\eye-for-an-eye-actors.db",
+                File.AppendAllLines($@"{Config.TranslationsPath}\eye-for-an-eye-actors.db",
                     new[] { JsonConvert.SerializeObject(pack, Formatting.None) });
             }
         }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿global using WFRP4e.Translator.Utilities;
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,25 +11,24 @@ using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Packs;
 using WFRP4e.Translator.Scanners;
 using WFRP4e.Translator.Effects;
+using System.Reflection;
 
 namespace WFRP4e.Translator
 {
     internal class Program
     {
-        public static IConfigurationRoot Configuration;
 
         private static void Main(string[] args)
         {
-            Configuration = new ConfigurationBuilder()
+           Config.Configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
                 .AddJsonFile("appsettings.json", false)
                 .Build();
 
-            System.Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", @"C:\Code\Wfrp4core-trans\signinkey.json");
-
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", Config.GoogleSigninKeyPath);
 
             Console.WriteLine(
-                $"Konfiguracja:\nŚcieżka do podręcznika: {Configuration.GetSection("PdfPath").Value}\nŚcieżka do plików .db: {Configuration.GetSection("PacksPath").Value}\nŚcieżka do rolltables (.json): {Configuration.GetSection("TablesPath").Value}\nŚcieżka do plików wyjściowych: {Configuration.GetSection("OutputPath").Value}");
+                $"Konfiguracja:\nŚcieżka do podręcznika: {Config.PdfPath}\nŚcieżka do plików .db: {Config.PacksPath}\nŚcieżka do plików wyjściowych: { Config.TranslationsPath}");
             Console.WriteLine(
                 @"
                   Wciśnij 1. aby wygenerować pliki wyjściowe.
@@ -36,6 +37,11 @@ namespace WFRP4e.Translator
                   Wciśnij 4. aby zmodyfikować skrypty efektów w kompendium i świecie. 
                   Wciśnij 5. aby przetłumaczyć journal entries. 
                   Wciśnij 6. aby zmodyfikować Forien's Armoury.");
+
+            InitAllMappings();
+
+            ExtractMappings();
+
             
             var input = Console.ReadKey();
             Console.WriteLine();
@@ -104,12 +110,53 @@ namespace WFRP4e.Translator
             Console.WriteLine("Zakończono");
         }
 
+        private static void InitAllMappings()
+        {
+            var packs = Directory.EnumerateFiles(Config.PacksPath, "*.db", SearchOption.AllDirectories).ToList();
+            var listOfJsons = Directory.EnumerateFiles(Config.TranslationsPath + "\\wfrp4e-jsons", "*.json", SearchOption.TopDirectoryOnly).ToList();
+            foreach(var json in listOfJsons)
+            {
+                if (json.Contains("disease"))
+                {
+                    var descriptions = JsonConvert.DeserializeObject<List<DiseaseEntry>>(File.ReadAllText(json));
+                    foreach(var entry in descriptions)
+                    {
+                        Mappings.Diseases.Add(entry.Id, entry);
+                    }
+                }
+                else if (json.Contains("talent"))
+                {
+                    var descriptions = JsonConvert.DeserializeObject<List<TalentEntry>>(File.ReadAllText(json)); 
+                    foreach (var entry in descriptions)
+                    {
+                        Mappings.Talents.Add(entry.Id, entry);
+                    }
+                }
+                else
+                {
+                    var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(json));
+                    var dictionary = GetDictionaryFromFileName(json);
+                    foreach (var entry in descriptions)
+                    {
+                        dictionary.Add(entry.Id, entry);
+                    }
+                }
+            }
+            Mappings.Init();
+        }
+
+        private static Dictionary<string, Entry> GetDictionaryFromFileName(string json)
+        {
+            var prop = typeof(Mappings).GetFields(BindingFlags.Public | BindingFlags.Static).First(x => json.ToLower().Contains(x.Name.ToLower()));
+            return (Dictionary<string,Entry>)prop.GetValue(null);
+        }
+
         private static void ScanTalents()
         {
             var scanner = new TalentsScanner();
-            var descriptions = scanner.Run(Configuration.GetSection("PdfPath").Value);
+            var descriptions = scanner.Run(Config.PdfPath);
             var withDescriptionText = JsonConvert.SerializeObject(descriptions, Formatting.Indented);
-            File.WriteAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.talents.desc.json", withDescriptionText);
+            File.WriteAllText($@"{Config.TranslationsPath}\wfrp4e.talents.desc.json", withDescriptionText);
 
             Console.WriteLine(@"Plik: wfrp4e.talents.desc.json z tłumaczeniami został wygenerowany, część wpisów wymaga ręcznej poprawy");
 
@@ -118,9 +165,9 @@ namespace WFRP4e.Translator
         private static void ScanSkills()
         {
             var scanner = new SkillsScanner();
-            var descriptions = scanner.Run(Configuration.GetSection("PdfPath").Value);
+            var descriptions = scanner.Run(Config.PdfPath);
             var withDescription = JsonConvert.SerializeObject(descriptions, Formatting.Indented);
-            File.WriteAllText($@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.skills.desc.json", withDescription);
+            File.WriteAllText($@"{Config.TranslationsPath}\wfrp4e.skills.desc.json", withDescription);
 
             Console.WriteLine(@"Plik: wfrp4e.skills.desc.json z tłumaczeniami został wygenerowany, część wpisów wymaga ręcznej poprawy");
         }
@@ -133,7 +180,7 @@ namespace WFRP4e.Translator
 
         private static void ProcessDiseases()
         {
-            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.diseases.desc.json";
+            var fileName = $@"{Config.TranslationsPath}\wfrp4e.diseases.desc.json";
             if (File.Exists(fileName))
             {
                 var parser = new DiseasesParser();
@@ -148,7 +195,7 @@ namespace WFRP4e.Translator
 
         private static void ProcessSkills()
         {
-            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.skills.desc.json";
+            var fileName = $@"{Config.TranslationsPath}\wfrp4e.skills.desc.json";
             if (File.Exists(fileName))
             {
                 var parser = new SkillsParser();
@@ -163,7 +210,7 @@ namespace WFRP4e.Translator
 
         private static void ProcessTraits()
         {
-            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.traits.desc.json";
+            var fileName = $@"{Config.TranslationsPath}\wfrp4e.traits.desc.json";
             if (File.Exists(fileName))
             {
                 var parser = new TraitsParser();
@@ -178,7 +225,7 @@ namespace WFRP4e.Translator
 
         private static void ProcessTalents()
         {
-            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.talents.desc.json";
+            var fileName = $@"{Config.TranslationsPath}\wfrp4e.talents.desc.json";
             if (File.Exists(fileName))
             {
                 var parser = new TalentsParser();
@@ -193,7 +240,7 @@ namespace WFRP4e.Translator
 
         private static void ProcessCriticals()
         {
-            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.criticals.desc.json";
+            var fileName = $@"{Config.TranslationsPath}\wfrp4e.criticals.desc.json";
             if (File.Exists(fileName))
             {
                 var parser = new CriticalsParser();
@@ -208,7 +255,7 @@ namespace WFRP4e.Translator
 
         private static void ProcessTrappings()
         {
-            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.trappings.desc.json";
+            var fileName = $@"{Config.TranslationsPath}\wfrp4e.trappings.desc.json";
             if (File.Exists(fileName))
             {
                 var parser = new TrappingsParser();
@@ -223,7 +270,7 @@ namespace WFRP4e.Translator
 
         private static void ProcessMutations()
         {
-            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.mutations.desc.json";
+            var fileName = $@"{Config.TranslationsPath}\wfrp4e.mutations.desc.json";
             if (File.Exists(fileName))
             {
                 var parser = new MutationsParser();
@@ -238,7 +285,7 @@ namespace WFRP4e.Translator
 
         private static void ProcessPsychologies()
         {
-            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.psychologies.desc.json";
+            var fileName = $@"{Config.TranslationsPath}\wfrp4e.psychologies.desc.json";
             if (File.Exists(fileName))
             {
                 var parser = new PsychologiesParser();
@@ -254,7 +301,7 @@ namespace WFRP4e.Translator
 
         private static void ProcessSpells()
         {
-            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.spells.desc.json";
+            var fileName = $@"{Config.TranslationsPath}\wfrp4e.spells.desc.json";
             if (File.Exists(fileName))
             {
                 var parser = new SpellsParser();
@@ -269,7 +316,7 @@ namespace WFRP4e.Translator
 
         private static void ProcessPrayers()
         {
-            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.prayers.desc.json";
+            var fileName = $@"{Config.TranslationsPath}\wfrp4e.prayers.desc.json";
             if (File.Exists(fileName))
             {
                 var parser = new PrayersParser();
@@ -284,7 +331,7 @@ namespace WFRP4e.Translator
 
         private static void ProcessInjuries()
         {
-            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.injuries.desc.json";
+            var fileName = $@"{Config.TranslationsPath}\wfrp4e.injuries.desc.json";
             if (File.Exists(fileName))
             {
                 var parser = new InjuriesParser();
@@ -300,7 +347,7 @@ namespace WFRP4e.Translator
 
         private static void ProcessBestiary()
         {
-            var fileName = $@"{Configuration.GetSection("OutputPath").Value}\wfrp4e.bestiary.desc.json";
+            var fileName = $@"{Config.TranslationsPath}\wfrp4e.bestiary.desc.json";
             if (File.Exists(fileName))
             {
                 var parser = new BestiaryParser();
@@ -320,6 +367,38 @@ namespace WFRP4e.Translator
         }
 
         #region Various
+
+        private static void ExtractMappings()
+        {
+
+            var packs = Directory.EnumerateFiles(Config.PacksPath, "*.db", SearchOption.AllDirectories).ToList();
+            var spells = packs.First(x => x.Contains("eisspells.db"));
+            var spellLines = File.ReadAllLines(spells);
+            foreach(var spell in spellLines)
+            {
+                var spellJson = JObject.Parse(spell);
+                var name = spellJson["name"].Value<string>();
+                var id = spellJson["_id"].Value<string>();
+                var desc = spellJson["data"]["description"]["value"].Value<string>();
+                Mappings.Spells.Add(name, new Entry { Id = name, Name = name, FoundryId = id, Description = desc });
+
+            }
+            File.WriteAllText(Path.Combine(Config.TranslationsPath, "wfrp4e-jsons", "wfrp4e.spells.desc.json"), JsonConvert.SerializeObject(Mappings.Spells.Values, Formatting.Indented));
+
+            var mutations = packs.First(x => x.Contains("expandedmutations.db"));
+            var mutationLines = File.ReadAllLines(spells);
+            foreach (var mutation in mutationLines)
+            {
+                var mutationJson = JObject.Parse(mutation);
+                var name = mutationJson["name"].Value<string>();
+                var id = mutationJson["_id"].Value<string>();
+                var desc = mutationJson["data"]["description"]["value"].Value<string>();
+                Mappings.Mutations.Add(name, new Entry { Id = name, Name = name, FoundryId = id, Description = desc });
+            }
+            File.WriteAllText(Path.Combine(Config.TranslationsPath, "wfrp4e-jsons", "wfrp4e.mutations.desc.json"), JsonConvert.SerializeObject(Mappings.Mutations.Values, Formatting.Indented));
+
+        }
+
 
         private static void Wfrp08Update()
         {
@@ -522,7 +601,7 @@ namespace WFRP4e.Translator
             {
                 if (file.Contains("wfrp4e") && file.Contains("json"))
                 {
-                    var list = JsonConvert.DeserializeObject<List<Mapping>>(File.ReadAllText(file));
+                    var list = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(file));
 
                     if (File.Exists("Final\\" + file.Split('\\').Last().Replace(".json", ".desc.json")))
                     {

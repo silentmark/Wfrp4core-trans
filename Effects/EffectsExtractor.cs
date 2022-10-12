@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WFRP4e.Translator.Utilities;
 
 namespace WFRP4e.Translator.Effects
 {
@@ -13,8 +14,8 @@ namespace WFRP4e.Translator.Effects
 
         public static void ExtractEffects(string packName)
         {
-            var scriptPath = Program.Configuration.GetSection("OutputPath").Value + "\\" + packName.Replace(".db", "");
-            var packElements = File.ReadAllLines(Path.Combine(Program.Configuration.GetSection("OutputPath").Value, packName));
+            var scriptPath = Config.TranslationsPath + "\\" + packName.Replace(".db", "");
+            var packElements = File.ReadAllLines(Path.Combine(Config.TranslationsPath, packName));
             var jsons = packElements.Select(pack => JObject.Parse(pack)).ToList();
             Console.WriteLine($"Processing {packName} with {jsons.Count} elements");
             foreach (var json in jsons)

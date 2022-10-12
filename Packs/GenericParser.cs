@@ -31,8 +31,8 @@ namespace WFRP4e.Translator.Packs
         
         public void Parse(List<T> translations)
         {
-            var outputPath = Program.Configuration.GetSection("OutputPath").Value;
-            var packsPath = Program.Configuration.GetSection("PacksPath").Value;
+            var outputPath = Config.TranslationsPath;
+            var packsPath = Config.PacksPath;
 
             if (File.Exists($@"{outputPath}\{DbName}"))
             {

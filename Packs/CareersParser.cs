@@ -12,12 +12,12 @@ namespace WFRP4e.Translator.Packs
     {
         public void Parse()
         {
-            var careers = JsonConvert.DeserializeObject<List<Mapping>>(File.ReadAllText(@"Mappings\wfrp4e.careers.json"));
-            var talents = JsonConvert.DeserializeObject<List<Mapping>>(File.ReadAllText(@"Mappings\wfrp4e.talents.json"));
-            var skills = JsonConvert.DeserializeObject<List<Mapping>>(File.ReadAllText(@"Mappings\wfrp4e.skills.json"));
+            var careers = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(@"Mappings\wfrp4e.careers.json"));
+            var talents = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(@"Mappings\wfrp4e.talents.json"));
+            var skills = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(@"Mappings\wfrp4e.skills.json"));
 
             Console.WriteLine($@"Przetwarzam Profesje, znaleziono {careers.Count} wpisów w json");
-            var packs = File.ReadAllLines(Path.Combine(Program.Configuration.GetSection("PacksPath").Value, "careers.db"));
+            var packs = File.ReadAllLines(Path.Combine(Config.PacksPath, "wfrp4e-core", "careers.db"));
             var packsCareers = packs.Select(pack => JObject.Parse(pack)).ToList();
             Console.WriteLine($@"Przetwarzam Kompendium, znaleziono {packsCareers.Count} wpisów w db");
 
@@ -120,7 +120,7 @@ namespace WFRP4e.Translator.Packs
 
             foreach (var pack in packsCareers.OrderBy(x=>x["name"].ToString()))
             {
-                File.AppendAllLines($@"{Program.Configuration.GetSection("OutputPath").Value}\careers.db",
+                File.AppendAllLines($@"{Config.TranslationsPath}\wfrp4e-core\careers.db",
                     new[] {JsonConvert.SerializeObject(pack, Formatting.None)});
             }
         }

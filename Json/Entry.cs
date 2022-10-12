@@ -8,6 +8,8 @@
 
         public string Description { get; set; }
 
+        public string FoundryId { get; set; }
+
         public override string ToString()
         {
             return $"{Id}   :   {Name}";

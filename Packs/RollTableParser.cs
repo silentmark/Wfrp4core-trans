@@ -13,14 +13,14 @@ namespace WFRP4e.Translator.Packs
     {
         public void Parse()
         {
-            var outputPath = Program.Configuration.GetSection("OutputPath").Value;
+            var outputPath = Config.TranslationsPath;
 
             if (File.Exists($@"{outputPath}\tables.db"))
             {
                 File.Delete($@"{outputPath}\tables.db");
             }
 
-            var originalPacks = File.ReadAllLines(Path.Combine(Program.Configuration.GetSection("PacksPath").Value, "tables.db"));
+            var originalPacks = File.ReadAllLines(Path.Combine(Config.PacksPath, "wfrp4e-core", "tables.db"));
             var polishPack = File.ReadAllLines(Path.Combine(outputPath, "tables-polish.db"));
             var originalPackEntries = originalPacks.Select(pack => JObject.Parse(pack)).ToList();
             var polishPackEntries = polishPack.Select(pack => JObject.Parse(pack)).ToList();

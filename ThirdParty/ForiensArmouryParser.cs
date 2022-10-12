@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
+using WFRP4e.Translator.Utilities;
 
 namespace WFRP4e.Translator.Packs
 {
@@ -91,7 +92,7 @@ namespace WFRP4e.Translator.Packs
 
             foreach (var pack in packsArmoury.OrderBy(x=>x["name"].ToString()))
             {
-                File.AppendAllLines($@"{Program.Configuration.GetSection("OutputPath").Value}\armoury.db",
+                File.AppendAllLines($@"{Config.TranslationsPath}\armoury.db",
                     new[] {JsonConvert.SerializeObject(pack, Formatting.None)});
             }
         }

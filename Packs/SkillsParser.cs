@@ -14,7 +14,7 @@ namespace WFRP4e.Translator.Packs
 
         protected override void TranslatePack(JObject pack, List<Entry> translations)
         {
-            var skills = JsonConvert.DeserializeObject<List<Mapping>>(File.ReadAllText(@"Mappings\wfrp4e.skills.json"));
+            var skills = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(@"Mappings\wfrp4e.skills.json"));
             var name = pack.Value<string>("name");
             var mapping = skills.FirstOrDefault(x => x.Id == name) ?? skills.FirstOrDefault(x => x.Id.StartsWith(name) || name.StartsWith(x.Id));
 

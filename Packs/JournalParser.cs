@@ -17,7 +17,7 @@ namespace WFRP4e.Translator.Packs
 
         public void Parse()
         {
-            var packs = File.ReadAllLines(Path.Combine(Program.Configuration.GetSection("PacksPath").Value, "journal-entries.db"));
+            var packs = File.ReadAllLines(Path.Combine(Config.PacksPath, "wfrp4e-core", "journal-entries.db"));
             var packsJournal = packs.Select(pack => JObject.Parse(pack)).ToList();
 
             Console.WriteLine($@"Przetwarzam Kompendium, znaleziono {packsJournal.Count} wpisów w db");
@@ -56,7 +56,7 @@ namespace WFRP4e.Translator.Packs
 
             foreach (var pack in packsJournal.OrderBy(x=>x["name"].ToString()))
             {
-                File.AppendAllLines($@"{Program.Configuration.GetSection("OutputPath").Value}\journal-entries.db",
+                File.AppendAllLines($@"{Config.TranslationsPath}\wfrp4e-core\journal-entries.db",
                     new[] {JsonConvert.SerializeObject(pack, Formatting.None)});
             }
         }

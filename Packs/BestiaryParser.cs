@@ -14,15 +14,15 @@ namespace WFRP4e.Translator.Packs
         //TODO: translate effects in traits and talents + parameters in traits names (like Size (Large)).
         public void Parse(List<Entry> translations)
         {
-            var bestiary = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Program.Configuration.GetSection("OutputPath").Value + @"\wfrp4e.bestiary.desc.json"));
-            var traitsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Program.Configuration.GetSection("OutputPath").Value + @"\wfrp4e.traits.desc.json"));
-            var skillsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Program.Configuration.GetSection("OutputPath").Value  + @"\wfrp4e.skills.desc.json"));
-            var talentsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Program.Configuration.GetSection("OutputPath").Value + @"\wfrp4e.talents.desc.json"));
+            var bestiary = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.bestiary.desc.json"));
+            var traitsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.traits.desc.json"));
+            var skillsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.skills.desc.json"));
+            var talentsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.talents.desc.json"));
 
-            var packsTraits = File.ReadAllLines(Path.Combine(Program.Configuration.GetSection("OutputPath").Value, "traits.db"));
+            var packsTraits = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "traits.db"));
             var traitsDb = packsTraits.Select(pack => JObject.Parse(pack)).ToList();
 
-            var packs = File.ReadAllLines(Path.Combine(Program.Configuration.GetSection("PacksPath").Value, "bestiary.db"));
+            var packs = File.ReadAllLines(Path.Combine(Config.PacksPath, "wfrp4e-core", "bestiary.db"));
             var packsBestiary = packs.Select(pack => JObject.Parse(pack)).ToList();
             Console.WriteLine($@"Przetwarzam Kompendium, znaleziono {packsBestiary.Count} wpisów w db");
 
@@ -226,7 +226,7 @@ namespace WFRP4e.Translator.Packs
 
             foreach (var pack in packsBestiary.OrderBy(x=>x["name"].ToString()))
             {
-                File.AppendAllLines($@"{Program.Configuration.GetSection("OutputPath").Value}\bestiary.db",
+                File.AppendAllLines($@"{Config.TranslationsPath}\wfrp4e-core\bestiary.db",
                     new[] {JsonConvert.SerializeObject(pack, Formatting.None)});
             }
         }
