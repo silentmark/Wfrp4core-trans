@@ -40,9 +40,6 @@ namespace WFRP4e.Translator
 
             InitAllMappings();
 
-            ExtractMappings();
-
-            
             var input = Console.ReadKey();
             Console.WriteLine();
             if (input.KeyChar == '1')
@@ -370,8 +367,29 @@ namespace WFRP4e.Translator
 
         private static void ExtractMappings()
         {
-
             var packs = Directory.EnumerateFiles(Config.PacksPath, "*.db", SearchOption.AllDirectories).ToList();
+            var actors = packs.First(x => x.Contains("eisactors.db"));
+            var actorLines = File.ReadAllLines(actors);
+            foreach (var actor in actorLines)
+            {
+                var actorJson = JObject.Parse(actor);
+                var name = actorJson["name"].Value<string>();
+                var id = actorJson["_id"].Value<string>();
+                var desc = string.Empty;
+                if (actorJson["data"]["details"]["biography"] != null)
+                {
+                    desc = actorJson["data"]["details"]["biography"]["value"].Value<string>();
+                }
+                else if (actorJson["data"]["details"]["description"] != null)
+                {
+                    desc = actorJson["data"]["details"]["description"]["value"].Value<string>();
+                }
+                Mappings.EnemyInShadowsActors.Add(name, new Entry { Id = name, Name = name, FoundryId = id, Description = desc });
+            }
+            File.WriteAllText(Path.Combine(Config.TranslationsPath, "wfrp4e-jsons", "wfrp4e.eisactors.desc.json"), JsonConvert.SerializeObject(Mappings.EnemyInShadowsActors.Values, Formatting.Indented));
+
+
+
             var spells = packs.First(x => x.Contains("eisspells.db"));
             var spellLines = File.ReadAllLines(spells);
             foreach(var spell in spellLines)
@@ -386,14 +404,21 @@ namespace WFRP4e.Translator
             File.WriteAllText(Path.Combine(Config.TranslationsPath, "wfrp4e-jsons", "wfrp4e.spells.desc.json"), JsonConvert.SerializeObject(Mappings.Spells.Values, Formatting.Indented));
 
             var mutations = packs.First(x => x.Contains("expandedmutations.db"));
-            var mutationLines = File.ReadAllLines(spells);
+            var mutationLines = File.ReadAllLines(mutations);
             foreach (var mutation in mutationLines)
             {
                 var mutationJson = JObject.Parse(mutation);
                 var name = mutationJson["name"].Value<string>();
                 var id = mutationJson["_id"].Value<string>();
                 var desc = mutationJson["data"]["description"]["value"].Value<string>();
-                Mappings.Mutations.Add(name, new Entry { Id = name, Name = name, FoundryId = id, Description = desc });
+                if (Mappings.Mutations.ContainsKey(name))
+                {
+                    Console.WriteLine("Already exists: " + name);
+                }
+                else
+                {
+                    Mappings.Mutations.Add(name, new Entry { Id = name, Name = name, FoundryId = id, Description = desc });
+                }
             }
             File.WriteAllText(Path.Combine(Config.TranslationsPath, "wfrp4e-jsons", "wfrp4e.mutations.desc.json"), JsonConvert.SerializeObject(Mappings.Mutations.Values, Formatting.Indented));
 

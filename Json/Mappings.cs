@@ -9,7 +9,7 @@ namespace WFRP4e.Translator.Json
     public static class Mappings
     {
         public static Dictionary<string, Entry> Bestiary = new Dictionary<string, Entry>();
-        public static Dictionary<string, Entry> EnemyInShadowsActors = new Dictionary<string, Entry>();
+        public static Dictionary<string, Entry> EiSactors = new Dictionary<string, Entry>();
         public static Dictionary<string, Entry> Careers = new Dictionary<string, Entry>();
         public static Dictionary<string, Entry> Criticals = new Dictionary<string, Entry>();
         public static Dictionary<string, Entry> Diseases = new Dictionary<string, Entry>();
@@ -27,9 +27,9 @@ namespace WFRP4e.Translator.Json
 
         public static void Init()
         {
-            TypeToMappingDictonary["creature"] = new List<Dictionary<string, Entry>> { Bestiary, EnemyInShadowsActors };
-            TypeToMappingDictonary["npc"] = new List<Dictionary<string, Entry>> { Bestiary, EnemyInShadowsActors };
-            TypeToMappingDictonary["character"] = new List<Dictionary<string, Entry>> { Bestiary, EnemyInShadowsActors };
+            TypeToMappingDictonary["creature"] = new List<Dictionary<string, Entry>> { Bestiary, EiSactors };
+            TypeToMappingDictonary["npc"] = new List<Dictionary<string, Entry>> { Bestiary, EiSactors };
+            TypeToMappingDictonary["character"] = new List<Dictionary<string, Entry>> { Bestiary, EiSactors };
             TypeToMappingDictonary["career"] = new List<Dictionary<string, Entry>> { Careers };
             TypeToMappingDictonary["critical"] = new List<Dictionary<string, Entry>> { Criticals };
             TypeToMappingDictonary["disease"] = new List<Dictionary<string, Entry>> { Diseases };
