@@ -17,6 +17,9 @@ namespace WFRP4e.Translator.Utilities
         public static string GoogleSigninKeyPath { get => GetSection(); }
         public static string PdfPath { get => GetSection(); }
 
+        public static string DeepLAuthKey { get => GetSection(); }
+
+
         private static string GetSection([CallerMemberName] string name = "")
         {
            return Configuration.GetSection(name).Value;

@@ -23,7 +23,7 @@ namespace WFRP4e.Translator.Json
         public static Dictionary<string, Entry> Traits = new Dictionary<string, Entry>();
         public static Dictionary<string, Entry> Trappings = new Dictionary<string, Entry>();
 
-        public static Dictionary<String, List<Dictionary<string, Entry>>> TypeToMappingDictonary { get; } = new Dictionary<string, List<Dictionary<string, Entry>>>();
+        public static Dictionary<string, List<Dictionary<string, Entry>>> TypeToMappingDictonary { get; } = new Dictionary<string, List<Dictionary<string, Entry>>>();
 
         public static void Init()
         {

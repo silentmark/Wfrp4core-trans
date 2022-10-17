@@ -12,6 +12,7 @@ using WFRP4e.Translator.Packs;
 using WFRP4e.Translator.Scanners;
 using WFRP4e.Translator.Effects;
 using System.Reflection;
+using DeepL;
 
 namespace WFRP4e.Translator
 {
@@ -20,15 +21,15 @@ namespace WFRP4e.Translator
 
         private static void Main(string[] args)
         {
-           Config.Configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
-                .AddJsonFile("appsettings.json", false)
-                .Build();
+            Config.Configuration = new ConfigurationBuilder()
+                 .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
+                 .AddJsonFile("appsettings.json", false)
+                 .Build();
 
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", Config.GoogleSigninKeyPath);
 
             Console.WriteLine(
-                $"Konfiguracja:\nŚcieżka do podręcznika: {Config.PdfPath}\nŚcieżka do plików .db: {Config.PacksPath}\nŚcieżka do plików wyjściowych: { Config.TranslationsPath}");
+                $"Konfiguracja:\nŚcieżka do podręcznika: {Config.PdfPath}\nŚcieżka do plików .db: {Config.PacksPath}\nŚcieżka do plików wyjściowych: {Config.TranslationsPath}");
             Console.WriteLine(
                 @"
                   Wciśnij 1. aby wygenerować pliki wyjściowe.
@@ -39,6 +40,8 @@ namespace WFRP4e.Translator
                   Wciśnij 6. aby zmodyfikować Forien's Armoury.");
 
             InitAllMappings();
+
+            CreateDeeplGlossary();
 
             var input = Console.ReadKey();
             Console.WriteLine();
@@ -64,7 +67,7 @@ namespace WFRP4e.Translator
                 ProcessTrappings();
                 ProcessDiseases();
             }
-            else if(input.KeyChar == '3')
+            else if (input.KeyChar == '3')
             {
                 EffectsExtractor.ExtractEffects("skills.db");
                 EffectsExtractor.ExtractEffects("talents.db");
@@ -111,19 +114,19 @@ namespace WFRP4e.Translator
         {
             var packs = Directory.EnumerateFiles(Config.PacksPath, "*.db", SearchOption.AllDirectories).ToList();
             var listOfJsons = Directory.EnumerateFiles(Config.TranslationsPath + "\\wfrp4e-jsons", "*.json", SearchOption.TopDirectoryOnly).ToList();
-            foreach(var json in listOfJsons)
+            foreach (var json in listOfJsons)
             {
                 if (json.Contains("disease"))
                 {
                     var descriptions = JsonConvert.DeserializeObject<List<DiseaseEntry>>(File.ReadAllText(json));
-                    foreach(var entry in descriptions)
+                    foreach (var entry in descriptions)
                     {
                         Mappings.Diseases.Add(entry.Id, entry);
                     }
                 }
                 else if (json.Contains("talent"))
                 {
-                    var descriptions = JsonConvert.DeserializeObject<List<TalentEntry>>(File.ReadAllText(json)); 
+                    var descriptions = JsonConvert.DeserializeObject<List<TalentEntry>>(File.ReadAllText(json));
                     foreach (var entry in descriptions)
                     {
                         Mappings.Talents.Add(entry.Id, entry);
@@ -145,7 +148,7 @@ namespace WFRP4e.Translator
         private static Dictionary<string, Entry> GetDictionaryFromFileName(string json)
         {
             var prop = typeof(Mappings).GetFields(BindingFlags.Public | BindingFlags.Static).First(x => json.ToLower().Contains(x.Name.ToLower()));
-            return (Dictionary<string,Entry>)prop.GetValue(null);
+            return (Dictionary<string, Entry>)prop.GetValue(null);
         }
 
         private static void ScanTalents()
@@ -365,6 +368,37 @@ namespace WFRP4e.Translator
 
         #region Various
 
+        private static void CreateDeeplGlossary()
+        {
+            var translator = DeepLTranslator.Client;
+
+            var entriesDictionary = new Dictionary<string, string>();
+            var props = typeof(Mappings).GetFields(BindingFlags.Public | BindingFlags.Static).ToList();
+            foreach (var prop in props)
+            {
+                var dic = prop.GetValue(null) as Dictionary<string, Entry>;
+                if (dic != null)
+                {
+                    foreach (var value in dic.Keys)
+                    {
+                        entriesDictionary[value] = dic[value].Name;
+                    }
+                }
+            }
+
+            entriesDictionary.Add("roll", "rzut");
+            entriesDictionary.Add("Hit Location", "Miejsce Trafienia");
+            entriesDictionary.Add("Foundry", "Foundry");
+
+
+            var glossaries = translator.ListGlossariesAsync().Result;
+            foreach(var glossary in glossaries)
+            {
+                translator.DeleteGlossaryAsync(glossary).Wait();
+            }
+            var glossaryEnToDe = translator.CreateGlossaryAsync("Wfrp Glossary", "EN", "PL", new GlossaryEntries(entriesDictionary)).Result;
+        }
+
         private static void ExtractMappings()
         {
             var packs = Directory.EnumerateFiles(Config.PacksPath, "*.db", SearchOption.AllDirectories).ToList();
@@ -384,9 +418,9 @@ namespace WFRP4e.Translator
                 {
                     desc = actorJson["data"]["details"]["description"]["value"].Value<string>();
                 }
-                Mappings.EnemyInShadowsActors.Add(name, new Entry { Id = name, Name = name, FoundryId = id, Description = desc });
+                Mappings.EiSactors.Add(name, new Entry { Id = name, Name = name, FoundryId = id, Description = desc });
             }
-            File.WriteAllText(Path.Combine(Config.TranslationsPath, "wfrp4e-jsons", "wfrp4e.eisactors.desc.json"), JsonConvert.SerializeObject(Mappings.EnemyInShadowsActors.Values, Formatting.Indented));
+            File.WriteAllText(Path.Combine(Config.TranslationsPath, "wfrp4e-jsons", "wfrp4e.eisactors.desc.json"), JsonConvert.SerializeObject(Mappings.EiSactors.Values, Formatting.Indented));
 
 
 

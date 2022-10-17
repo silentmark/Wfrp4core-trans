@@ -18,6 +18,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CognitiveServices.Translator.Client" Version="1.0.31" />
+    <PackageReference Include="DeepL.net" Version="1.5.0" />
     <PackageReference Include="Google.Cloud.Translate.V3" Version="3.0.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
