@@ -62,6 +62,7 @@ namespace WFRP4e.Translator
                 new DiseasesParser().Parse(@"wfrp4e-core\packs\diseases.db");
                 new BestiaryParser().Parse(@"wfrp4e-core\packs\bestiary.db");
                 new MixedCompendiumParser().Parse(@"wfrp4e-eis\packs\eisitems.db");
+                new BestiaryParser().Parse(@"wfrp4e-eis\packs\eisactors.db");
             }
             else if (input.KeyChar == '2')
             {

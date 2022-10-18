@@ -13,47 +13,77 @@ namespace WFRP4e.Translator.Packs
         public override void TranslatePack(JObject pack)
         {
             var bestiary = Mappings.Bestiary.Values.ToList();
+            var eisMappings = Mappings.EiSactors.Values.ToList();
+            bestiary.AddRange(eisMappings);
+
             var traitsDesc = Mappings.Traits.Values.ToList();
             var skillsDesc = Mappings.Skills.Values.ToList();
             var talentsDesc = Mappings.Talents.Values.ToList();
             var trappingsDesc = Mappings.Trappings.Values.ToList();
 
             var packsTraits = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "traits.db")).Select(pack => JObject.Parse(pack)).ToList();
+            var eisTraits = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-eis", "packs", "eisitems.db")).Select(pack => JObject.Parse(pack))
+                .Where(x => x["type"].Value<string>() == "trait").ToList();
+
+            packsTraits.AddRange(eisTraits);
+
             var packSkills = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "skills.db")).Select(pack => JObject.Parse(pack)).ToList();
             var packTalents = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "talents.db")).Select(pack => JObject.Parse(pack)).ToList();
+            var eisTalents = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-eis", "packs", "eisitems.db")).Select(pack => JObject.Parse(pack))
+                .Where(x => x["type"].Value<string>() == "talent").ToList();
+
+            packTalents.AddRange(eisTalents);
+
             var packTrappings = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "trappings.db")).Select(pack => JObject.Parse(pack)).ToList();
+            var eisTrappings = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-eis", "packs", "eisitems.db")).Select(pack => JObject.Parse(pack))
+                .Where(x => x["type"].Value<string>() == "trapping" || x["type"].Value<string>() == "container").ToList();
+
+            packTrappings.AddRange(eisTrappings);
+
             //var packMutations = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "mutations.db")).Select(pack => JObject.Parse(pack)).ToList();
             //var packSpells = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "spells.db")).Select(pack => JObject.Parse(pack)).ToList();
 
             var name = pack.Value<string>("name");
             var trans = GetEntry(pack, bestiary);
+
+            var pathToData = "system";
+            if (pack["data"] != null)
+            {
+                pathToData = "data";
+            }
+            
+
             if (trans != null) 
             { 
                 Console.WriteLine($"Potwora {name.PadRight(30)} tłumaczę na: {trans.Name}");
 
-                pack["system"]["details"]["biography"]["value"] = trans.Description;
                 pack["name"] = trans.Name;
+                if (pack["type"].Value<string>() == "vehicle")
+                {
+                    return;
+                }
+                pack[pathToData]["details"]["biography"]["value"] = trans.Description;
 
-                pack["system"]["characteristics"]["ws"]["label"] = "Walka Wręcz";
-                pack["system"]["characteristics"]["ws"]["abrev"] = "WW";
-                pack["system"]["characteristics"]["bs"]["label"] = "Umiejętności Strzeleckie";
-                pack["system"]["characteristics"]["bs"]["abrev"] = "US";
-                pack["system"]["characteristics"]["s"]["label"] = "Siła";
-                pack["system"]["characteristics"]["s"]["abrev"] = "S";
-                pack["system"]["characteristics"]["t"]["label"] = "Wytrzymałość";
-                pack["system"]["characteristics"]["t"]["abrev"] = "Wt";
-                pack["system"]["characteristics"]["i"]["label"] = "Inicjatywa";
-                pack["system"]["characteristics"]["i"]["abrev"] = "I";
-                pack["system"]["characteristics"]["ag"]["label"] = "Zwinność";
-                pack["system"]["characteristics"]["ag"]["abrev"] = "Zw";
-                pack["system"]["characteristics"]["dex"]["label"] = "Zręczność";
-                pack["system"]["characteristics"]["dex"]["abrev"] = "Zr";
-                pack["system"]["characteristics"]["int"]["label"] = "Inteligencja";
-                pack["system"]["characteristics"]["int"]["abrev"] = "Int";
-                pack["system"]["characteristics"]["wp"]["label"] = "Siła Woli";
-                pack["system"]["characteristics"]["wp"]["abrev"] = "SW";
-                pack["system"]["characteristics"]["fel"]["label"] = "Ogłada";
-                pack["system"]["characteristics"]["fel"]["abrev"] = "Ogd";
+                pack[pathToData]["characteristics"]["ws"]["label"] = "Walka Wręcz";
+                pack[pathToData]["characteristics"]["ws"]["abrev"] = "WW";
+                pack[pathToData]["characteristics"]["bs"]["label"] = "Umiejętności Strzeleckie";
+                pack[pathToData]["characteristics"]["bs"]["abrev"] = "US";
+                pack[pathToData]["characteristics"]["s"]["label"] = "Siła";
+                pack[pathToData]["characteristics"]["s"]["abrev"] = "S";
+                pack[pathToData]["characteristics"]["t"]["label"] = "Wytrzymałość";
+                pack[pathToData]["characteristics"]["t"]["abrev"] = "Wt";
+                pack[pathToData]["characteristics"]["i"]["label"] = "Inicjatywa";
+                pack[pathToData]["characteristics"]["i"]["abrev"] = "I";
+                pack[pathToData]["characteristics"]["ag"]["label"] = "Zwinność";
+                pack[pathToData]["characteristics"]["ag"]["abrev"] = "Zw";
+                pack[pathToData]["characteristics"]["dex"]["label"] = "Zręczność";
+                pack[pathToData]["characteristics"]["dex"]["abrev"] = "Zr";
+                pack[pathToData]["characteristics"]["int"]["label"] = "Inteligencja";
+                pack[pathToData]["characteristics"]["int"]["abrev"] = "Int";
+                pack[pathToData]["characteristics"]["wp"]["label"] = "Siła Woli";
+                pack[pathToData]["characteristics"]["wp"]["abrev"] = "SW";
+                pack[pathToData]["characteristics"]["fel"]["label"] = "Ogłada";
+                pack[pathToData]["characteristics"]["fel"]["abrev"] = "Ogd";
 
                 var items = ((JArray)pack["items"]);
                 List<JToken> list = items.ToList();
@@ -115,7 +145,7 @@ namespace WFRP4e.Translator.Packs
             var transTrapping = GetEntry((JObject)item, trappingsDesc);
             JToken trapping = null;
             JToken clone = null;
-            if (transTrapping != null)
+            if (transTrapping != null && !string.IsNullOrEmpty(transTrapping.FoundryId))
             {
                 trapping = packTrappings.FirstOrDefault(x => x["_id"].Value<string>() == transTrapping.FoundryId);
                 clone = trapping.DeepClone();
@@ -126,7 +156,7 @@ namespace WFRP4e.Translator.Packs
             if (clone != null && clone["effects"] != null && ((JArray)clone["effects"]).Count > 0)
             {
                 var actorEffects = ((JArray)actor["effects"])
-                    .Where(x => x["origin"].Value<string>().EndsWith(clone["_id"].Value<string>()))
+                    .Where(x => x["origin"] != null && x["origin"].Value<string>().EndsWith(clone["_id"].Value<string>()))
                     .ToList();
                 if (actorEffects.Count == 1)
                 {
@@ -161,7 +191,7 @@ namespace WFRP4e.Translator.Packs
             if (clone != null && clone["effects"] != null && ((JArray)clone["effects"]).Count > 0)
             {
                 var actorEffects = ((JArray)actor["effects"])
-                    .Where(x => x["origin"].Value<string>().EndsWith(clone["_id"].Value<string>()))
+                    .Where(x => x["origin"] != null && x["origin"].Value<string>().EndsWith(clone["_id"].Value<string>()))
                     .ToList();
                 if (actorEffects.Count == 1)
                 {
@@ -196,6 +226,11 @@ namespace WFRP4e.Translator.Packs
 
         private void HandleTraits(JObject actor, List<Entry> traitsDesc, List<JObject> packsTraits, JArray items, int i, JToken item)
         {
+            var pathToData = "system";
+            if (item["data"] != null)
+            {
+                pathToData = "data";
+            }
             JToken trait = null;
             JToken clone = null;
             var searchTrait = item["name"].Value<string>().Trim();
@@ -251,15 +286,24 @@ namespace WFRP4e.Translator.Packs
                     //TODO
                 }
             }
-            if (!string.IsNullOrEmpty(item["system"]["specification"]?["value"]?.ToString()) && clone != null)
+            if (!string.IsNullOrEmpty(item[pathToData]["specification"]?["value"]?.ToString()) && clone != null)
             {
-                clone["system"]["specification"]["value"] =
-                   TraitsParser.TranslateSpecification(item["system"]["specification"]["value"].ToString());
+                if (clone[pathToData] != null)
+                {
+                    clone[pathToData]["specification"]["value"] =
+                       TraitsParser.TranslateSpecification(item[pathToData]["specification"]["value"].ToString());
+                }
+                else
+                {
+                    clone["system"]["specification"]["value"] =
+                       TraitsParser.TranslateSpecification(item[pathToData]["specification"]["value"].ToString());
+                }
+
             }
             if (clone != null && clone["effects"] != null && ((JArray)clone["effects"]).Count > 0)
             {
                 var actorEffects = ((JArray)actor["effects"])
-                    .Where(x => x["origin"].Value<string>().EndsWith(clone["_id"].Value<string>()))
+                    .Where(x => x["origin"] != null && x["origin"].Value<string>().EndsWith(clone["_id"].Value<string>()))
                     .ToList();
                 if(actorEffects.Count == 1)
                 {
