@@ -20,6 +20,8 @@ namespace WFRP4e.Translator.Packs
             var skillsDesc = Mappings.Skills.Values.ToList();
             var talentsDesc = Mappings.Talents.Values.ToList();
             var trappingsDesc = Mappings.Trappings.Values.ToList();
+            var spellsDesc = Mappings.Spells.Values.ToList();
+            var mutationsDesc = Mappings.Mutations.Values.ToList();
 
             var packsTraits = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "traits.db")).Select(pack => JObject.Parse(pack)).ToList();
             var eisTraits = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-eis", "packs", "eisitems.db")).Select(pack => JObject.Parse(pack))
@@ -40,8 +42,13 @@ namespace WFRP4e.Translator.Packs
 
             packTrappings.AddRange(eisTrappings);
 
-            //var packMutations = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "mutations.db")).Select(pack => JObject.Parse(pack)).ToList();
-            //var packSpells = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "spells.db")).Select(pack => JObject.Parse(pack)).ToList();
+            var packMutations = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "mutations.db")).Select(pack => JObject.Parse(pack)).ToList();
+            var eisMutations = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-eis", "packs", "expandedmutations.db")).Select(pack => JObject.Parse(pack)).ToList();
+            packMutations.AddRange(eisMutations);
+
+            var packSpells = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "spells.db")).Select(pack => JObject.Parse(pack)).ToList();
+            var eisSpells = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-eis", "packs", "eisspells.db")).Select(pack => JObject.Parse(pack)).ToList();
+            packSpells.AddRange(eisSpells);
 
             var name = pack.Value<string>("name");
             var trans = GetEntry(pack, bestiary);
@@ -132,6 +139,14 @@ namespace WFRP4e.Translator.Packs
                     {
                         HandleTrappings(pack, trappingsDesc, packTrappings, items, i, item);
                     }
+                    else if (item["type"].Value<string>() == "mutation")
+                    {
+                        HandleMutations(pack, mutationsDesc, packMutations, items, i, item);
+                    }
+                    else if (item["type"].Value<string>() == "spell")
+                    {
+                        HandleSpells(pack, spellsDesc, packSpells, items, i, item);
+                    }
                     else
                     {
                         Console.WriteLine($"NIEZNANY PRZEDMIOT: {item["type"]}: {item["name"]}");
@@ -153,6 +168,76 @@ namespace WFRP4e.Translator.Packs
                 items.RemoveAt(i);
                 items.Insert(i, clone);
             }
+            if (clone != null && clone["effects"] != null && ((JArray)clone["effects"]).Count > 0)
+            {
+                var actorEffects = ((JArray)actor["effects"])
+                    .Where(x => x["origin"] != null && x["origin"].Value<string>().EndsWith(clone["_id"].Value<string>()))
+                    .ToList();
+                if (actorEffects.Count == 1)
+                {
+                    actorEffects[0]["flags"] = clone["effects"][0]["flags"].DeepClone();
+                }
+                else if (actorEffects.Count == 0 && ((JArray)clone["effects"]).Count == 1)
+                {
+                    var cloneEffect = (clone["effects"][0]).DeepClone();
+                    cloneEffect["origin"] = $"Actor.{actor["_id"]}.Item.{clone["_id"]}";
+                    ((JArray)actor["effects"]).Add(cloneEffect);
+                }
+                else
+                {
+                }
+            }
+        }
+
+        private void HandleSpells(JObject actor, List<Entry> translations, List<JObject> packs, JArray items, int i, JToken item)
+        {
+            var translation = GetEntry((JObject)item, translations);
+            JToken packItem = null;
+            JToken clone = null;
+            if (translation != null)
+            {
+                packItem = packs.FirstOrDefault(x => x["_id"].Value<string>() == translation.FoundryId);
+                clone = packItem.DeepClone();
+
+                items.RemoveAt(i);
+                items.Insert(i, clone);
+            }
+
+            if (clone != null && clone["effects"] != null && ((JArray)clone["effects"]).Count > 0)
+            {
+                var actorEffects = ((JArray)actor["effects"])
+                    .Where(x => x["origin"] != null && x["origin"].Value<string>().EndsWith(clone["_id"].Value<string>()))
+                    .ToList();
+                if (actorEffects.Count == 1)
+                {
+                    actorEffects[0]["flags"] = clone["effects"][0]["flags"].DeepClone();
+                }
+                else if (actorEffects.Count == 0 && ((JArray)clone["effects"]).Count == 1)
+                {
+                    var cloneEffect = (clone["effects"][0]).DeepClone();
+                    cloneEffect["origin"] = $"Actor.{actor["_id"]}.Item.{clone["_id"]}";
+                    ((JArray)actor["effects"]).Add(cloneEffect);
+                }
+                else
+                {
+                }
+            }
+        }
+
+        private void HandleMutations(JObject actor, List<Entry> translations, List<JObject> packs, JArray items, int i, JToken item)
+        {
+            var translation = GetEntry((JObject)item, translations);
+            JToken packItem = null;
+            JToken clone = null;
+            if (translation != null)
+            {
+                packItem = packs.FirstOrDefault(x => x["_id"].Value<string>() == translation.FoundryId);
+                clone = packItem.DeepClone();
+
+                items.RemoveAt(i);
+                items.Insert(i, clone);
+            }
+
             if (clone != null && clone["effects"] != null && ((JArray)clone["effects"]).Count > 0)
             {
                 var actorEffects = ((JArray)actor["effects"])
