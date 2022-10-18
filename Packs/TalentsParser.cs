@@ -1,21 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using org.pdfclown.documents.contents.colorSpaces;
 using WFRP4e.Translator.Json;
 
 namespace WFRP4e.Translator.Packs
 {
     public class TalentsParser : GenericParser<TalentEntry>
     {
-        protected override void TranslatePack(JObject pack, List<TalentEntry> translations)
+        public override void TranslatePack(JObject pack)
+        {
+            TranslatePack(pack, Mappings.Talents.Values.OfType<TalentEntry>().ToList());
+        }
+
+        protected void TranslatePack(JObject pack, List<TalentEntry> translations)
         {
             var name = pack.Value<string>("name");
-            var trans = translations.FirstOrDefault(x => x.Id == name);
+            var trans = GetEntry(pack, translations);
             if (trans != null)
             {
-                pack["system"]["tests"]["value"] = trans.Tests;
+                if (pack["system"] != null)
+                {
+                    pack["system"]["tests"]["value"] = trans.Tests;
+                }
+                else
+                {
+                    pack["data"]["tests"]["value"] = trans.Tests;
+                }
                 if (pack["effects"] != null)
                 {
                     foreach (var effect in (JArray) pack["effects"])
@@ -41,11 +54,7 @@ namespace WFRP4e.Translator.Packs
                     }
                 }
             }
-            else
-            {
-                Console.WriteLine("NIE ODNALEZIONO: " + name);
-            }
-            base.TranslatePack(pack, translations);
+            TranslateDescriptions(pack, translations);
         }
 
         private string TranslateEffectData(string desc)
@@ -64,7 +73,5 @@ namespace WFRP4e.Translator.Packs
             }
 
         }
-
-        protected override string DbName => "talents.db";
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
 
@@ -8,12 +10,15 @@ namespace WFRP4e.Translator.Packs
 {
     public class TraitsParser : GenericParser<Entry>
     {
-        protected override string DbName => "traits.db";
+        public override void TranslatePack(JObject pack)
+        {
+            TranslatePack(pack, Mappings.Traits.Values.ToList());
+        }
 
-        protected override void TranslatePack(JObject pack, List<Entry> translations)
+        protected void TranslatePack(JObject pack, List<Entry> translations)
         {
             var name = pack.Value<string>("name");
-            var trans = translations.FirstOrDefault(x => x.Id == name);
+            var trans = GetEntry(pack, translations);
             if (trans != null)
             {
                 if (pack["effects"] != null)
@@ -38,7 +43,7 @@ namespace WFRP4e.Translator.Packs
                 }
             }
 
-            base.TranslatePack(pack, translations);
+            TranslateDescriptions(pack, translations);
         }
 
         public static string TranslateSpecification(string spec)
@@ -141,11 +146,11 @@ namespace WFRP4e.Translator.Packs
                 case "9": return "9";
                 default:
                 {
-                    Console.WriteLine("Nie odnaleziono effect data dla: " + spec);
+                    //Console.WriteLine("Nie odnaleziono effect data dla: " + spec);
                     return spec;
-
                 }
             }
         }
+
     }
 }

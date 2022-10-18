@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
 
@@ -8,12 +10,15 @@ namespace WFRP4e.Translator.Packs
 {
     public class InjuriesParser : GenericParser<Entry>
     {
-        protected override string DbName => "injuries.db";
+        public override void TranslatePack(JObject pack)
+        {
+            TranslatePack(pack, Mappings.Injuries.Values.ToList());
+        }
 
-        protected override void TranslatePack(JObject pack, List<Entry> translations)
+        protected void TranslatePack(JObject pack, List<Entry> translations)
         {
             var name = pack.Value<string>("name");
-            var trans = translations.FirstOrDefault(x => x.Id == name);
+            var trans = GetEntry(pack, translations);
             if (trans != null)
             {
                 pack["system"]["location"]["value"] = TranslateLocation(pack["system"]["location"]["value"].ToString());
@@ -95,7 +100,7 @@ namespace WFRP4e.Translator.Packs
                 }
             }
 
-            base.TranslatePack(pack, translations);
+            TranslateDescriptions(pack, translations);
         }
 
         public static string TranslateLocation(string location)
@@ -118,7 +123,7 @@ namespace WFRP4e.Translator.Packs
                 case "Tongue": return "Język";
                 default:
                 {
-                    Console.WriteLine("NIE ODNALEZIONO KLASY: " + location);
+                    Console.WriteLine("NIE ODNALEZIONO LOKACJI: " + location);
                     return location;
                 }
             }

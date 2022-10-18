@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
 
@@ -8,10 +10,15 @@ namespace WFRP4e.Translator.Packs
 {
     public class TrappingsParser : GenericParser<Entry>
     {
-        protected override void TranslatePack(JObject pack, List<Entry> translations)
+        public override void TranslatePack(JObject pack)
+        {
+            TranslatePack(pack, Mappings.Trappings.Values.ToList());
+        }
+
+        protected  void TranslatePack(JObject pack, List<Entry> translations)
         {
             var name = pack.Value<string>("name");
-            var trans = translations.FirstOrDefault(x => x.Id == name);
+            var trans = GetEntry(pack, translations);
             if (pack["system"]["qualities"] != null && pack["system"]["qualities"]["value"] != null)
             {
                 try
@@ -49,15 +56,15 @@ namespace WFRP4e.Translator.Packs
                 {
                     if (effect["label"].Value<string>() == name)
                     {
-                        effect["label"] = trans.Name;
+                        if (trans != null)
+                        {
+                            effect["label"] = trans.Name;
+                        }
                     }
                 }
             }
-            base.TranslatePack(pack, translations);
+            TranslateDescriptions(pack, translations);
         }
-
-        protected override string DbName => "trappings.db";
-
 
         public static string TranslateQualityFlaw(string qual)
         {

@@ -8,120 +8,108 @@ using WFRP4e.Translator.Json;
 
 namespace WFRP4e.Translator.Packs
 {
-    public class CareersParser
+    public class CareersParser : GenericParser<Entry>
     {
-        public void Parse()
+        public override void TranslatePack(JObject pack)
         {
-            var careers = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(@"Mappings\wfrp4e.careers.json"));
-            var talents = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(@"Mappings\wfrp4e.talents.json"));
-            var skills = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(@"Mappings\wfrp4e.skills.json"));
+            var careers = Mappings.Careers.Values.ToList();
+            var talents = Mappings.Talents.Values.ToList();
+            var skills = Mappings.Skills.Values.ToList();
 
-            Console.WriteLine($@"Przetwarzam Profesje, znaleziono {careers.Count} wpisów w json");
-            var packs = File.ReadAllLines(Path.Combine(Config.PacksPath, "wfrp4e-core", "careers.db"));
-            var packsCareers = packs.Select(pack => JObject.Parse(pack)).ToList();
-            Console.WriteLine($@"Przetwarzam Kompendium, znaleziono {packsCareers.Count} wpisów w db");
-
-            foreach (var pack in packsCareers)
+            var skillsMapping = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText($@"{Config.TranslationsPath}\wfrp4e-jsons\wfrp4e.skills.mapping.json"));
+            var name = pack.Value<string>("name");
+            var polishCareer = GetEntry(pack, careers);
+            if (polishCareer != null)
             {
-                var name = pack.Value<string>("name");
-                var polishCareer = careers.FirstOrDefault(x => x.Id == name);
-                if (polishCareer == null)
+                Console.WriteLine($"Profesję {name.PadRight(30)} tłumaczę na: {polishCareer.Name}");
+                if(name == polishCareer.Name)
                 {
-                    Console.WriteLine($"NIE ODNALEZIONO: {name}");
+                    return;
+                }
+
+                var careerGroup = pack["system"]["careergroup"]["value"].ToString();
+
+                var transCareerGroup = careers.FirstOrDefault(x => x.Id == careerGroup || x.Name == careerGroup);
+                if (transCareerGroup == null)
+                {
+                    Console.WriteLine($"NIE ODNALEZIONO CAREER GROUP: {careerGroup}");
                 }
                 else
                 {
-                    Console.WriteLine($"Profesję {name.PadRight(30)} tłumaczę na: {polishCareer.Name}");
+                    pack["system"]["careergroup"]["value"] = transCareerGroup.Name;
+                    pack["system"]["description"]["value"] = pack["system"]["description"]["value"].ToString().Replace(careerGroup, transCareerGroup.Name);
+                }
 
-                    var careerGroup = pack["system"]["careergroup"]["value"].ToString();
+                pack["system"]["class"]["value"] = ReplaceCareer(pack["system"]["class"]["value"].ToString());
 
-                    var transCareerGroup = careers.FirstOrDefault(x => x.Id == careerGroup);
-                    if (transCareerGroup == null)
+                var transSkills = new List<string>();
+                foreach (var skill in pack["system"]["skills"].Values<string>())
+                {
+                    var searchSkill = skill.Trim();
+                    if (skill.Contains("(Any)", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        Console.WriteLine($"NIE ODNALEZIONO CAREER GROUP: {careerGroup}");
+                        searchSkill = searchSkill.Replace("(Any)", "()", StringComparison.InvariantCultureIgnoreCase).Trim();
+                    }
+                    var skillMapping = skillsMapping.FirstOrDefault(x => x.Id == searchSkill || x.Name == searchSkill);
+                    if (skillMapping != null)
+                    {
+                        transSkills.Add(skillMapping.Name);
                     }
                     else
                     {
-                        pack["system"]["careergroup"]["value"] = transCareerGroup.Name;
-                        pack["system"]["description"]["value"] = pack["system"]["description"]["value"].ToString().Replace(careerGroup, transCareerGroup.Name);
+                        transSkills.Add(skill);
+                        Console.WriteLine($"NIE ODNALEZIONO UMIEJĘTNOŚCI: {skill}");
                     }
+                }
 
-                    pack["system"]["class"]["value"] = ReplaceCareer(pack["system"]["class"]["value"].ToString());
+                ((JArray)pack["system"]["skills"]).RemoveAll();
+                foreach (var skill in transSkills)
+                {
+                    ((JArray)pack["system"]["skills"]).Add(skill);
+                }
 
-                    var transSkills = new List<string>();
-                    foreach (var skill in pack["system"]["skills"].Values<string>())
+                var transTalents = new List<string>();
+                foreach (var talent in pack["system"]["talents"].Values<string>())
+                {
+                    var transTalent = talents.FirstOrDefault(x => x.Id == talent.Trim() || x.Name == talent.Trim());
+                    if (transTalent != null)
                     {
-                        var searchSkill = skill.Trim();
-                        if (skill.Contains("(Any)", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            searchSkill = searchSkill.Replace("(Any)", "()", StringComparison.InvariantCultureIgnoreCase).Trim();
-                        }
-
-                        var transSkill = skills.FirstOrDefault(x => x.Id == searchSkill);
-                        if (transSkill != null)
-                        {
-                            transSkills.Add(transSkill.Name);
-                        }
-                        else
-                        {
-                            Console.WriteLine($"NIE ODNALEZIONO UMIEJĘTNOŚCI: {skill}");
-                        }
+                        transTalents.Add(transTalent.Name);
                     }
-
-                    ((JArray)pack["system"]["skills"]).RemoveAll();
-                    foreach(var skill in transSkills)
+                    else
                     {
-                        ((JArray)pack["system"]["skills"]).Add(skill);
-                    }
+                        if (talent.Contains("("))
+                        {
+                            var searchTalent = talent.Substring(0, talent.IndexOf("(") - 1);
+                            var searchSpec = talent.Substring(talent.IndexOf("(") + 1,
+                                talent.IndexOf(")") - (talent.IndexOf("(") + 1));
 
-                    var transTalents = new List<string>();
-                    foreach (var talent in pack["system"]["talents"].Values<string>())
-                    {
-                        var transTalent = talents.FirstOrDefault(x => x.Id == talent.Trim());
-                        if (transTalent != null)
-                        {
-                            transTalents.Add(transTalent.Name);
-                        }
-                        else
-                        {
-                            if (talent.Contains("("))
+                            transTalent = talents.FirstOrDefault(x => x.Id == searchTalent.Trim() || x.Name == searchTalent.Trim());
+                            if (transTalent != null)
                             {
-                                var searchTalent = talent.Substring(0, talent.IndexOf("(") - 1);
-                                var searchSpec = talent.Substring(talent.IndexOf("(") + 1,
-                                    talent.IndexOf(")") - (talent.IndexOf("(") + 1));
-
-                                transTalent = talents.FirstOrDefault(x => x.Id == searchTalent.Trim());
-                                if (transTalent != null)
-                                {
-                                    transTalents.Add(transTalent.Name + " (" + TranslateTalentSpec(searchSpec) + ")");
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"NIE ODNALEZIONO TALENTU: {talent}");
-                                }
+                                transTalents.Add(transTalent.Name + " (" + TranslateTalentSpec(searchSpec) + ")");
                             }
                             else
                             {
+                                transTalents.Add(talent);
                                 Console.WriteLine($"NIE ODNALEZIONO TALENTU: {talent}");
                             }
                         }
+                        else
+                        {
+                            transTalents.Add(talent);
+                            Console.WriteLine($"NIE ODNALEZIONO TALENTU: {talent}");
+                        }
                     }
-
-                    ((JArray)pack["system"]["talents"]).RemoveAll();
-                    foreach (var talent in transTalents)
-                    {
-                        ((JArray)pack["system"]["talents"]).Add(talent);
-                    }
-
-                    pack["name"] = polishCareer.Name;
                 }
-            }
 
+                ((JArray)pack["system"]["talents"]).RemoveAll();
+                foreach (var talent in transTalents)
+                {
+                    ((JArray)pack["system"]["talents"]).Add(talent);
+                }
 
-            foreach (var pack in packsCareers.OrderBy(x=>x["name"].ToString()))
-            {
-                File.AppendAllLines($@"{Config.TranslationsPath}\wfrp4e-core\careers.db",
-                    new[] {JsonConvert.SerializeObject(pack, Formatting.None)});
+                pack["name"] = polishCareer.Name;
             }
         }
 

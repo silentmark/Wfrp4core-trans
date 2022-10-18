@@ -20,32 +20,35 @@ namespace WFRP4e.Translator.Effects
             Effects.Clear();
             EffectsWithName.Clear();
 
-            var scriptPath = Config.TranslationsPath;
-            var scriptDirectoriees = Directory.GetDirectories(scriptPath);
-            foreach(var scriptDir in scriptDirectoriees)
+            var scriptPaths = new string[] { Config.TranslationsPath + "\\wfrp4e-core\\packs" };
+            foreach (var scriptPath in scriptPaths)
             {
-                var files = Directory.GetFiles(scriptDir);
-                foreach(var file in files)
+                var scriptDirectoriees = Directory.GetDirectories(scriptPath);
+                foreach (var scriptDir in scriptDirectoriees)
                 {
-                    var effectId = file.Split("_")[1].Replace(".js", "");
-                    var effectName = Path.GetFileName(file).Replace(".js", "");
-                    var script = File.ReadAllText(file);
-                    if (Effects.ContainsKey(effectId))
+                    var files = Directory.GetFiles(scriptDir);
+                    foreach (var file in files)
                     {
-                        Console.WriteLine("BŁĄD, ZDUPLIKOWANY EFFECT ID: " + effectId);
-                        Console.WriteLine(file);
-                        Console.WriteLine(script);
-                        Console.WriteLine("ISTNIEJĄCY SKRYPT:");
-                        Console.WriteLine(Effects[effectId]);
-                        Console.WriteLine();
-                        Console.WriteLine();
-                        Console.WriteLine();
+                        var effectId = file.Split("_")[1].Replace(".js", "");
+                        var effectName = Path.GetFileName(file).Replace(".js", "");
+                        var script = File.ReadAllText(file);
+                        if (Effects.ContainsKey(effectId))
+                        {
+                            Console.WriteLine("BŁĄD, ZDUPLIKOWANY EFFECT ID: " + effectId);
+                            Console.WriteLine(file);
+                            Console.WriteLine(script);
+                            Console.WriteLine("ISTNIEJĄCY SKRYPT:");
+                            Console.WriteLine(Effects[effectId]);
+                            Console.WriteLine();
+                            Console.WriteLine();
+                            Console.WriteLine();
+                        }
+                        else
+                        {
+                            Effects[effectId] = script;
+                        }
+                        EffectsWithName[effectName] = script;
                     }
-                    else
-                    {
-                        Effects[effectId] = script;
-                    }
-                    EffectsWithName[effectName] = script;
                 }
             }
         }

@@ -22,6 +22,9 @@ namespace WFRP4e.Translator.Json
         public static Dictionary<string, Entry> Talents = new Dictionary<string, Entry>();
         public static Dictionary<string, Entry> Traits = new Dictionary<string, Entry>();
         public static Dictionary<string, Entry> Trappings = new Dictionary<string, Entry>();
+        public static Dictionary<string, Entry> Journals = new Dictionary<string, Entry>();
+        public static Dictionary<string, Entry> Scenes = new Dictionary<string, Entry>();
+        public static Dictionary<string, Entry> Tables = new Dictionary<string, Entry>();
 
         public static Dictionary<string, List<Dictionary<string, Entry>>> TypeToMappingDictonary { get; } = new Dictionary<string, List<Dictionary<string, Entry>>>();
 
@@ -42,6 +45,15 @@ namespace WFRP4e.Translator.Json
             TypeToMappingDictonary["talent"] = new List<Dictionary<string, Entry>> { Talents };
             TypeToMappingDictonary["trait"] = new List<Dictionary<string, Entry>> { Traits };
             TypeToMappingDictonary["trapping"] = new List<Dictionary<string, Entry>> { Trappings };
+            TypeToMappingDictonary["weapon"] = new List<Dictionary<string, Entry>> { Trappings };
+            TypeToMappingDictonary["armour"] = new List<Dictionary<string, Entry>> { Trappings };
+            TypeToMappingDictonary["container"] = new List<Dictionary<string, Entry>> { Trappings };
+            TypeToMappingDictonary["ammunition"] = new List<Dictionary<string, Entry>> { Trappings };
+            TypeToMappingDictonary["vehicle"] = new List<Dictionary<string, Entry>> { Trappings };
+            TypeToMappingDictonary["money"] = new List<Dictionary<string, Entry>> { Trappings };
+            TypeToMappingDictonary["scene"] = new List<Dictionary<string, Entry>> { Scenes };
+            TypeToMappingDictonary["journal"] = new List<Dictionary<string, Entry>> { Journals };
+            TypeToMappingDictonary["table"] = new List<Dictionary<string, Entry>> { Tables };
         }
     }
 }

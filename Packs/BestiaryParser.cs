@@ -8,228 +8,296 @@ using WFRP4e.Translator.Json;
 
 namespace WFRP4e.Translator.Packs
 {
-    public class BestiaryParser
+    public class BestiaryParser : GenericParser<Entry>
     {
-
-        //TODO: translate effects in traits and talents + parameters in traits names (like Size (Large)).
-        public void Parse(List<Entry> translations)
+        public override void TranslatePack(JObject pack)
         {
-            var bestiary = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.bestiary.desc.json"));
-            var traitsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.traits.desc.json"));
-            var skillsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.skills.desc.json"));
-            var talentsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.talents.desc.json"));
+            var bestiary = Mappings.Bestiary.Values.ToList();
+            var traitsDesc = Mappings.Traits.Values.ToList();
+            var skillsDesc = Mappings.Skills.Values.ToList();
+            var talentsDesc = Mappings.Talents.Values.ToList();
+            var trappingsDesc = Mappings.Trappings.Values.ToList();
 
-            var packsTraits = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "traits.db"));
-            var traitsDb = packsTraits.Select(pack => JObject.Parse(pack)).ToList();
+            var packsTraits = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "traits.db")).Select(pack => JObject.Parse(pack)).ToList();
+            var packSkills = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "skills.db")).Select(pack => JObject.Parse(pack)).ToList();
+            var packTalents = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "talents.db")).Select(pack => JObject.Parse(pack)).ToList();
+            var packTrappings = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "trappings.db")).Select(pack => JObject.Parse(pack)).ToList();
+            //var packMutations = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "mutations.db")).Select(pack => JObject.Parse(pack)).ToList();
+            //var packSpells = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "spells.db")).Select(pack => JObject.Parse(pack)).ToList();
 
-            var packs = File.ReadAllLines(Path.Combine(Config.PacksPath, "wfrp4e-core", "bestiary.db"));
-            var packsBestiary = packs.Select(pack => JObject.Parse(pack)).ToList();
-            Console.WriteLine($@"Przetwarzam Kompendium, znaleziono {packsBestiary.Count} wpisów w db");
+            var name = pack.Value<string>("name");
+            var trans = GetEntry(pack, bestiary);
+            if (trans != null) 
+            { 
+                Console.WriteLine($"Potwora {name.PadRight(30)} tłumaczę na: {trans.Name}");
 
-            foreach (var pack in packsBestiary)
-            {
-                var name = pack.Value<string>("name");
-                var polishMonster = bestiary.FirstOrDefault(x => x.Id == name);
-                if (polishMonster == null)
+                pack["system"]["details"]["biography"]["value"] = trans.Description;
+                pack["name"] = trans.Name;
+
+                pack["system"]["characteristics"]["ws"]["label"] = "Walka Wręcz";
+                pack["system"]["characteristics"]["ws"]["abrev"] = "WW";
+                pack["system"]["characteristics"]["bs"]["label"] = "Umiejętności Strzeleckie";
+                pack["system"]["characteristics"]["bs"]["abrev"] = "US";
+                pack["system"]["characteristics"]["s"]["label"] = "Siła";
+                pack["system"]["characteristics"]["s"]["abrev"] = "S";
+                pack["system"]["characteristics"]["t"]["label"] = "Wytrzymałość";
+                pack["system"]["characteristics"]["t"]["abrev"] = "Wt";
+                pack["system"]["characteristics"]["i"]["label"] = "Inicjatywa";
+                pack["system"]["characteristics"]["i"]["abrev"] = "I";
+                pack["system"]["characteristics"]["ag"]["label"] = "Zwinność";
+                pack["system"]["characteristics"]["ag"]["abrev"] = "Zw";
+                pack["system"]["characteristics"]["dex"]["label"] = "Zręczność";
+                pack["system"]["characteristics"]["dex"]["abrev"] = "Zr";
+                pack["system"]["characteristics"]["int"]["label"] = "Inteligencja";
+                pack["system"]["characteristics"]["int"]["abrev"] = "Int";
+                pack["system"]["characteristics"]["wp"]["label"] = "Siła Woli";
+                pack["system"]["characteristics"]["wp"]["abrev"] = "SW";
+                pack["system"]["characteristics"]["fel"]["label"] = "Ogłada";
+                pack["system"]["characteristics"]["fel"]["abrev"] = "Ogd";
+
+                var items = ((JArray)pack["items"]);
+                List<JToken> list = items.ToList();
+                for (int i = 0; i < list.Count; i++)
                 {
-                    Console.WriteLine($"NIE ODNALEZIONO: {name}");
-                }
-                else
-                {
-                    Console.WriteLine($"Potwora {name.PadRight(30)} tłumaczę na: {polishMonster.Name}");
-
-                    var trans = translations.FirstOrDefault(x => x.Name == polishMonster.Name);
-                    pack["system"]["details"]["biography"]["value"] = trans.Description;
-                    pack["name"] = trans.Name;
-
-                    pack["system"]["characteristics"]["ws"]["label"] = "Walka Wręcz";
-                    pack["system"]["characteristics"]["ws"]["abrev"] = "WW";
-                    pack["system"]["characteristics"]["bs"]["label"] = "Umiejętności Strzeleckie";
-                    pack["system"]["characteristics"]["bs"]["abrev"] = "US";
-                    pack["system"]["characteristics"]["s"]["label"] = "Siła";
-                    pack["system"]["characteristics"]["s"]["abrev"] = "S";
-                    pack["system"]["characteristics"]["t"]["label"] = "Wytrzymałość";
-                    pack["system"]["characteristics"]["t"]["abrev"] = "Wt";
-                    pack["system"]["characteristics"]["i"]["label"] = "Inicjatywa";
-                    pack["system"]["characteristics"]["i"]["abrev"] = "I";
-                    pack["system"]["characteristics"]["ag"]["label"] = "Zwinność";
-                    pack["system"]["characteristics"]["ag"]["abrev"] = "Zw";
-                    pack["system"]["characteristics"]["dex"]["label"] = "Zręczność";
-                    pack["system"]["characteristics"]["dex"]["abrev"] = "Zr";
-                    pack["system"]["characteristics"]["int"]["label"] = "Inteligencja";
-                    pack["system"]["characteristics"]["int"]["abrev"] = "Int";
-                    pack["system"]["characteristics"]["wp"]["label"] = "Siła Woli";
-                    pack["system"]["characteristics"]["wp"]["abrev"] = "SW";
-                    pack["system"]["characteristics"]["fel"]["label"] = "Ogłada";
-                    pack["system"]["characteristics"]["fel"]["abrev"] = "Ogd";
-
-                    foreach (var item in (JArray) pack["items"])
+                    JToken item = list[i];
+                    if (item["type"].Value<string>() == "trait")
                     {
-                        if (item["type"].Value<string>() == "trait")
+                        HandleTraits(pack, traitsDesc, packsTraits, items, i, item);
+                    }
+                    else if (item["type"].Value<string>() == "skill")
+                    {
+                        HandleSkills(skillsDesc, packSkills, items, i, item);
+                    }
+                    else if (item["type"].Value<string>() == "talent")
+                    {
+                        HandleTalents(pack, talentsDesc, packTalents, items, i, item);
+                    }
+                    else if (item["type"].Value<string>() == "money")
+                    {
+                        var money = item["name"].Value<string>().Trim();
+                        switch (money)
                         {
-                            var searchTrait = item["name"].Value<string>().Trim();
-                            var transTrait = traitsDesc.FirstOrDefault(x =>
-                                x.Id == searchTrait || searchTrait.StartsWith(x.Id));
-
-                            JObject traitDb = null;
-                            if (searchTrait.StartsWith("Ranged"))
-                            {
-                                var desc = traitsDesc.First(x => x.Name == "Strzelanie (Zasięg)");
-                                item["name"] = "Strzelanie" + searchTrait.Replace("Ranged", "");
-                                item["system"]["description"]["value"] = desc.Description;
-                            }
-                            else if (searchTrait.StartsWith("Tongue Attack"))
-                            {
-                                var desc = traitsDesc.First(x => x.Name == "Atak Językiem (Zasięg)");
-                                item["name"] = "Atak Językiem" + searchTrait.Replace("Tongue Attack", "");
-                                item["system"]["description"]["value"] = desc.Description;
-
-                                traitDb = traitsDb.First(x => x["name"].ToString().StartsWith("Atak Językiem"));
-
-                            }
-                            else
-                            {
-                                if (transTrait != null)
+                            case "Brass Penny":
                                 {
-                                    var desc = traitsDesc.First(x => x.Name == transTrait.Name);
-                                    item["name"] = desc.Name;
-                                    item["system"]["description"]["value"] = desc.Description;
-
-                                    if (desc.Name.Contains("Macki"))
-                                    {
-                                        traitDb = traitsDb.First(x => x["name"].ToString().Contains("Macki"));
-                                    }
-                                    else
-                                    {
-                                        traitDb = traitsDb.First(x =>
-                                            x["name"].ToString().StartsWith(desc.Name.Split('(').First().Trim()));
-                                    }
-                                    if (!string.IsNullOrEmpty(item["system"]["specification"]?["value"]?.ToString()))
-                                    {
-                                        item["system"]["specification"]["value"] =
-                                           TraitsParser.TranslateSpecification(item["system"]["specification"]["value"].ToString());
-                                    }
+                                    item["name"] = "Brązowy Pens";
+                                    break;
                                 }
-                                else
+                            case "Silver Shilling":
                                 {
-                                    Console.WriteLine($"NIE ODNALEZIONO CECHY: {searchTrait}");
+                                    item["name"] = "Srebrny Szyling";
+                                    break;
                                 }
-                            }
-
-                            if (traitDb != null)
-                            {
-                                var bestiaryEffects = pack["effects"] as JArray;
-                                var itemEffects = item["effects"] as JArray;
-                                var traitEffects = traitDb["effects"] as JArray;
-
-
-                                if (bestiaryEffects != null)
+                            case "Gold Crown":
                                 {
-                                    foreach (JObject effect in bestiaryEffects)
-                                    {
-                                        var itemEffect = itemEffects.FirstOrDefault(x => x["label"].ToString() == effect["label"].ToString());
-                                        if(itemEffect != null)
-                                        {
-                                            if (itemEffects.Count == 1 && traitEffects != null &&
-                                                traitEffects.Count == 1)
-                                            {
-                                                effect["label"] = traitEffects[0]["label"];
-                                            }
-                                            else if (effect["label"].ToString() == "Swarm Bonuses")
-                                            {
-                                                effect["label"] = "Bonusy Roju";
-                                            }
-                                            else if (effect["label"].ToString() == "Swarm")
-                                            {
-                                                effect["label"] = "Rój";
-                                            }
-                                            else 
-                                            {
-                                                Console.WriteLine("UPS, NIE UMIEM DOPASOWAĆ EFEKTU DLA: " + effect["label"] + " z CECHY: " + traitDb["name"]);
-                                            }
-                                        }
-                                    }
+                                    item["name"] = "Złota Korona";
+                                    break;
                                 }
-
-                                if (itemEffects != null)
-                                {
-                                    (item["effects"] as JArray)?.Clear();
-                                    foreach (var jToken in traitDb["effects"] as JArray)
-                                    {
-                                        (item["effects"] as JArray).Add(jToken.DeepClone());
-                                    }
-                                }
-                            }
                         }
-                        else if (item["type"].Value<string>() == "skill")
-                        {
-                            var searchSkill = item["name"].Value<string>().Trim();
-                            var transSkill = skillsDesc.FirstOrDefault(x => x.Id == searchSkill || searchSkill.StartsWith(x.Id) || x.Id.StartsWith(searchSkill));
-                            
-                            if (transSkill != null)
-                            {
-                                var desc = skillsDesc.First(x => x.Name == transSkill.Name || transSkill.Name.StartsWith(x.Name));
-                                item["name"] = transSkill.Name;
-                                item["system"]["description"]["value"] = desc.Description;
-                            }
-                            else
-                            {
-                                Console.WriteLine($"NIE ODNALEZIONO UMIEJĘTNOŚCI: {searchSkill}");
-                            }
-                        }
-                        else if (item["type"].Value<string>() == "talent")
-                        {
-                            var searchTalent = item["name"].Value<string>().Trim();
-                            var transTalent = talentsDesc.FirstOrDefault(x => x.Id == searchTalent || searchTalent.StartsWith(x.Id) || x.Id.StartsWith(searchTalent));
-
-                            if (transTalent != null)
-                            {
-                                var desc = talentsDesc.First(x => x.Name == transTalent.Name || transTalent.Name.StartsWith(x.Name));
-                                item["name"] = transTalent.Name;
-                                item["system"]["description"]["value"] = desc.Description;
-                            }
-                            else
-                            {
-                                Console.WriteLine($"NIE ODNALEZIONO UMIEJĘTNOŚCI: {transTalent}");
-                            }
-                        }
-                        else if (item["type"].Value<string>() == "money")
-                        {
-                            var money = item["name"].Value<string>().Trim();
-                            switch (money)
-                            {
-                                case "Brass Penny":
-                                    {
-                                        item["name"] = "Brązowy Pens";
-                                        break;
-                                    }
-                                case "Silver Shilling":
-                                    {
-                                        item["name"] = "Srebrny Szyling";
-                                        break;
-                                    }
-                                case "Gold Crown":
-                                    {
-                                        item["name"] = "Złota Korona";
-                                        break;
-                                    }
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine($"NIEZNANY PRZEDMIOT: {item["type"]}: {item["name"]}");
-                        }
+                    }
+                    else if (item["type"].Value<string>() == "trapping" ||
+                        item["type"].Value<string>() == "weapon" ||
+                        item["type"].Value<string>() == "armour" ||
+                        item["type"].Value<string>() == "container" ||
+                        item["type"].Value<string>() == "ammunition")
+                    {
+                        HandleTrappings(pack, trappingsDesc, packTrappings, items, i, item);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"NIEZNANY PRZEDMIOT: {item["type"]}: {item["name"]}");
                     }
                 }
             }
+        }
 
-
-            foreach (var pack in packsBestiary.OrderBy(x=>x["name"].ToString()))
+        private void HandleTrappings(JObject actor, List<Entry> trappingsDesc, List<JObject> packTrappings, JArray items, int i, JToken item)
+        {
+            var transTrapping = GetEntry((JObject)item, trappingsDesc);
+            JToken trapping = null;
+            JToken clone = null;
+            if (transTrapping != null)
             {
-                File.AppendAllLines($@"{Config.TranslationsPath}\wfrp4e-core\bestiary.db",
-                    new[] {JsonConvert.SerializeObject(pack, Formatting.None)});
+                trapping = packTrappings.FirstOrDefault(x => x["_id"].Value<string>() == transTrapping.FoundryId);
+                clone = trapping.DeepClone();
+
+                items.RemoveAt(i);
+                items.Insert(i, clone);
+            }
+            if (clone != null && clone["effects"] != null && ((JArray)clone["effects"]).Count > 0)
+            {
+                var actorEffects = ((JArray)actor["effects"])
+                    .Where(x => x["origin"].Value<string>().EndsWith(clone["_id"].Value<string>()))
+                    .ToList();
+                if (actorEffects.Count == 1)
+                {
+                    actorEffects[0]["flags"] = clone["effects"][0]["flags"].DeepClone();
+                }
+                else if (actorEffects.Count == 0 && ((JArray)clone["effects"]).Count == 1)
+                {
+                    var cloneEffect = (clone["effects"][0]).DeepClone();
+                    cloneEffect["origin"] = $"Actor.{actor["_id"]}.Item.{clone["_id"]}";
+                    ((JArray)actor["effects"]).Add(cloneEffect);
+                }
+                else
+                {
+                }
             }
         }
-        
+
+        private void HandleTalents(JObject actor, List<Entry> talentsDesc, List<JObject> packTalents, JArray items, int i, JToken item)
+        {
+            var transTalent = GetEntry((JObject)item, talentsDesc);
+            JToken talent = null;
+            JToken clone = null;
+            if (transTalent != null)
+            {
+                talent = packTalents.FirstOrDefault(x => x["_id"].Value<string>() == transTalent.FoundryId);
+                clone = talent.DeepClone();
+
+                items.RemoveAt(i);
+                items.Insert(i, clone);
+            }
+
+            if (clone != null && clone["effects"] != null && ((JArray)clone["effects"]).Count > 0)
+            {
+                var actorEffects = ((JArray)actor["effects"])
+                    .Where(x => x["origin"].Value<string>().EndsWith(clone["_id"].Value<string>()))
+                    .ToList();
+                if (actorEffects.Count == 1)
+                {
+                    actorEffects[0]["flags"] = clone["effects"][0]["flags"].DeepClone();
+                }
+                else if (actorEffects.Count == 0 && ((JArray)clone["effects"]).Count == 1)
+                {
+                    var cloneEffect = (clone["effects"][0]).DeepClone();
+                    cloneEffect["origin"] = $"Actor.{actor["_id"]}.Item.{clone["_id"]}";
+                    ((JArray)actor["effects"]).Add(cloneEffect);
+                }
+                else
+                {                    
+                }
+            }
+        }
+
+        private void HandleSkills(List<Entry> skillsDesc, List<JObject> packSkills, JArray items, int i, JToken item)
+        {
+            var transSkill = GetEntry((JObject)item, skillsDesc);
+            JToken skill = null;
+            JToken clone = null;
+            if (transSkill != null)
+            {
+                skill = packSkills.FirstOrDefault(x => x["_id"].Value<string>() == transSkill.FoundryId);
+                clone = skill.DeepClone();
+
+                items.RemoveAt(i);
+                items.Insert(i, clone);
+            }
+        }
+
+        private void HandleTraits(JObject actor, List<Entry> traitsDesc, List<JObject> packsTraits, JArray items, int i, JToken item)
+        {
+            JToken trait = null;
+            JToken clone = null;
+            var searchTrait = item["name"].Value<string>().Trim();
+            var transTrait = GetEntry((JObject)item, traitsDesc);
+            if (transTrait != null)
+            {
+                trait = packsTraits.FirstOrDefault(x => x["_id"].Value<string>() == transTrait.FoundryId);
+                if (trait != null)
+                {
+                    items.RemoveAt(i);
+                    clone = trait.DeepClone();
+                    clone["_id"] = item["_id"].Value<string>();
+                    items.Insert(i, clone);
+                }
+                else
+                {
+                    Console.WriteLine($"Nie umiem znaleźć cechy {searchTrait} - {transTrait.Name} - {transTrait.FoundryId}");
+                }
+            }
+            else
+            {
+                if (searchTrait.StartsWith("Ranged") || searchTrait.StartsWith("Strzelanie"))
+                {
+                    var desc = traitsDesc.First(x => x.Name == "Strzelanie (Zasięg)");
+                    trait = packsTraits.FirstOrDefault(x => x["_id"].Value<string>() == desc.FoundryId);
+
+                    items.RemoveAt(i);
+                    clone = trait.DeepClone();
+                    clone["_id"] = item["_id"].Value<string>();
+                    clone["name"] = $"Strzelanie ({searchTrait.Replace("Ranged (", "").Replace("Strzelanie (", "").Replace(")", "")})";
+                    items.Insert(i, clone);
+                }
+                else if (searchTrait.StartsWith("Tongue Attack") || searchTrait.StartsWith("Atak Językiem"))
+                {
+                    var desc = traitsDesc.First(x => x.Name == "Atak Językiem (Zasięg)");
+                    trait = packsTraits.FirstOrDefault(x => x["_id"].Value<string>() == desc.FoundryId);
+
+                    items.RemoveAt(i);
+                    clone = trait.DeepClone();
+
+                    clone["_id"] = item["_id"].Value<string>();
+                    clone["name"] = $"Atak Językiem ({searchTrait.Replace("Tongue Attack (", "").Replace("Atak Językiem (", "").Replace(")", "")})";
+                    items.Insert(i, clone);
+                }
+                else if (searchTrait.Contains("Tentacles") || searchTrait.StartsWith("Macki"))
+                {
+                    trait = packsTraits.First(x => x["name"].ToString().Contains("Macki"));
+
+                    items.RemoveAt(i);
+                    clone = trait.DeepClone();
+                    clone["_id"] = item["_id"].Value<string>();
+                    items.Insert(i, clone);
+                    //TODO
+                }
+            }
+            if (!string.IsNullOrEmpty(item["system"]["specification"]?["value"]?.ToString()) && clone != null)
+            {
+                clone["system"]["specification"]["value"] =
+                   TraitsParser.TranslateSpecification(item["system"]["specification"]["value"].ToString());
+            }
+            if (clone != null && clone["effects"] != null && ((JArray)clone["effects"]).Count > 0)
+            {
+                var actorEffects = ((JArray)actor["effects"])
+                    .Where(x => x["origin"].Value<string>().EndsWith(clone["_id"].Value<string>()))
+                    .ToList();
+                if(actorEffects.Count == 1)
+                {
+                    actorEffects[0]["flags"] = clone["effects"][0]["flags"].DeepClone();
+                }
+                else if(actorEffects.Count == 0 && ((JArray)clone["effects"]).Count == 1)
+                {
+                    var cloneEffect = (clone["effects"][0]).DeepClone();
+                    cloneEffect["origin"] = $"Actor.{actor["_id"]}.Item.{clone["_id"]}";
+                    ((JArray)actor["effects"]).Add(cloneEffect);
+                }
+                else
+                {
+                    if (clone["name"].Value<string>() == "Rój")
+                    {
+                        var effect1 = actorEffects.FirstOrDefault(x => ((JArray)x["changes"]).Count > 0);
+                        var cloneEffect1 = ((JArray)clone["effects"]).First(x => x["label"].Value<string>() == "Bonusy Roju");
+                        if(effect1 == null)
+                        {
+                            effect1 = cloneEffect1.DeepClone();
+                            ((JArray)actor["effects"]).Add(effect1);
+                        }
+                        effect1["flags"] = cloneEffect1["flags"].DeepClone();
+                        effect1["origin"] = $"Actor.{actor["_id"]}.Item.{clone["_id"]}";
+
+
+                        var effect2 = actorEffects.FirstOrDefault(x => ((JArray)x["changes"]).Count == 0);
+                        var cloneEffect2 = ((JArray)clone["effects"]).First(x => x["label"].Value<string>() != "Bonusy Roju");
+                        if (effect1 == null)
+                        {
+                            effect2 = cloneEffect2.DeepClone();
+                            ((JArray)actor["effects"]).Add(effect2);
+                        }
+                        effect2["flags"] = cloneEffect2["flags"].DeepClone();
+                        effect2["origin"] = $"Actor.{actor["_id"]}.Item.{clone["_id"]}";
+                    }
+                }
+            }
+        }
     }
 }
