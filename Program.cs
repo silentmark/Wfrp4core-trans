@@ -53,12 +53,15 @@ namespace WFRP4e.Translator
                 new CriticalsParser().Parse(@"wfrp4e-core\packs\criticals.db");
                 new InjuriesParser().Parse(@"wfrp4e-core\packs\injuries.db");
                 new MutationsParser().Parse(@"wfrp4e-core\packs\mutations.db");
+                new MutationsParser().Parse(@"wfrp4e-eis\packs\expandedmutations.db");
                 new PrayersParser().Parse(@"wfrp4e-core\packs\prayers.db");
                 new PsychologiesParser().Parse(@"wfrp4e-core\packs\psychologies.db");
                 new SpellsParser().Parse(@"wfrp4e-core\packs\spells.db");
+                new SpellsParser().Parse(@"wfrp4e-eis\packs\eisspells.db");
                 new TrappingsParser().Parse(@"wfrp4e-core\packs\trappings.db");
                 new DiseasesParser().Parse(@"wfrp4e-core\packs\diseases.db");
                 new BestiaryParser().Parse(@"wfrp4e-core\packs\bestiary.db");
+                new MixedCompendiumParser().Parse(@"wfrp4e-eis\packs\eisitems.db");
             }
             else if (input.KeyChar == '2')
             {
@@ -74,6 +77,9 @@ namespace WFRP4e.Translator
                 EffectsExtractor.ExtractEffects(@"wfrp4e-core\packs\prayers.db");
                 EffectsExtractor.ExtractEffects(@"wfrp4e-core\packs\psychologies.db");
                 EffectsExtractor.ExtractEffects(@"wfrp4e-core\packs\traits.db");
+                EffectsExtractor.ExtractEffects(@"wfrp4e-eis\packs\expandedmutations.db");
+                EffectsExtractor.ExtractEffects(@"wfrp4e-eis\packs\eisspells.db");
+                EffectsExtractor.ExtractEffects(@"wfrp4e-eis\packs\eisitems.db");
             }
             else if (input.KeyChar == '3')
             {
@@ -88,6 +94,8 @@ namespace WFRP4e.Translator
                 EffectsUpdater.EffectsUpdate(@"wfrp4e-core\packs\prayers.db");
                 EffectsUpdater.EffectsUpdate(@"wfrp4e-core\packs\psychologies.db");
                 EffectsUpdater.EffectsUpdate(@"wfrp4e-core\packs\traits.db");
+                EffectsUpdater.EffectsUpdate(@"wfrp4e-eis\packs\eisspells.db");
+                EffectsUpdater.EffectsUpdate(@"wfrp4e-eis\packs\expandedmutations.db");
                 //EffectsUpdater.EffectsUpdate(@"wfrp4e-core\packs\bestiary.db", true);
                 //                EffectsUpdater.EffectsUpdate("items.db");
                 //                EffectsUpdater.EffectsUpdate("actors.db", true);

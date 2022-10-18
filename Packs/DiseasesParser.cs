@@ -24,13 +24,18 @@ namespace WFRP4e.Translator.Packs
             {
                 var newSymptoms = trans.Symptoms.Split(',').Select(x => x.Trim()).ToList();
 
-                pack["system"]["contraction"]["value"] = trans.Contraction;
-                pack["system"]["duration"]["value"] = trans.Duration;
-                pack["system"]["duration"]["unit"] = trans.DurationUnit;
-                pack["system"]["incubation"]["value"] = trans.Incubation;
-                pack["system"]["incubation"]["unit"] = trans.IncubationUnit;
-                pack["system"]["permanent"]["value"] = trans.Permanent;
-                pack["system"]["symptoms"]["value"] = trans.Symptoms;
+                var pathToData = "system";
+                if (pack["data"] != null)
+                {
+                    pathToData = "data";
+                }
+                pack[pathToData]["contraction"]["value"] = trans.Contraction;
+                pack[pathToData]["duration"]["value"] = trans.Duration;
+                pack[pathToData]["duration"]["unit"] = trans.DurationUnit;
+                pack[pathToData]["incubation"]["value"] = trans.Incubation;
+                pack[pathToData]["incubation"]["unit"] = trans.IncubationUnit;
+                pack[pathToData]["permanent"]["value"] = trans.Permanent;
+                pack[pathToData]["symptoms"]["value"] = trans.Symptoms;
 
 
                 if (pack["effects"] != null)
@@ -77,7 +82,7 @@ namespace WFRP4e.Translator.Packs
             {"pox", "Wysypka"},
             {"wounded", "Uciążliwa Rana"},
             {"delirium", "Delirium"},
-            {"swelling", "Obrzęk"}
+            {"swelling", "Opuchlizna"}
         };
     }
 }

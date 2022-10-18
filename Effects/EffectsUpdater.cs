@@ -20,7 +20,7 @@ namespace WFRP4e.Translator.Effects
             Effects.Clear();
             EffectsWithName.Clear();
 
-            var scriptPaths = new string[] { Config.TranslationsPath + "\\wfrp4e-core\\packs" };
+            var scriptPaths = new string[] { Config.TranslationsPath + "\\wfrp4e-core\\packs", Config.TranslationsPath + "\\wfrp4e-eis\\packs" };
             foreach (var scriptPath in scriptPaths)
             {
                 var scriptDirectoriees = Directory.GetDirectories(scriptPath);

@@ -17,6 +17,11 @@ namespace WFRP4e.Translator.Packs
 
         protected void TranslatePack(JObject pack, List<Entry> translations)
         {
+            var pathToData = "system";
+            if (pack["data"] != null)
+            {
+                pathToData = "data";
+            }
             var name = pack.Value<string>("name");
             var trans = GetEntry(pack, translations);
             if (trans != null)
@@ -36,10 +41,11 @@ namespace WFRP4e.Translator.Packs
                     }
                 }
 
-                if (!string.IsNullOrEmpty(pack["system"]["specification"]["value"].ToString()))
+
+                if (!string.IsNullOrEmpty(pack[pathToData]["specification"]["value"].ToString()))
                 {
-                    pack["system"]["specification"]["value"] =
-                        TranslateSpecification(pack["system"]["specification"]["value"].ToString());
+                    pack[pathToData]["specification"]["value"] =
+                        TranslateSpecification(pack[pathToData]["specification"]["value"].ToString());
                 }
             }
 
