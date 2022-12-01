@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using WFRP4e.Translator.Json;
+using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
@@ -14,6 +14,25 @@ namespace WFRP4e.Translator.Packs
     {
         public override void TranslatePack(JObject packObject)
         {
+            var results = (JArray)packObject["results"];
+            foreach (JObject result in results)
+            {
+                if (result["collection"] != null && !string.IsNullOrEmpty(result["collection"].Value<string>()))
+                {
+                    var collection = result["collection"].Value<string>();
+                    var text = result["text"].Value<string>();
+                    var packs = File.ReadAllLines(Path.Combine(Config.TranslationsPath, collection.Split('.')[0], "packs", collection.Split('.')[1] + ".db"))
+                        .Select(pack => JObject.Parse(pack)).ToList();
+                    if (packs[0]["type"].Value<string>() == "mutation")
+                    {
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+
             //foreach (var polishTable in polishPackEntries)
             //{
             //    var key = polishTable["flags"]["wfrp4e"]["key"].Value<string>();

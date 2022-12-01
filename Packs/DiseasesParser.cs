@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
+using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
@@ -13,7 +14,7 @@ namespace WFRP4e.Translator.Packs
 
         public override void TranslatePack(JObject pack)
         {
-            TranslatePack(pack, Mappings.Diseases.Values.OfType<DiseaseEntry>().ToList());
+            TranslatePack(pack, Mappings.TypeToMappingDictonary["disease"].Values.OfType<DiseaseEntry>().ToList());
         }
 
         protected void TranslatePack(JObject pack, List<DiseaseEntry> translations)

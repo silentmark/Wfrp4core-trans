@@ -5,23 +5,22 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
+using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
-    public class BestiaryParser : GenericParser<Entry>
+    public class CreatureParser : GenericParser<Entry>
     {
         public override void TranslatePack(JObject pack)
         {
-            var bestiary = Mappings.Bestiary.Values.ToList();
-            var eisMappings = Mappings.EiSactors.Values.ToList();
-            bestiary.AddRange(eisMappings);
-
-            var traitsDesc = Mappings.Traits.Values.ToList();
-            var skillsDesc = Mappings.Skills.Values.ToList();
-            var talentsDesc = Mappings.Talents.Values.ToList();
-            var trappingsDesc = Mappings.Trappings.Values.ToList();
-            var spellsDesc = Mappings.Spells.Values.ToList();
-            var mutationsDesc = Mappings.Mutations.Values.ToList();
+            var bestiary = Mappings.TypeToMappingDictonary["creature"].Values.ToList();
+          
+            var traitsDesc = Mappings.TypeToMappingDictonary["trait"].Values.ToList();
+            var skillsDesc = Mappings.TypeToMappingDictonary["skill"].Values.ToList();
+            var talentsDesc = Mappings.TypeToMappingDictonary["talent"].Values.ToList();
+            var trappingsDesc = Mappings.TypeToMappingDictonary["trapping"].Values.ToList();
+            var spellsDesc = Mappings.TypeToMappingDictonary["spell"].Values.ToList();
+            var mutationsDesc = Mappings.TypeToMappingDictonary["mutation"].Values.ToList();
 
             var packsTraits = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-core", "packs", "traits.db")).Select(pack => JObject.Parse(pack)).ToList();
             var eisTraits = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "wfrp4e-eis", "packs", "eisitems.db")).Select(pack => JObject.Parse(pack))

@@ -13,6 +13,8 @@ using WFRP4e.Translator.Scanners;
 using WFRP4e.Translator.Effects;
 using System.Reflection;
 using DeepL;
+using System.Collections;
+using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator
 {
@@ -35,17 +37,20 @@ namespace WFRP4e.Translator
                   Wciśnij 1. aby zmodyfikować pliki .db na podstawie plików json.
                   Wciśnij 2. aby wyciągnąć skrypty efektów z wygenerowanych plików .db
                   Wciśnij 3. aby zmodyfikować skrypty efektów w kompendium i świecie. 
-                  Wciśnij 4. aby przetłumaczyć journal entries."
+                  Wciśnij 4. aby przetłumaczyć journal entries.
+                  Wciśnij 5. aby zwalidować i zaktualizować mapowania. 
+                  "
 );
 
             InitAllMappings();
-            CreateDeeplGlossary();
+
+            ExtractJsonsToFiles(Config.PacksPath);
+            ExtractJsonsToFiles(Config.TranslationsPath);
 
             var input = Console.ReadKey();
             Console.WriteLine();
             if (input.KeyChar == '1')
             {
-                new RollTableParser().Parse(@"wfrp4e-core\packs\tables.db");
                 new TalentsParser().Parse(@"wfrp4e-core\packs\talents.db");
                 new SkillsParser().Parse(@"wfrp4e-core\packs\skills.db");
                 new CareersParser().Parse(@"wfrp4e-core\packs\careers.db");
@@ -60,9 +65,14 @@ namespace WFRP4e.Translator
                 new SpellsParser().Parse(@"wfrp4e-eis\packs\eisspells.db");
                 new TrappingsParser().Parse(@"wfrp4e-core\packs\trappings.db");
                 new DiseasesParser().Parse(@"wfrp4e-core\packs\diseases.db");
-                new BestiaryParser().Parse(@"wfrp4e-core\packs\bestiary.db");
+                new CreatureParser().Parse(@"wfrp4e-core\packs\bestiary.db");
                 new MixedCompendiumParser().Parse(@"wfrp4e-eis\packs\eisitems.db");
-                new BestiaryParser().Parse(@"wfrp4e-eis\packs\eisactors.db");
+                new MixedCompendiumParser().Parse(@"wfrp4e-horned-rat\packs\horned-rat-items.db");
+                new CreatureParser().Parse(@"wfrp4e-eis\packs\eisactors.db");
+                new CreatureParser().Parse(@"wfrp4e-horned-rat\packs\horned-rat-actors.db");
+                new RollTableParser().Parse(@"wfrp4e-eis\packs\tables.db");
+                new RollTableParser().Parse(@"wfrp4e-core\packs\tables.db");
+                new RollTableParser().Parse(@"wfrp4e-horned-rat\packs\horned-rat-tables.db");
             }
             else if (input.KeyChar == '2')
             {
@@ -78,6 +88,9 @@ namespace WFRP4e.Translator
                 EffectsExtractor.ExtractEffects(@"wfrp4e-core\packs\prayers.db");
                 EffectsExtractor.ExtractEffects(@"wfrp4e-core\packs\psychologies.db");
                 EffectsExtractor.ExtractEffects(@"wfrp4e-core\packs\traits.db");
+
+                EffectsExtractor.ExtractEffects(@"wfrp4e-horned-rat\packs\horned-rat-items.db");
+
                 EffectsExtractor.ExtractEffects(@"wfrp4e-eis\packs\expandedmutations.db");
                 EffectsExtractor.ExtractEffects(@"wfrp4e-eis\packs\eisspells.db");
                 EffectsExtractor.ExtractEffects(@"wfrp4e-eis\packs\eisitems.db");
@@ -95,62 +108,189 @@ namespace WFRP4e.Translator
                 EffectsUpdater.EffectsUpdate(@"wfrp4e-core\packs\prayers.db");
                 EffectsUpdater.EffectsUpdate(@"wfrp4e-core\packs\psychologies.db");
                 EffectsUpdater.EffectsUpdate(@"wfrp4e-core\packs\traits.db");
+
+                EffectsUpdater.EffectsUpdate(@"wfrp4e-horned-rat\packs\horned-rat-items.db");
+
                 EffectsUpdater.EffectsUpdate(@"wfrp4e-eis\packs\eisspells.db");
                 EffectsUpdater.EffectsUpdate(@"wfrp4e-eis\packs\expandedmutations.db");
+
+
                 //EffectsUpdater.EffectsUpdate(@"wfrp4e-core\packs\bestiary.db", true);
                 //                EffectsUpdater.EffectsUpdate("items.db");
                 //                EffectsUpdater.EffectsUpdate("actors.db", true);
             }
-            else if (input.KeyChar == '5')
+            else if (input.KeyChar == '4')
             {
-                new JournalParser().Parse();
+                new JournalParser().Parse(@"wfrp4e-eis\packs\eisjournals.db");
             }
-            else if (input.KeyChar == '6')
+            else if(input.KeyChar == '5')
             {
-                new ForiensArmouryParser().Parse();
+                UpdateJsonMappingFiles(Config.PacksPath, Config.TranslationsPath, Config.TranslationsPath + "\\wfrp4e-jsons");
             }
             Console.WriteLine("Zakończono");
         }
 
+        private static void UpdateJsonMappingFiles(string packsPath, string translationsPath, string mappingJsons)
+        {
+            var packs = Directory.EnumerateFiles(packsPath, "*.db", SearchOption.AllDirectories).ToList();
+            foreach (var pack in packs)
+            {
+                var jsons = File.ReadAllLines(pack);
+                foreach (var jsonString in jsons)
+                {
+                    var obj = JObject.Parse(jsonString);
+                    var id = obj.GetValue("_id").Value<string>();
+                    var type = GetTypeFromJson(obj);
+                    var targtetType = GetEntryType(type, typeof(Entry));
+
+                    var name = obj.GetValue("name").Value<string>();
+                    var dic = Mappings.TypeToMappingDictonary[type];
+                    if (!dic.ContainsKey(id))
+                    {
+                        Console.WriteLine($"Nie odnalazłem wpisu: {id} - {type} - {name}");
+                        var entry = targtetType.GetConstructor(new Type[] { }).Invoke(new object[] {}) as Entry;
+                        var readerType = GetEntryType(type, typeof(GenericItemReader));
+                        if (readerType != null)
+                        {
+                            var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                            var method = readerType.GetMethod("UpdateEntry");
+                            method.Invoke(reader, new object[] { obj, entry });
+                        }
+                        else
+                        {
+                            entry.FoundryId = id;
+                            entry.Description = "";
+                            entry.Name = name;
+                            entry.OriginalName = name;
+                            entry.Type = type;
+                        }
+                        dic.Add(id, entry);
+                    }
+                    else
+                    {
+                        var readerType = GetEntryType(type, typeof(GenericItemReader));
+                        if (readerType != null)
+                        {
+                            var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                            var method = readerType.GetMethod("UpdateEntry");
+                            method.Invoke(reader, new object[] { obj, dic[id] });
+                        }
+                        else
+                        {
+                            dic[id].OriginalName = name;
+                            dic[id].Type = type;
+                        }
+                    }
+                }
+            }
+
+            packs = Directory.EnumerateFiles(translationsPath, "*.db", SearchOption.AllDirectories).ToList();
+            foreach (var pack in packs)
+            {
+                var jsons = File.ReadAllLines(pack);
+                foreach (var jsonString in jsons)
+                {
+                    var obj = JObject.Parse(jsonString);
+                    var id = obj.GetValue("_id").Value<string>();
+                    var type = GetTypeFromJson(obj);
+
+                    var name = obj.GetValue("name").Value<string>();
+                    var dic = Mappings.TypeToMappingDictonary[type];
+                    if (!dic.ContainsKey(id))
+                    {
+                        Console.WriteLine($"Nie odnalazłem wpisu dla przetłumaczonego elementu: {id} - {type} - {name}");
+                    }
+                }
+            }
+
+            foreach (var dic in Mappings.TypeToMappingDictonary)
+            {
+                foreach (var item in dic.Value.Where(x => string.IsNullOrEmpty(x.Value.OriginalName)).ToList())
+                {
+                    dic.Value.Remove(item.Key);
+                }
+            }
+
+            var newTypeToJsonListDic = new Dictionary<string, List<Entry>>();
+            foreach (var dic in Mappings.TypeToMappingDictonary)
+            {
+                foreach (var item in dic.Value.Values)
+                {
+                    if (!newTypeToJsonListDic.ContainsKey(item.Type))
+                    {
+                        newTypeToJsonListDic.Add(item.Type, new List<Entry>());
+                    }
+                    newTypeToJsonListDic[item.Type].Add(item);
+                }
+            }
+
+
+            foreach (var list in newTypeToJsonListDic)
+            {
+                var targetPath = mappingJsons + "\\wfrp4e." + list.Key + ".desc.json";
+                var arr = list.Value.OrderBy(x=>x.FoundryId).ToArray();
+                File.WriteAllText(targetPath, JsonConvert.SerializeObject(arr, Formatting.Indented));
+            }
+        }
+
+        private static void ExtractJsonsToFiles(string packsPath)
+         {
+            var packs = Directory.EnumerateFiles(packsPath, "*.db", SearchOption.AllDirectories).ToList();
+            foreach(var pack in packs)
+            {
+                var jsons = File.ReadAllLines(pack);
+                foreach (var jsonString in jsons)
+                {
+                    var obj = JObject.Parse(jsonString);
+                    var id = obj.GetValue("_id").Value<string>();
+                    obj.Remove("_stats");
+                    if (!Directory.Exists(Path.GetDirectoryName(pack) + "\\jsons\\" + Path.GetFileNameWithoutExtension(pack)))
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(pack) + "\\jsons\\" + Path.GetFileNameWithoutExtension(pack));
+                    }
+                    var targetPath = Path.GetDirectoryName(pack) + "\\jsons\\" + Path.GetFileNameWithoutExtension(pack) + "\\" + id + ".json";
+                    File.WriteAllText(targetPath, JsonConvert.SerializeObject(obj, Formatting.Indented));
+                }
+            }
+        }
+
         private static void InitAllMappings()
         {
-            var packs = Directory.EnumerateFiles(Config.PacksPath, "*.db", SearchOption.AllDirectories).ToList();
             var listOfJsons = Directory.EnumerateFiles(Config.TranslationsPath + "\\wfrp4e-jsons", "*desc.json", SearchOption.TopDirectoryOnly).ToList();
             foreach (var json in listOfJsons)
             {
-                if (json.Contains("disease"))
+                var dictionary = GetDictionaryFromFileName(json);
+                var type = GetTypeFromJson(json);
+                var targtetTypeList = typeof(List<>).MakeGenericType(GetEntryType(type, typeof(Entry)));
+
+                var elements = JsonConvert.DeserializeObject(File.ReadAllText(json), targtetTypeList) as IList;
+                foreach(Entry element in elements)
                 {
-                    var descriptions = JsonConvert.DeserializeObject<List<DiseaseEntry>>(File.ReadAllText(json));
-                    foreach (var entry in descriptions)
-                    {
-                        Mappings.Diseases.Add(entry.Id, entry);
-                    }
-                }
-                else if (json.Contains("talent"))
-                {
-                    var descriptions = JsonConvert.DeserializeObject<List<TalentEntry>>(File.ReadAllText(json));
-                    foreach (var entry in descriptions)
-                    {
-                        Mappings.Talents.Add(entry.Id, entry);
-                    }
-                }
-                else
-                {
-                    var descriptions = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(json));
-                    var dictionary = GetDictionaryFromFileName(json);
-                    foreach (var entry in descriptions)
-                    {
-                        dictionary.Add(entry.Id, entry);
-                    }                    
+                    dictionary.Add(element.FoundryId, element);
                 }
             }
-            Mappings.Init();
+        }
+
+        private static Type GetEntryType(string foundryType, Type baseType)
+        {
+            var types = typeof(Entry).Assembly.GetTypes().Where(x => x.CustomAttributes.Any(x => x.AttributeType == typeof(FoundryTypeAttribute)) && x.IsAssignableTo(baseType)).ToList();
+            var type = types.FirstOrDefault(x => x.GetCustomAttribute<FoundryTypeAttribute>().Type == foundryType);
+            return type;
+        }
+
+        private static string GetTypeFromJson(string json)
+        {
+            return json.Split("wfrp4e.")[1].Replace(".desc.json", "");
         }
 
         private static Dictionary<string, Entry> GetDictionaryFromFileName(string json)
         {
-            var prop = typeof(Mappings).GetFields(BindingFlags.Public | BindingFlags.Static).FirstOrDefault(x => json.ToLower().Contains(x.Name.ToLower()));
-            return (Dictionary<string, Entry>)prop.GetValue(null);
+            var type = GetTypeFromJson(json);
+            if (!Mappings.TypeToMappingDictonary.ContainsKey(type))
+            {
+                Mappings.TypeToMappingDictonary.Add(type, new Dictionary<string, Entry>());
+            }
+            return Mappings.TypeToMappingDictonary[type];
         }
 
         #region Various
@@ -250,7 +390,7 @@ namespace WFRP4e.Translator
                                     {
                                         FoundryId = $"{id}.{type}.{effectId}",
                                         Name = $"{name} - {label}",
-                                        Id = $"{name} - {label}",
+                                        OriginalName = $"{name} - {label}",
                                         Description = effect["flags"]?["wfrp4e"]?["script"]?.ToString()
                                     });
                                 }
@@ -265,132 +405,6 @@ namespace WFRP4e.Translator
                 }
             }
             File.WriteAllText(Config.TranslationsPath + "\\wfrp4e-jsons\\effects.json", JsonConvert.SerializeObject(effectsObjects, Formatting.Indented));            
-        }
-
-        private static void UpdateMappings()
-        {
-            var packs = Directory.EnumerateFiles(Config.PacksPath, "*.db", SearchOption.AllDirectories).ToList();
-            var listOfJsons = Directory.EnumerateFiles(Config.TranslationsPath + "\\wfrp4e-jsons", "*desc.json", SearchOption.TopDirectoryOnly).ToList();
-            var skillsMapping = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + "\\wfrp4e-jsons\\wfrp4e.skills.mapping.json"));
-
-            foreach (var pack in packs)
-            {
-                var lines = File.ReadAllLines(pack);
-                foreach (var line in lines)
-                {
-                    var packObject = JObject.Parse(line);
-                    var type = GetTypeFromJson(packObject);
-                    var name = packObject["name"].Value<string>(); 
-                    var id = packObject["_id"].Value<string>();
-                    if (Mappings.TypeToMappingDictonary.ContainsKey(type))
-                    {
-                        var dictionaries = Mappings.TypeToMappingDictonary[type];
-                        var dic = dictionaries.FirstOrDefault(dic => dic.ContainsKey(name));
-                        if (dic != null)
-                        {
-                            dic[name].FoundryId = id;
-                        }
-                        else if(type == "skill")
-                        {
-                            var skill = dictionaries[0].Keys.FirstOrDefault(x => x == name.Split("(")[0].Trim());
-                            if(skill != null)
-                            {
-                                var mapping = skillsMapping.FirstOrDefault(x => x.Id == name);
-                                if(mapping != null)
-                                {
-                                    dictionaries[0].Add(name, new Entry
-                                    {
-                                        Id = name,
-                                        Name = mapping.Name,
-                                        FoundryId = id,
-                                        Description = dictionaries[0][skill].Description
-                                    });
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"Couldn't find object {name} of type: {type}");
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Couldn't find object {name} of type: {type}");
-                            }
-                        }
-                        else 
-                        {
-                            Console.WriteLine($"Couldn't find object {name} of type: {type}");
-                        }
-                    }
-                    else 
-                    {
-                        Console.WriteLine($"Couldn't find object {name} of type: {type}");                        
-                    }
-                }
-            }
-            foreach (var json in listOfJsons)
-            {
-                var dic = GetDictionaryFromFileName(json);
-                File.WriteAllText(json, JsonConvert.SerializeObject(dic.Values, Formatting.Indented));
-            }
-        }
-
-        private static void ExtractMappings()
-        {
-            var packs = Directory.EnumerateFiles(Config.PacksPath, "*.db", SearchOption.AllDirectories).ToList();
-            var actors = packs.First(x => x.Contains("eisactors.db"));
-            var actorLines = File.ReadAllLines(actors);
-            foreach (var actor in actorLines)
-            {
-                var actorJson = JObject.Parse(actor);
-                var name = actorJson["name"].Value<string>();
-                var id = actorJson["_id"].Value<string>();
-                var desc = string.Empty;
-                if (actorJson["data"]["details"]["biography"] != null)
-                {
-                    desc = actorJson["data"]["details"]["biography"]["value"].Value<string>();
-                }
-                else if (actorJson["data"]["details"]["description"] != null)
-                {
-                    desc = actorJson["data"]["details"]["description"]["value"].Value<string>();
-                }
-                Mappings.EiSactors.Add(name, new Entry { Id = name, Name = name, FoundryId = id, Description = desc });
-            }
-            File.WriteAllText(Path.Combine(Config.TranslationsPath, "wfrp4e-jsons", "wfrp4e.eisactors.desc.json"), JsonConvert.SerializeObject(Mappings.EiSactors.Values, Formatting.Indented));
-
-
-
-            var spells = packs.First(x => x.Contains("eisspells.db"));
-            var spellLines = File.ReadAllLines(spells);
-            foreach(var spell in spellLines)
-            {
-                var spellJson = JObject.Parse(spell);
-                var name = spellJson["name"].Value<string>();
-                var id = spellJson["_id"].Value<string>();
-                var desc = spellJson["data"]["description"]["value"].Value<string>();
-                Mappings.Spells.Add(name, new Entry { Id = name, Name = name, FoundryId = id, Description = desc });
-
-            }
-            File.WriteAllText(Path.Combine(Config.TranslationsPath, "wfrp4e-jsons", "wfrp4e.spells.desc.json"), JsonConvert.SerializeObject(Mappings.Spells.Values, Formatting.Indented));
-
-            var mutations = packs.First(x => x.Contains("expandedmutations.db"));
-            var mutationLines = File.ReadAllLines(mutations);
-            foreach (var mutation in mutationLines)
-            {
-                var mutationJson = JObject.Parse(mutation);
-                var name = mutationJson["name"].Value<string>();
-                var id = mutationJson["_id"].Value<string>();
-                var desc = mutationJson["data"]["description"]["value"].Value<string>();
-                if (Mappings.Mutations.ContainsKey(name))
-                {
-                    Console.WriteLine("Already exists: " + name);
-                }
-                else
-                {
-                    Mappings.Mutations.Add(name, new Entry { Id = name, Name = name, FoundryId = id, Description = desc });
-                }
-            }
-            File.WriteAllText(Path.Combine(Config.TranslationsPath, "wfrp4e-jsons", "wfrp4e.mutations.desc.json"), JsonConvert.SerializeObject(Mappings.Mutations.Values, Formatting.Indented));
-
         }
 
 
@@ -544,7 +558,7 @@ namespace WFRP4e.Translator
             var critLeg = JObject.Parse(File.ReadAllText("Tables\\critleg.json"));
             var list = new List<JObject> { critArm, critBody, critHead, critLeg };
 
-            var entries = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText("Final\\wfrp4e.criticals.desc.json"));
+            var entries = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText("Final\\wfrp4e.critical.desc.json"));
             foreach (var entry in entries)
             {
                 JObject row = null;
@@ -585,42 +599,7 @@ namespace WFRP4e.Translator
                 }
             }
             var text = JsonConvert.SerializeObject(entries, Formatting.Indented);
-            File.WriteAllText("Final\\wfrp4e.criticals.desc.json", text);
-        }
-
-
-        private static void ValidationMethod()
-        {
-            foreach (var file in Directory.GetFiles("Mappings"))
-            {
-                if (file.Contains("wfrp4e") && file.Contains("json"))
-                {
-                    var list = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(file));
-
-                    if (File.Exists("Final\\" + file.Split('\\').Last().Replace(".json", ".desc.json")))
-                    {
-                        var entries =
-                            JsonConvert.DeserializeObject<List<Entry>>(
-                                File.ReadAllText("Final\\" + file.Split('\\').Last().Replace(".json", ".desc.json")));
-
-                        foreach (var entry in entries)
-                        {
-                            var mapping = list.SingleOrDefault(x => x.Name == entry.Name);
-                            if (mapping == null)
-                            {
-                                Console.WriteLine("Nie odnaleziono: " + entry + " w pliku: " + file);
-                            }
-                            else
-                            {
-                                entry.Id = mapping.Id;
-                            }
-                        }
-
-                        var text = JsonConvert.SerializeObject(entries, Formatting.Indented);
-                        File.WriteAllText("Final\\" + file.Split('\\').Last().Replace(".json", ".desc.json"), text);
-                    }
-                }
-            }
+            File.WriteAllText("Final\\wfrp4e.critical.desc.json", text);
         }
 
         #endregion

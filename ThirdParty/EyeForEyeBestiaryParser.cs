@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using WFRP4e.Translator.Json;
+using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
@@ -13,9 +13,9 @@ namespace WFRP4e.Translator.Packs
         //TODO: translate effects in traits and talents + parameters in traits names (like Size (Large)).
         public void Parse()
         {
-            var traitsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.traits.desc.json"));
-            var skillsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.skills.desc.json"));
-            var talentsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.talents.desc.json"));
+            var traitsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.trait.desc.json"));
+            var skillsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.skill.desc.json"));
+            var talentsDesc = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(Config.TranslationsPath + @"\wfrp4e.talent.desc.json"));
 
             var packsTraits = File.ReadAllLines(Path.Combine(Config.TranslationsPath, "traits.db"));
             var traitsDb = packsTraits.Select(pack => JObject.Parse(pack)).ToList();
@@ -56,7 +56,7 @@ namespace WFRP4e.Translator.Packs
                     {
                         var searchTrait = item["name"].Value<string>().Trim();
                         var transTrait = traitsDesc.FirstOrDefault(x =>
-                            x.Id == searchTrait || searchTrait.StartsWith(x.Id));
+                            x.OriginalName == searchTrait || searchTrait.StartsWith(x.OriginalName));
 
                         JObject traitDb = null;
                         if (searchTrait.StartsWith("Ranged"))
@@ -151,7 +151,7 @@ namespace WFRP4e.Translator.Packs
                     else if (item["type"].Value<string>() == "skill")
                     {
                         var searchSkill = item["name"].Value<string>().Trim();
-                        var transSkill = skillsDesc.FirstOrDefault(x => x.Id == searchSkill || searchSkill.StartsWith(x.Id) || x.Id.StartsWith(searchSkill));
+                        var transSkill = skillsDesc.FirstOrDefault(x => x.OriginalName == searchSkill || searchSkill.StartsWith(x.OriginalName) || x.OriginalName.StartsWith(searchSkill));
 
                         if (transSkill != null)
                         {
@@ -167,7 +167,7 @@ namespace WFRP4e.Translator.Packs
                     else if (item["type"].Value<string>() == "talent")
                     {
                         var searchTalent = item["name"].Value<string>().Trim();
-                        var transTalent = talentsDesc.FirstOrDefault(x => x.Id == searchTalent || searchTalent.StartsWith(x.Id) || x.Id.StartsWith(searchTalent));
+                        var transTalent = talentsDesc.FirstOrDefault(x => x.OriginalName == searchTalent || searchTalent.StartsWith(x.OriginalName) || x.OriginalName.StartsWith(searchTalent));
 
                         if (transTalent != null)
                         {

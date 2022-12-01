@@ -1,0 +1,8 @@
+﻿namespace WFRP4e.Translator.Json.Entries
+{
+    [FoundryType("npc")]
+    public class NpcEntry : ActorEntry
+    {
+
+    }
+}

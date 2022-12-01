@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
+using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
@@ -12,11 +13,11 @@ namespace WFRP4e.Translator.Packs
     {
         public override void TranslatePack(JObject pack)
         {
-            var careers = Mappings.Careers.Values.ToList();
-            var talents = Mappings.Talents.Values.ToList();
-            var skills = Mappings.Skills.Values.ToList();
+            var careers = Mappings.TypeToMappingDictonary["career"].Values.ToList();
+            var talents = Mappings.TypeToMappingDictonary["talent"].Values.ToList();
+            var skills = Mappings.TypeToMappingDictonary["skill"].Values.ToList();
 
-            var skillsMapping = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText($@"{Config.TranslationsPath}\wfrp4e-jsons\wfrp4e.skills.mapping.json"));
+            var skillsMapping = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText($@"{Config.TranslationsPath}\wfrp4e-jsons\wfrp4e.skill.mapping.json"));
             var name = pack.Value<string>("name");
             var polishCareer = GetEntry(pack, careers);
             if (polishCareer != null)
@@ -34,7 +35,7 @@ namespace WFRP4e.Translator.Packs
 
                 var careerGroup = pack[pathToData]["careergroup"]["value"].ToString();
 
-                var transCareerGroup = careers.FirstOrDefault(x => x.Id == careerGroup || x.Name == careerGroup);
+                var transCareerGroup = careers.FirstOrDefault(x => x.OriginalName == careerGroup || x.Name == careerGroup);
                 if (transCareerGroup == null)
                 {
                     Console.WriteLine($"NIE ODNALEZIONO CAREER GROUP: {careerGroup}");
@@ -55,7 +56,7 @@ namespace WFRP4e.Translator.Packs
                     {
                         searchSkill = searchSkill.Replace("(Any)", "()", StringComparison.InvariantCultureIgnoreCase).Trim();
                     }
-                    var skillMapping = skillsMapping.FirstOrDefault(x => x.Id == searchSkill || x.Name == searchSkill);
+                    var skillMapping = skillsMapping.FirstOrDefault(x => x.OriginalName == searchSkill || x.Name == searchSkill);
                     if (skillMapping != null)
                     {
                         transSkills.Add(skillMapping.Name);
@@ -76,7 +77,7 @@ namespace WFRP4e.Translator.Packs
                 var transTalents = new List<string>();
                 foreach (var talent in pack[pathToData]["talents"].Values<string>())
                 {
-                    var transTalent = talents.FirstOrDefault(x => x.Id == talent.Trim() || x.Name == talent.Trim());
+                    var transTalent = talents.FirstOrDefault(x => x.OriginalName == talent.Trim() || x.Name == talent.Trim());
                     if (transTalent != null)
                     {
                         transTalents.Add(transTalent.Name);
@@ -89,7 +90,7 @@ namespace WFRP4e.Translator.Packs
                             var searchSpec = talent.Substring(talent.IndexOf("(") + 1,
                                 talent.IndexOf(")") - (talent.IndexOf("(") + 1));
 
-                            transTalent = talents.FirstOrDefault(x => x.Id == searchTalent.Trim() || x.Name == searchTalent.Trim());
+                            transTalent = talents.FirstOrDefault(x => x.OriginalName == searchTalent.Trim() || x.Name == searchTalent.Trim());
                             if (transTalent != null)
                             {
                                 transTalents.Add(transTalent.Name + " (" + TranslateTalentSpec(searchSpec) + ")");

@@ -4,7 +4,7 @@ using System.Linq;
 using org.pdfclown.documents.contents;
 using org.pdfclown.documents.contents.objects;
 using org.pdfclown.files;
-using WFRP4e.Translator.Json;
+using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Scanners
 {

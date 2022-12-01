@@ -1,6 +1,7 @@
-﻿namespace WFRP4e.Translator.Json
+﻿namespace WFRP4e.Translator.Json.Entries
 {
-    public class DiseaseEntry : Entry
+    [FoundryType("disease")]
+    public class DiseaseEntry : ItemEntry
     {
         public string Symptoms { get; set; }
 

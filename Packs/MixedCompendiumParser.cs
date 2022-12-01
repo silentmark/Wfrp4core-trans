@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using WFRP4e.Translator.Json;
+using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
@@ -35,6 +35,21 @@ namespace WFRP4e.Translator.Packs
                         break;
                     }
                 case "trapping":
+                    {
+                        new TrappingsParser().TranslatePack(pack);
+                        break;
+                    }
+                case "spell":
+                    {
+                        new SpellsParser().TranslatePack(pack);
+                        break;
+                    }
+                case "weapon":
+                    {
+                        new TrappingsParser().TranslatePack(pack);
+                        break;
+                    }
+                case "ammunition":
                     {
                         new TrappingsParser().TranslatePack(pack);
                         break;

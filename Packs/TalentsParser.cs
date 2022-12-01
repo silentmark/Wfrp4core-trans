@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
+using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
@@ -12,7 +13,7 @@ namespace WFRP4e.Translator.Packs
     {
         public override void TranslatePack(JObject pack)
         {
-            TranslatePack(pack, Mappings.Talents.Values.OfType<TalentEntry>().ToList());
+            TranslatePack(pack, Mappings.TypeToMappingDictonary["talent"].Values.OfType<TalentEntry>().ToList());
         }
 
         protected void TranslatePack(JObject pack, List<TalentEntry> translations)

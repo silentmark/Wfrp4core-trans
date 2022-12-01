@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using WFRP4e.Translator.Json;
+using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
@@ -51,13 +51,13 @@ namespace WFRP4e.Translator.Packs
         {
             var name = pack.Value<string>("name");
             var id = pack.Value<string>("_id");
-            var mapping = translations.FirstOrDefault(x => x.FoundryId == id && (x.Id == name || x.Name == name));
+            var mapping = translations.FirstOrDefault(x => x.FoundryId == id && (x.OriginalName == name || x.Name == name));
             if (mapping == null)
             {
                 mapping = translations.FirstOrDefault(x => x.FoundryId == id);
                 if (mapping == null)
                 {
-                    mapping = translations.FirstOrDefault(x => x.Id == name);
+                    mapping = translations.FirstOrDefault(x => x.OriginalName == name);
                     if (mapping == null)
                     {
                         mapping = translations.FirstOrDefault(x => x.Name == name);
