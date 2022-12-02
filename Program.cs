@@ -141,8 +141,8 @@ namespace WFRP4e.Translator
                 {
                     var obj = JObject.Parse(jsonString);
                     var id = obj.GetValue("_id").Value<string>();
-                    var type = GetTypeFromJson(obj);
-                    var targtetType = GetEntryType(type, typeof(Entry));
+                    var type = GenericReader.GetTypeFromJson(obj);
+                    var targtetType = GenericReader.GetEntryType(type, typeof(Entry));
 
                     var name = obj.GetValue("name").Value<string>();
                     if (Mappings.TypeToMappingDictonary.ContainsKey(type))
@@ -150,7 +150,7 @@ namespace WFRP4e.Translator
                         var dic = Mappings.TypeToMappingDictonary[type];
                         if (dic.ContainsKey(id))
                         {
-                            var readerType = GetEntryType(type, typeof(GenericReader));
+                            var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
                             if (readerType != null)
                             {
                                 var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
@@ -170,8 +170,8 @@ namespace WFRP4e.Translator
                 {
                     var obj = JObject.Parse(jsonString);
                     var id = obj.GetValue("_id").Value<string>();
-                    var type = GetTypeFromJson(obj);
-                    var targtetType = GetEntryType(type, typeof(Entry));
+                    var type = GenericReader.GetTypeFromJson(obj);
+                    var targtetType = GenericReader.GetEntryType(type, typeof(Entry));
 
                     var name = obj.GetValue("name").Value<string>();
                     if (Mappings.TypeToMappingDictonary.ContainsKey(type))
@@ -181,7 +181,7 @@ namespace WFRP4e.Translator
                         {
                             Console.WriteLine($"Nie odnalazłem wpisu dla: {id} - {type} - {name}");
                             var entry = targtetType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as Entry;
-                            var readerType = GetEntryType(type, typeof(GenericReader));
+                            var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
                             if (readerType != null)
                             {
                                 var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
@@ -192,7 +192,7 @@ namespace WFRP4e.Translator
                         }
                         else if (dic[id].Name == dic[id].OriginalName)
                         {
-                            var readerType = GetEntryType(type, typeof(GenericReader));
+                            var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
                             if (readerType != null)
                             {
                                 var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
@@ -262,7 +262,7 @@ namespace WFRP4e.Translator
             {
                 var dictionary = GetDictionaryFromFileName(json);
                 var type = GetTypeFromJson(json);
-                var targtetTypeList = typeof(List<>).MakeGenericType(GetEntryType(type, typeof(Entry)));
+                var targtetTypeList = typeof(List<>).MakeGenericType(GenericReader.GetEntryType(type, typeof(Entry)));
 
                 var elements = JsonConvert.DeserializeObject(File.ReadAllText(json), targtetTypeList) as IList;
                 foreach(Entry element in elements)
@@ -272,12 +272,6 @@ namespace WFRP4e.Translator
             }
         }
 
-        private static Type GetEntryType(string foundryType, Type baseType)
-        {
-            var types = typeof(Entry).Assembly.GetTypes().Where(x => x.CustomAttributes.Any(x => x.AttributeType == typeof(FoundryTypeAttribute)) && x.IsAssignableTo(baseType)).ToList();
-            var type = types.FirstOrDefault(x => x.GetCustomAttribute<FoundryTypeAttribute>().Type == foundryType);
-            return type;
-        }
 
         private static string GetTypeFromJson(string json)
         {
@@ -326,28 +320,6 @@ namespace WFRP4e.Translator
             var glossaryEnToDe = translator.CreateGlossaryAsync("Wfrp Glossary", "EN", "PL", new GlossaryEntries(entriesDictionary)).Result;
         }
 
-        private static string GetTypeFromJson(JObject packObject)
-        {
-            var type = "unknown";
-            if (packObject["type"] != null)
-            {
-                type = packObject["type"].Value<string>();
-            }
-            else if (packObject["pages"] != null)
-            {
-                type = "journal";
-            }
-            else if (packObject["thumb"] != null)
-            {
-                type = "scene";
-            }
-            else if (packObject["results"] != null)
-            {
-                type = "table";
-            }
-            return type;
-        }
-
         private static void ExportAllEffects()
         {
             var packs = Directory.EnumerateFiles(Config.TranslationsPath, "*.db", SearchOption.AllDirectories).ToList();
@@ -370,7 +342,7 @@ namespace WFRP4e.Translator
                     try
                     {
                         var packObject = JObject.Parse(line);
-                        var type = GetTypeFromJson(packObject);
+                        var type = GenericReader.GetTypeFromJson(packObject);
                         var name = packObject["name"].Value<string>();
                         var id = packObject["_id"].Value<string>();
                         var effects = packObject["effects"]?.ToArray();

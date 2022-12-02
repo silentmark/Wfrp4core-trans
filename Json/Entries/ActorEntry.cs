@@ -7,5 +7,9 @@ namespace WFRP4e.Translator.Json.Entries
     {
         [JsonConverter(typeof(ItemEntryJsonConverter))]
         public List<ItemEntry> Items { get; set; } = new List<ItemEntry>();
+
+        public string Species { get; set; }
+
+        public string Gender { get; set; }
     }
 }
