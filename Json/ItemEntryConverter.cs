@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using WFRP4e.Translator.Json.Entries;
+using WFRP4e.Translator.Packs;
 
 namespace WFRP4e.Translator.Json
 {
@@ -34,10 +35,9 @@ namespace WFRP4e.Translator.Json
                     var token = (JArray)JToken.Load(reader);
                     foreach (var item in token)
                     {
-                        var foundryType = item.Value<string>("type");
+                        var foundryType = item.Value<string>("Type");
 
-                        var types = typeof(Entry).Assembly.GetTypes().Where(x => x.CustomAttributes.Any(x => x.AttributeType == typeof(FoundryTypeAttribute))).ToList();
-                        var type = types.First(x => x.GetCustomAttribute<FoundryTypeAttribute>().Type == foundryType);
+                        var type = GenericReader.GetEntryType(foundryType, typeof(ItemEntry));
                         var entry = (ItemEntry)item.ToObject(type);
                         result.Add(entry);
                     }

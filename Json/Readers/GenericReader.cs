@@ -76,15 +76,16 @@ namespace WFRP4e.Translator.Packs
             foreach (JObject item in items)
             {
                 var type = GetTypeFromJson(item);
-                var obj = GetEntryType(type, typeof(ItemEntry)).GetConstructor(new Type[] { }).Invoke(new object[] { });
+                var obj = (ItemEntry) GetEntryType(type, typeof(ItemEntry)).GetConstructor(new Type[] { }).Invoke(new object[] { });
                 var readerType = GetEntryType(type, typeof(GenericReader));
+                obj.Type = type;
                 if (readerType != null)
                 {
                     var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
                     var method = readerType.GetMethod("UpdateEntry");
                     method.Invoke(reader, new object[] { item, obj });
                 }
-                mapping.Items.Add((ItemEntry)obj);
+                mapping.Items.Add(obj);
             }
             mapping.Items = mapping.Items.OrderBy(x => x.Type).ThenBy(x => x.FoundryId).ToList();
         }
