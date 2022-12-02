@@ -10,7 +10,7 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("skill")]
-    public class SkillReader : GenericItemReader
+    public class SkillReader : GenericReader
     { 
         public void UpdateEntry(JObject pack, SkillEntry mapping)
         {

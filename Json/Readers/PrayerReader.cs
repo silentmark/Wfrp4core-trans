@@ -10,7 +10,7 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("prayer")]
-    public class PrayerReader : GenericItemReader
+    public class PrayerReader : GenericReader
     { 
         public void UpdateEntry(JObject pack, PrayerEntry mapping)
         {

@@ -10,7 +10,7 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("mutation")]
-    public class MutationReader : GenericItemReader
+    public class MutationReader : GenericReader
     { 
         public void UpdateEntry(JObject pack, MutationEntry mapping)
         {

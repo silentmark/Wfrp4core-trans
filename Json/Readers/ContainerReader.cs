@@ -10,7 +10,7 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("container")]
-    public class ContainerReader : GenericItemReader
+    public class ContainerReader : GenericReader
     { 
         public void UpdateEntry(JObject pack, ContainerEntry mapping)
         {

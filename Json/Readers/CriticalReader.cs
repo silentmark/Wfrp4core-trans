@@ -10,7 +10,7 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("critical")]
-    public class CriticalReader : GenericItemReader
+    public class CriticalReader : GenericReader
     { 
         public void UpdateEntry(JObject pack, CriticalEntry mapping)
         {

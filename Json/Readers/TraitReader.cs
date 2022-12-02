@@ -10,7 +10,7 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("trait")]
-    public class TraitReader : GenericItemReader
+    public class TraitReader : GenericReader
     { 
         public void UpdateEntry(JObject pack, TraitEntry mapping)
         {

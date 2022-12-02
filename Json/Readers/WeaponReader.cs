@@ -10,7 +10,7 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("weapon")]
-    public class WeaponReader : GenericItemReader
+    public class WeaponReader : GenericReader
     { 
         public void UpdateEntry(JObject pack, WeaponEntry mapping)
         {

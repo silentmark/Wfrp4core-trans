@@ -10,7 +10,7 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("trapping")]
-    public class TrappingReader : GenericItemReader
+    public class TrappingReader : GenericReader
     { 
         public void UpdateEntry(JObject pack, TrappingEntry mapping)
         {

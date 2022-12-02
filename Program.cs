@@ -145,15 +145,18 @@ namespace WFRP4e.Translator
                     var targtetType = GetEntryType(type, typeof(Entry));
 
                     var name = obj.GetValue("name").Value<string>();
-                    var dic = Mappings.TypeToMappingDictonary[type];
-                    if (dic.ContainsKey(id))
+                    if (Mappings.TypeToMappingDictonary.ContainsKey(type))
                     {
-                        var readerType = GetEntryType(type, typeof(GenericItemReader));
-                        if (readerType != null)
+                        var dic = Mappings.TypeToMappingDictonary[type];
+                        if (dic.ContainsKey(id))
                         {
-                            var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
-                            var method = readerType.GetMethod("UpdateEntry");
-                            method.Invoke(reader, new object[] { obj, dic[id] });
+                            var readerType = GetEntryType(type, typeof(GenericReader));
+                            if (readerType != null)
+                            {
+                                var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                                var method = readerType.GetMethod("UpdateEntry");
+                                method.Invoke(reader, new object[] { obj, dic[id] });
+                            }
                         }
                     }
                 }
@@ -171,28 +174,31 @@ namespace WFRP4e.Translator
                     var targtetType = GetEntryType(type, typeof(Entry));
 
                     var name = obj.GetValue("name").Value<string>();
-                    var dic = Mappings.TypeToMappingDictonary[type];
-                    if (!dic.ContainsKey(id))
+                    if (Mappings.TypeToMappingDictonary.ContainsKey(type))
                     {
-                        Console.WriteLine($"Nie odnalazłem wpisu dla: {id} - {type} - {name}"); 
-                        var entry = targtetType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as Entry;
-                        var readerType = GetEntryType(type, typeof(GenericItemReader));
-                        if (readerType != null)
+                        var dic = Mappings.TypeToMappingDictonary[type];
+                        if (!dic.ContainsKey(id))
                         {
-                            var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
-                            var method = readerType.GetMethod("UpdateEntry");
-                            method.Invoke(reader, new object[] { obj, entry });
+                            Console.WriteLine($"Nie odnalazłem wpisu dla: {id} - {type} - {name}");
+                            var entry = targtetType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as Entry;
+                            var readerType = GetEntryType(type, typeof(GenericReader));
+                            if (readerType != null)
+                            {
+                                var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                                var method = readerType.GetMethod("UpdateEntry");
+                                method.Invoke(reader, new object[] { obj, entry });
+                            }
+                            dic.Add(id, entry);
                         }
-                        dic.Add(id, entry);
-                    }
-                    else if (dic[id].Name == dic[id].OriginalName)
-                    {
-                        var readerType = GetEntryType(type, typeof(GenericItemReader));
-                        if (readerType != null)
+                        else if (dic[id].Name == dic[id].OriginalName)
                         {
-                            var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
-                            var method = readerType.GetMethod("UpdateEntry");
-                            method.Invoke(reader, new object[] { obj, dic[id] });
+                            var readerType = GetEntryType(type, typeof(GenericReader));
+                            if (readerType != null)
+                            {
+                                var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                                var method = readerType.GetMethod("UpdateEntry");
+                                method.Invoke(reader, new object[] { obj, dic[id] });
+                            }
                         }
                     }
                 }
@@ -328,10 +334,6 @@ namespace WFRP4e.Translator
                 type = packObject["type"].Value<string>();
             }
             else if (packObject["pages"] != null)
-            {
-                type = "journal";
-            }
-            else if (packObject["content"] != null)
             {
                 type = "journal";
             }

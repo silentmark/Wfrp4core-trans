@@ -9,8 +9,8 @@ using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
-    public class GenericItemReader
-    { 
+    public class GenericReader 
+    {
         protected string GetPathToData(JObject pack)
         {
             var pathToItem = pack["system"] != null ? "system" : "data";

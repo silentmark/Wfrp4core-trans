@@ -10,7 +10,7 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("injury")]
-    public class InjuryReader : GenericItemReader
+    public class InjuryReader : GenericReader
     { 
         public void UpdateEntry(JObject pack, InjuryEntry mapping)
         {

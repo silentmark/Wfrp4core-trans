@@ -10,7 +10,7 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("career")]
-    public class CareerReader : GenericItemReader
+    public class CareerReader : GenericReader
     { 
         public void UpdateEntry(JObject pack, CareerEntry mapping)
         {

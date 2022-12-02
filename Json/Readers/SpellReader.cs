@@ -10,7 +10,7 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("spell")]
-    public class SpellReader : GenericItemReader
+    public class SpellReader : GenericReader
     { 
         public void UpdateEntry(JObject pack, SpellEntry mapping)
         {

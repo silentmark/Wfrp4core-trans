@@ -10,7 +10,7 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("disease")]
-    public class DiseasesReader : GenericItemReader
+    public class DiseasesReader : GenericReader
     { 
         public void UpdateEntry(JObject pack, DiseaseEntry mapping)
         {
