@@ -9,15 +9,15 @@ using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
-    [FoundryType("talent")]
-    public class TalentReader : GenericItemReader
+    [FoundryType("weapon")]
+    public class WeaponReader : GenericItemReader
     { 
-        public void UpdateEntry(JObject pack, TalentEntry mapping)
+        public void UpdateEntry(JObject pack, WeaponEntry mapping)
         {
             UpdateItemEntry(pack, mapping);
 
             var pathToData = GetPathToData(pack);
-            mapping.Tests = pack[pathToData]?["tests"]?["value"]?.Value<string>();
+            mapping.Special = pack[pathToData]?["special"]?["value"]?.Value<string>();
         }
     }
 }

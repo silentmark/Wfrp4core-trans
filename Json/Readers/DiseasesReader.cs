@@ -17,13 +17,13 @@ namespace WFRP4e.Translator.Packs
             UpdateItemEntry(pack, mapping);
             var pathToData = GetPathToData(pack);
 
-            mapping.Contraction = mapping.Contraction ?? pack[pathToData]["contraction"]["value"].Value<string>();
-            mapping.Duration = mapping.Duration ?? pack[pathToData]["duration"]["value"].Value<string>();
-            mapping.DurationUnit = mapping.DurationUnit ?? pack[pathToData]["duration"]["unit"].Value<string>(); 
-            mapping.Incubation = mapping.Incubation ?? pack[pathToData]["incubation"]["value"].Value<string>();
-            mapping.IncubationUnit = mapping.IncubationUnit ?? pack[pathToData]["incubation"]["unit"].Value<string>();
-            mapping.Permanent = mapping.Permanent ?? pack[pathToData]["permanent"]["value"].Value<string>();
-            mapping.Symptoms = mapping.Symptoms ?? pack[pathToData]["symptoms"]["value"].Value<string>();
+            mapping.Contraction = pack[pathToData]?["contraction"]?["value"]?.Value<string>();
+            mapping.Duration = pack[pathToData]?["duration"]?["value"]?.Value<string>();
+            mapping.DurationUnit = pack[pathToData]?["duration"]?["unit"]?.Value<string>(); 
+            mapping.Incubation = pack[pathToData]?["incubation"]?["value"]?.Value<string>();
+            mapping.IncubationUnit = pack[pathToData]?["incubation"]?["unit"]?.Value<string>();
+            mapping.Permanent = pack[pathToData]?["permanent"]?["value"]?.Value<string>();
+            mapping.Symptoms = pack[pathToData]?["symptoms"]?["value"]?.Value<string>();
         }
     }
 }

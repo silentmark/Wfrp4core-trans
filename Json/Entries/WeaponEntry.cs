@@ -3,6 +3,6 @@
     [FoundryType("weapon")]
     public class WeaponEntry : ItemEntry
     {
-
+        public string Special { get; set; }
     }
 }

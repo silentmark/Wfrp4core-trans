@@ -3,6 +3,7 @@
     [FoundryType("armour")]
     public class ArmourEntry : ItemEntry
     {
+        public string Special { get; set; }
 
     }
 }

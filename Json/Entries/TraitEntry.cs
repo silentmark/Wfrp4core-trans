@@ -3,6 +3,7 @@
     [FoundryType("trait")]
     public class TraitEntry : ItemEntry
     {
+        public string Specification { get; set; }
 
     }
 }

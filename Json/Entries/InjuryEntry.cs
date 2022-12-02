@@ -3,6 +3,6 @@
     [FoundryType("injury")]
     public class InjuryEntry : ItemEntry
     {
-
+        public string Penalty { get; set; }
     }
 }

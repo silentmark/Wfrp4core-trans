@@ -19,12 +19,19 @@ namespace WFRP4e.Translator.Packs
 
         protected void UpdateItemEntry(JObject pack, ItemEntry mapping)
         {
-            mapping.OriginalName = pack.Value<string>("name");
+            if (string.IsNullOrEmpty(mapping.OriginalName))
+            {
+                mapping.OriginalName = pack.Value<string>("name");
+            }
+            else if(mapping.OriginalName == mapping.Name)
+            {
+                mapping.OriginalName = pack.Value<string>("name");
+            }
             mapping.FoundryId = pack.Value<string>("_id");
 
             var pathToData = GetPathToData(pack);
 
-            mapping.Description = mapping.Description ?? pack[pathToData]["description"]["value"].Value<string>();
+            mapping.Description = pack[pathToData]["description"]["value"].Value<string>();
             mapping.OriginFoundryId = pack["flags"]?["core"]?["sourceId"]?.Value<string>();
             mapping.GmDescription = pack[pathToData]["gmdescription"]["value"].Value<string>();
 

@@ -132,7 +132,34 @@ namespace WFRP4e.Translator
 
         private static void UpdateJsonMappingFiles(string packsPath, string translationsPath, string mappingJsons)
         {
-            var packs = Directory.EnumerateFiles(packsPath, "*.db", SearchOption.AllDirectories).ToList();
+            //  var packs = Directory.EnumerateFiles(packsPath, "*.db", SearchOption.AllDirectories).ToList();
+            var packs = Directory.EnumerateFiles(translationsPath, "*.db", SearchOption.AllDirectories).ToList();
+            foreach (var pack in packs)
+            {
+                var jsons = File.ReadAllLines(pack);
+                foreach (var jsonString in jsons)
+                {
+                    var obj = JObject.Parse(jsonString);
+                    var id = obj.GetValue("_id").Value<string>();
+                    var type = GetTypeFromJson(obj);
+                    var targtetType = GetEntryType(type, typeof(Entry));
+
+                    var name = obj.GetValue("name").Value<string>();
+                    var dic = Mappings.TypeToMappingDictonary[type];
+                    if (dic.ContainsKey(id))
+                    {
+                        var readerType = GetEntryType(type, typeof(GenericItemReader));
+                        if (readerType != null)
+                        {
+                            var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                            var method = readerType.GetMethod("UpdateEntry");
+                            method.Invoke(reader, new object[] { obj, dic[id] });
+                        }
+                    }
+                }
+            }
+
+            packs = Directory.EnumerateFiles(packsPath, "*.db", SearchOption.AllDirectories).ToList();
             foreach (var pack in packs)
             {
                 var jsons = File.ReadAllLines(pack);
@@ -147,8 +174,8 @@ namespace WFRP4e.Translator
                     var dic = Mappings.TypeToMappingDictonary[type];
                     if (!dic.ContainsKey(id))
                     {
-                        Console.WriteLine($"Nie odnalazłem wpisu: {id} - {type} - {name}");
-                        var entry = targtetType.GetConstructor(new Type[] { }).Invoke(new object[] {}) as Entry;
+                        Console.WriteLine($"Nie odnalazłem wpisu dla: {id} - {type} - {name}"); 
+                        var entry = targtetType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as Entry;
                         var readerType = GetEntryType(type, typeof(GenericItemReader));
                         if (readerType != null)
                         {
@@ -156,17 +183,9 @@ namespace WFRP4e.Translator
                             var method = readerType.GetMethod("UpdateEntry");
                             method.Invoke(reader, new object[] { obj, entry });
                         }
-                        else
-                        {
-                            entry.FoundryId = id;
-                            entry.Description = "";
-                            entry.Name = name;
-                            entry.OriginalName = name;
-                            entry.Type = type;
-                        }
                         dic.Add(id, entry);
                     }
-                    else
+                    else if (dic[id].Name == dic[id].OriginalName)
                     {
                         var readerType = GetEntryType(type, typeof(GenericItemReader));
                         if (readerType != null)
@@ -175,30 +194,6 @@ namespace WFRP4e.Translator
                             var method = readerType.GetMethod("UpdateEntry");
                             method.Invoke(reader, new object[] { obj, dic[id] });
                         }
-                        else
-                        {
-                            dic[id].OriginalName = name;
-                            dic[id].Type = type;
-                        }
-                    }
-                }
-            }
-
-            packs = Directory.EnumerateFiles(translationsPath, "*.db", SearchOption.AllDirectories).ToList();
-            foreach (var pack in packs)
-            {
-                var jsons = File.ReadAllLines(pack);
-                foreach (var jsonString in jsons)
-                {
-                    var obj = JObject.Parse(jsonString);
-                    var id = obj.GetValue("_id").Value<string>();
-                    var type = GetTypeFromJson(obj);
-
-                    var name = obj.GetValue("name").Value<string>();
-                    var dic = Mappings.TypeToMappingDictonary[type];
-                    if (!dic.ContainsKey(id))
-                    {
-                        Console.WriteLine($"Nie odnalazłem wpisu dla przetłumaczonego elementu: {id} - {type} - {name}");
                     }
                 }
             }
