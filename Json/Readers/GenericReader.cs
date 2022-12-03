@@ -72,12 +72,15 @@ namespace WFRP4e.Translator.Packs
             mapping.Gender = pack[pathToData]["details"]["gender"]["value"].Value<string>();
 
             var items = pack["items"].ToArray();
-            mapping.Items = new List<ItemEntry>();
+            var newMappingItems = new List<ItemEntry>();
             foreach (JObject item in items)
             {
                 var type = GetTypeFromJson(item);
-                var obj = (ItemEntry) GetEntryType(type, typeof(ItemEntry)).GetConstructor(new Type[] { }).Invoke(new object[] { });
                 var readerType = GetEntryType(type, typeof(GenericReader));
+              
+                var itemId = item.Value<string>("_id");
+                var obj = mapping.Items.FirstOrDefault(x => x.FoundryId == itemId) ?? (ItemEntry)GetEntryType(type, typeof(ItemEntry)).GetConstructor(new Type[] { }).Invoke(new object[] { });
+
                 obj.Type = type;
                 if (readerType != null)
                 {
@@ -85,9 +88,10 @@ namespace WFRP4e.Translator.Packs
                     var method = readerType.GetMethod("UpdateEntry");
                     method.Invoke(reader, new object[] { item, obj });
                 }
-                mapping.Items.Add(obj);
+                newMappingItems.Add(obj);
             }
-            mapping.Items = mapping.Items.OrderBy(x => x.Type).ThenBy(x => x.FoundryId).ToList();
+            mapping.Items.RemoveAll(x => newMappingItems.All(y => y.FoundryId != x.FoundryId));
+            mapping.Items.AddRange(newMappingItems.Where(x => mapping.Items.All(y => y.FoundryId != x.FoundryId)));
         }
 
 

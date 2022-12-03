@@ -25,6 +25,8 @@ namespace WFRP4e.Translator.Packs
             }
             result.FoundryId = jObj.Value<string>("_id");
             result.Type = "tableResult";
+            result.DocumentCollection = jObj.Value<string>("documentCollection");
+            result.DocumentId = jObj.Value<string>("documentId");
         }
     }
 }
