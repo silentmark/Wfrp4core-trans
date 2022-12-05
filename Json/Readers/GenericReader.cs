@@ -12,6 +12,9 @@ namespace WFRP4e.Translator.Packs
 {
     public class GenericReader 
     {
+        //this is soo bad and quick
+        public static bool OriginalPacksProcessing = false;
+
         protected string GetPathToData(JObject pack)
         {
             var pathToItem = pack["system"] != null ? "system" : "data";
@@ -20,11 +23,11 @@ namespace WFRP4e.Translator.Packs
 
         protected void UpdateItemEntry(JObject pack, ItemEntry mapping)
         {
-            if (string.IsNullOrEmpty(mapping.OriginalName))
+            if (string.IsNullOrEmpty(mapping.OriginalName) && OriginalPacksProcessing)
             {
                 mapping.OriginalName = pack.Value<string>("name");
             }
-            else if(mapping.OriginalName == mapping.Name)
+            else if(mapping.OriginalName == mapping.Name && OriginalPacksProcessing)
             {
                 mapping.OriginalName = pack.Value<string>("name");
             }
@@ -87,6 +90,28 @@ namespace WFRP4e.Translator.Packs
                     var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
                     var method = readerType.GetMethod("UpdateEntry");
                     method.Invoke(reader, new object[] { item, obj });
+                }
+                ItemEntry sourceObj = null;
+                if (!string.IsNullOrEmpty(obj.OriginFoundryId) && obj.OriginFoundryId.Split('.').Length == 4 && Mappings.TypeToMappingDictonary[type].ContainsKey(obj.OriginFoundryId.Split(".")[3]))
+                {
+                    sourceObj = (ItemEntry) Mappings.TypeToMappingDictonary[type][obj.OriginFoundryId.Split(".")[3]];
+                }
+                else if (!string.IsNullOrEmpty(obj.OriginFoundryId) && obj.OriginFoundryId.Split('.').Length == 2 && Mappings.TypeToMappingDictonary[type].ContainsKey(obj.OriginFoundryId.Split(".")[1]))
+                {
+                    sourceObj = (ItemEntry)Mappings.TypeToMappingDictonary[type][obj.OriginFoundryId.Split(".")[1]];
+                }
+                else if(Mappings.TypeToMappingDictonary[type].Values.Any(x=>x.OriginalName == obj.OriginalName))
+                {
+                    sourceObj = (ItemEntry)Mappings.TypeToMappingDictonary[type].Values.First(x => x.OriginalName == obj.OriginalName);
+                }
+                if(sourceObj != null)
+                {
+                    obj.Effects = sourceObj.Effects;
+                    obj.Description = sourceObj.Description;
+                    obj.GmDescription = sourceObj.GmDescription;
+                    obj.Name = sourceObj.Name;
+                    obj.OriginalName = sourceObj.OriginalName;
+                    obj.OriginFoundryId = sourceObj.OriginFoundryId;
                 }
                 newMappingItems.Add(obj);
             }

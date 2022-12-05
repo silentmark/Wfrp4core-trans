@@ -27,6 +27,20 @@ namespace WFRP4e.Translator.Packs
             result.Type = "tableResult";
             result.DocumentCollection = jObj.Value<string>("documentCollection");
             result.DocumentId = jObj.Value<string>("documentId");
+            if (!string.IsNullOrEmpty(result.DocumentId))
+            {
+                foreach (var dic in Mappings.TypeToMappingDictonary)
+                {
+                    foreach (var item in dic.Value)
+                    {
+                        if (item.Key == result.DocumentId)
+                        {
+                            result.Name = item.Value.Name;
+                            result.OriginalName = item.Value.OriginalName;
+                        }
+                    }
+                }
+            }
         }
     }
 }
