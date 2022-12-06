@@ -260,6 +260,20 @@ namespace WFRP4e.Translator
                     var id = obj.GetValue("_id").Value<string>();
                     obj.Remove("_stats");
                     dic[compendiumPrefix][id] = obj;
+
+                    var sourceId = obj["flags"]?["core"]?["sourceId"]?.Value<string>();
+                    if (string.IsNullOrEmpty(sourceId) || sourceId.Split(".").Length == 2)
+                    {
+                        if (obj["flags"] == null)
+                        {
+                            obj["flags"] = new JObject();
+                        }
+                        if (obj["flags"]["core"] == null)
+                        {
+                            obj["flags"]["core"] = new JObject();
+                        }
+                        obj["flags"]["core"]["sourceId"] = compendiumPrefix + "." + id;
+                    }
                 }
             }
             foreach(var dictionaries in dic)

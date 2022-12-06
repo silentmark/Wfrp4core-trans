@@ -35,6 +35,7 @@ namespace WFRP4e.Translator.Packs
 
             var pathToData = GetPathToData(pack);
 
+            mapping.Type = pack.Value<string>("type");
             mapping.Description = pack[pathToData]["description"]["value"].Value<string>();
             mapping.OriginFoundryId = pack["flags"]?["core"]?["sourceId"]?.Value<string>();
             mapping.GmDescription = pack[pathToData]["gmdescription"]["value"].Value<string>();
@@ -68,6 +69,7 @@ namespace WFRP4e.Translator.Packs
 
             mapping.Description = pack[pathToData]["details"]["biography"]["value"].Value<string>();
             mapping.OriginFoundryId = pack["flags"]?["core"]?["sourceId"]?.Value<string>();
+
             mapping.GmDescription = pack[pathToData]["details"]["gmnotes"]["value"].Value<string>();
 
 
