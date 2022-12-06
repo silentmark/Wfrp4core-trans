@@ -21,6 +21,14 @@ namespace WFRP4e.Translator
 {
     internal class Program
     {
+        private static  Random random = new Random();
+        
+        public static string RandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
 
         private static void Main(string[] args)
         {
@@ -610,6 +618,46 @@ namespace WFRP4e.Translator
             }
         }
 
+        private static void ValidatingCareerTranslatiosn()
+        {
+
+            var careers = JArray.Parse(File.ReadAllText("C:\\Code\\wfrp4core-pl\\wfrp4e-jsons\\wfrp4e.career.desc.json"));
+            var skills = JArray.Parse(File.ReadAllText("C:\\Code\\wfrp4core-pl\\wfrp4e-jsons\\wfrp4e.skill.desc.json"));
+            foreach (JObject career in careers)
+            {
+                var skillsText = ((JArray)career["Skills"]).Select(x => x.Value<string>()).ToList();
+                foreach (var skillText in skillsText)
+                {
+                    var skill = skills.FirstOrDefault(x => skillText == x.Value<string>("Name"));
+                    if (skill == null)
+                    {
+                        var trimmedSkillText = skillText;
+                        if (skillText.IndexOf("(") > 0)
+                        {
+                            trimmedSkillText = skillText.Substring(0, skillText.IndexOf("(") - 1).Trim();
+                        }
+
+                        skill = skills.FirstOrDefault(x => x.Value<string>("Name").StartsWith(trimmedSkillText));
+                        if (skill == null)
+                        {
+                            Console.WriteLine("NIE ODNALEZIONO UMIEJĘTNOŚCI: " + skillText + " DLA: " + career.Value<string>("Name"));
+                        }
+                        else
+                        {
+                            var randomtext = RandomString(16);
+                            var newSkill = skill.DeepClone();
+                            newSkill["Name"] = skillText;
+                            newSkill["OriginalName"] = skill.Value<string>("OriginalName").Split("(")[0].Trim() + " (" + randomtext + ")";
+                            newSkill["FoundryId"] = randomtext;
+                            newSkill["OriginFoundryId"] = "Compendium.wfrp4e-core.skills." + randomtext;
+                            skills.Add(newSkill);
+                        }
+                    }
+                }
+            }
+            File.WriteAllText("C:\\Code\\wfrp4core-pl\\wfrp4e-jsons\\wfrp4e.skill.desc.json", JsonConvert.SerializeObject(skills, Formatting.Indented));
+
+        }
         private static void FixStyling()
         {
             foreach (var file in Directory.GetFiles("Final"))
