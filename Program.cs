@@ -456,37 +456,34 @@ namespace WFRP4e.Translator
             }
         }
 
+
         private static void InitAllMappings()
         {
-            var listOfJsons = Directory.EnumerateFiles(Config.TranslationsPath + "\\wfrp4e-jsons", "*desc.json", SearchOption.TopDirectoryOnly).ToList();
-            foreach (var json in listOfJsons)
+            var listOfDirectories = Directory.GetDirectories(Config.SourceJsons);
+            foreach (var directory in listOfDirectories)
             {
-                var dictionary = GetDictionaryFromFileName(json);
-                var type = GetTypeFromJson(json);
-                var targtetTypeList = typeof(List<>).MakeGenericType(GenericReader.GetEntryType(type, typeof(Entry)));
-
-                var elements = JsonConvert.DeserializeObject(File.ReadAllText(json), targtetTypeList) as IList;
-                foreach(Entry element in elements)
+                var type = Path.GetFileName(directory);
+                if (!Mappings.TypeToMappingDictonary.ContainsKey(type))
                 {
+                    Mappings.TypeToMappingDictonary.Add(type, new Dictionary<string, Entry>());
+                }
+                var dictionary = Mappings.TypeToMappingDictonary[type];
+                var targtetType = GenericReader.GetEntryType(type, typeof(Entry));
+
+                var listOfJsons = Directory.EnumerateFiles(directory, "*.json", SearchOption.TopDirectoryOnly).ToList();
+                foreach (var json in listOfJsons)
+                {
+                    var element = JsonConvert.DeserializeObject(File.ReadAllText(json), targtetType) as Entry;
                     dictionary.Add(element.FoundryId, element);
                 }
             }
         }
 
 
-        private static string GetTypeFromJson(string json)
+        private static string GetTypeFromJsonPath(string json)
         {
-            return json.Split("wfrp4e.")[1].Replace(".desc.json", "");
-        }
-
-        private static Dictionary<string, Entry> GetDictionaryFromFileName(string json)
-        {
-            var type = GetTypeFromJson(json);
-            if (!Mappings.TypeToMappingDictonary.ContainsKey(type))
-            {
-                Mappings.TypeToMappingDictonary.Add(type, new Dictionary<string, Entry>());
-            }
-            return Mappings.TypeToMappingDictonary[type];
+            var type = Path.GetDirectoryName(json).Replace(Config.SourceJsons, "").Trim('\\');
+            return type;
         }
 
         #region Various
