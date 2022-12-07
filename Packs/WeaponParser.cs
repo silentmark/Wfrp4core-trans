@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -10,17 +9,17 @@ using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
-    [FoundryType("talent")]
-    public class TalentsParser : GenericItemParser
+    [FoundryType("weapon")]
+    public class WeaponParser : GenericItemParser
     {
         public override void Parse(JObject pack, Entry entry)
         {
             base.Parse(pack, entry);
 
             var pathToData = GenericReader.GetPathToData(pack);
-            var mapping = (TalentEntry)entry;
+            var mapping = (WeaponEntry)entry;
 
-            pack[pathToData]["tests"]["value"] = mapping.Tests;
+            pack[pathToData]["special"]["value"] = mapping.Special;
         }
     }
 }

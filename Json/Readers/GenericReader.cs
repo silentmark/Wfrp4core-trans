@@ -15,12 +15,6 @@ namespace WFRP4e.Translator.Packs
         //this is soo bad and quick
         public static bool OriginalPacksProcessing = false;
 
-        protected string GetPathToData(JObject pack)
-        {
-            var pathToItem = pack["system"] != null ? "system" : "data";
-            return pathToItem;
-        }
-
         protected void UpdateItemEntry(JObject pack, ItemEntry mapping)
         {
             if (string.IsNullOrEmpty(mapping.OriginalName) && OriginalPacksProcessing)
@@ -41,25 +35,30 @@ namespace WFRP4e.Translator.Packs
             mapping.GmDescription = pack[pathToData]["gmdescription"]["value"].Value<string>();
 
             var effects = pack["effects"].ToArray();
-            mapping.Effects = new List<EffectEntry>();
+            var existinEffects = mapping.Effects.ToList();
+            
             foreach(JObject effect in effects)
             {
-                var newEffect = new EffectEntry();
+                var newEffect = existinEffects.FirstOrDefault(x => x.FoundryId == effect.Value<string>("_id")) ?? new EffectEntry();
                 new EffectReader().UpdateEntry(effect, newEffect);
-                mapping.Effects.Add(newEffect);
+                if (string.IsNullOrEmpty(newEffect.OriginalName) && OriginalPacksProcessing)
+                {
+                    newEffect.OriginalName = effect.Value<string>("label");
+                    existinEffects.Add(newEffect);
+                }
             }
-            mapping.Effects = mapping.Effects.OrderBy(x => x.FoundryId).ToList();
+            mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
         }
 
 
 
         protected void UpdateActorEntry(JObject pack, ActorEntry mapping)
         {
-            if (string.IsNullOrEmpty(mapping.OriginalName))
+            if (string.IsNullOrEmpty(mapping.OriginalName) && OriginalPacksProcessing)
             {
                 mapping.OriginalName = pack.Value<string>("name");
             }
-            else if (mapping.OriginalName == mapping.Name)
+            else if (mapping.OriginalName == mapping.Name && OriginalPacksProcessing)
             {
                 mapping.OriginalName = pack.Value<string>("name");
             }
@@ -108,7 +107,20 @@ namespace WFRP4e.Translator.Packs
                 }
                 if(sourceObj != null)
                 {
-                    obj.Effects = sourceObj.Effects;
+                    obj.Effects = new List<EffectEntry>();
+                    foreach (var effect in sourceObj.Effects)
+                    {
+                        var newEffect = new EffectEntry();
+                        newEffect.Name = effect.Name;
+                        newEffect.Description = effect.Description;
+                        newEffect.Type = effect.Type;
+                        newEffect.Script = effect.Script;
+                        newEffect.SecondaryScript = effect.SecondaryScript;
+                        newEffect.OriginalName  = effect.OriginalName;
+                        newEffect.FoundryId = effect.FoundryId;
+                        newEffect.OriginFoundryId = effect.OriginFoundryId;
+                        obj.Effects.Add(newEffect);
+                    }
                     obj.Description = sourceObj.Description;
                     obj.GmDescription = sourceObj.GmDescription;
                     obj.Name = sourceObj.Name;
@@ -121,6 +133,12 @@ namespace WFRP4e.Translator.Packs
             mapping.Items.AddRange(newMappingItems.Where(x => mapping.Items.All(y => y.FoundryId != x.FoundryId)));
         }
 
+
+        public static string GetPathToData(JObject pack)
+        {
+            var pathToItem = pack["system"] != null ? "system" : "data";
+            return pathToItem;
+        }
 
         public static string GetTypeFromJson(JObject packObject)
         {
@@ -147,7 +165,7 @@ namespace WFRP4e.Translator.Packs
         public static Type GetEntryType(string foundryType, Type baseType)
         {
             var types = typeof(Entry).Assembly.GetTypes().Where(x => x.CustomAttributes.Any(x => x.AttributeType == typeof(FoundryTypeAttribute)) && x.IsAssignableTo(baseType)).ToList();
-            var type = types.FirstOrDefault(x => x.GetCustomAttributes<FoundryTypeAttribute>().FirstOrDefault(y => y.Type == foundryType) != null);
+            var type = types.FirstOrDefault(x => x.GetCustomAttributes<FoundryTypeAttribute>(false).FirstOrDefault(y => y.Type == foundryType) != null);
             return type;
         }
 

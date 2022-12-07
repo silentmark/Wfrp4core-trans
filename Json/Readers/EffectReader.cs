@@ -14,6 +14,14 @@ namespace WFRP4e.Translator.Packs
 
         public void UpdateEntry(JObject effect, EffectEntry newEffect)
         {
+            if (string.IsNullOrEmpty(newEffect.OriginalName) && GenericReader.OriginalPacksProcessing)
+            {
+                newEffect.OriginalName = effect.Value<string>("label");
+            }
+            else if (newEffect.OriginalName == newEffect.Name && GenericReader.OriginalPacksProcessing)
+            {
+                newEffect.OriginalName = effect.Value<string>("label");
+            }
             newEffect.FoundryId = effect.Value<string>("_id");
             newEffect.Description = effect["flags"]?["wfrp4e"]?["effectData"]?["description"]?.Value<string>();
             newEffect.Name = effect["label"].Value<string>();

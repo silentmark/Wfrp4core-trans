@@ -9,43 +9,29 @@ using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
-    public class PrayersParser : GenericParser<Entry>
+    [FoundryType("prayer")]
+    public class PrayersParser : GenericItemParser
     {
-        public override void TranslatePack(JObject pack)
+        public override void Parse(JObject pack, Entry entry)
         {
-            TranslatePack(pack, Mappings.TypeToMappingDictonary["prayer"].Values.ToList());
-        }
+            base.Parse(pack, entry);
 
-        protected void TranslatePack(JObject pack, List<Entry> translations)
-        {
-            var name = pack.Value<string>("name");
-            var trans = GetEntry(pack, translations);
-            if (trans != null)
+            var pathToData = GenericReader.GetPathToData(pack);
+            var mapping = (PrayerEntry)entry;
+
+
+            if (pack[pathToData]?["duration"]?["value"] != null)
             {
-                if (pack["effects"] != null)
-                {
-                    foreach (var effect in (JArray)pack["effects"])
-                    {
-                        if (effect["label"].Value<string>() == name)
-                        {
-                            effect["label"] = trans.Name;
-                        }
-                        else if (effect["label"].ToString() == "Movement Increase")
-                        {
-                            effect["label"] = "Zwiększenie Szybkości";
-                        }
-                        else if (effect["label"].ToString() == "Catfall")
-                        {
-                            effect["label"] = "Na Cztery Łapy";
-                        }
-                        else
-                        {
-                            Console.WriteLine("NIE ODNALEZIONO: " + effect["label"]);
-                        }
-                    }
-                }
+                pack[pathToData]["duration"]["value"] = mapping.Duration;
             }
-            TranslateDescriptions(pack, translations);
+            if (pack[pathToData]?["target"]?["value"] != null)
+            {
+                pack[pathToData]["target"]["value"] = mapping.Target;
+            }
+            if (pack[pathToData]?["range"]?["value"] != null)
+            {
+                pack[pathToData]["range"]["value"] = mapping.Range;
+            }
         }
     }
 }

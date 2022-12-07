@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -9,48 +10,26 @@ using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
-    public class TraitsParser : GenericParser<Entry>
+    [FoundryType("trait")]
+    public class TraitsParser : GenericItemParser
     {
-        public override void TranslatePack(JObject pack)
+        public override void Parse(JObject pack, Entry entry)
         {
-            TranslatePack(pack, Mappings.TypeToMappingDictonary["trait"].Values.ToList());
-        }
+            base.Parse(pack, entry);
 
-        protected void TranslatePack(JObject pack, List<Entry> translations)
-        {
-            var pathToData = "system";
-            if (pack["data"] != null)
+            var pathToData = GenericReader.GetPathToData(pack);
+            var mapping = (TraitEntry)entry;
+                    
+            if (pack[pathToData]?["specification"]?["value"] != null)
             {
-                pathToData = "data";
-            }
-            var name = pack.Value<string>("name");
-            var trans = GetEntry(pack, translations);
-            if (trans != null)
-            {
-                if (pack["effects"] != null)
+                var specification = pack[pathToData]?["specification"]?["value"].Value<string>();
+                var newSpec = TranslateSpecification(specification);
+                if(specification == newSpec)
                 {
-                    foreach (var effect in (JArray) pack["effects"])
-                    {
-                        if (effect["label"].Value<string>() == name)
-                        {
-                            effect["label"] = trans.Name;
-                        }
-                        else if (effect["label"].Value<string>() == "Swarm Bonuses")
-                        {
-                            effect["label"] = "Bonusy Roju";
-                        }
-                    }
+                    newSpec = mapping.Specification;
                 }
-
-
-                if (!string.IsNullOrEmpty(pack[pathToData]["specification"]["value"].ToString()))
-                {
-                    pack[pathToData]["specification"]["value"] =
-                        TranslateSpecification(pack[pathToData]["specification"]["value"].ToString());
-                }
+                pack[pathToData]["specification"]["value"] = newSpec;
             }
-
-            TranslateDescriptions(pack, translations);
         }
 
         public static string TranslateSpecification(string spec)

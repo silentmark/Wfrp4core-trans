@@ -2,91 +2,80 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Google.Api.Gax.ResourceNames;
-using Google.Cloud.Translate.V3;
-using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
-using WFRP4e.Translator.Utilities;
+using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
-    public class JournalParser
+    [FoundryType("journal")]
+    public class JournalParser : GenericItemParser
     {
-
-        public void Parse(string path)
+        public override void Parse(JObject pack, Entry entry)
         {
-            var packs = File.ReadAllLines(Path.Combine(Config.PacksPath, path));
-            var packsJournal = packs.Select(pack => JObject.Parse(pack)).ToList();
-
-            Console.WriteLine($@"Przetwarzam Kompendium, znaleziono {packsJournal.Count} wpisów w db");
-
-            foreach (var pack in packsJournal)
+            var mapping = (JournalEntry)entry;
+            pack["name"] = mapping.Name;
+            pack["description"] = mapping.Description;
+            if (pack["flags"] == null)
             {
-                var name = pack.Value<string>("name");
-                //var translation = GoogleTranslator.Translate(name);
-                var translation = DeepLTranslator.Translate(name);
-                //var translation = CognitiveTranslator.Translate(name);
-
-                Console.WriteLine($"Wpis: {name.PadRight(30)}{Environment.NewLine}tłumaczenie: {translation.PadRight(30)}");
-                pack["name"] = translation;
-                if (pack["pages"] != null)
-                {
-                    foreach (var item in (JArray)pack["pages"])
-                    {
-                        var pageName = item.Value<string>("name");
-                        //translation = GoogleTranslator.Translate(pageName);
-                        translation = DeepLTranslator.Translate(pageName);
-                        //translation = CognitiveTranslator.Translate(pageName);
-
-                        Console.WriteLine($"Stronę: {pageName.PadRight(40)}{Environment.NewLine}tłumaczenie: {translation.PadRight(40)}");
-                        item["name"] = translation;
-
-                        var pageContent = item["text"].Value<string>("content");
-                        var htmlDoc = new HtmlDocument();
-                        htmlDoc.LoadHtml("<html>" + pageContent + "</html>");
-
-                        var result = string.Empty;
-                        foreach (var node in htmlDoc.DocumentNode.ChildNodes[0].ChildNodes)
-                        {
-                            //translation = GoogleTranslator.Translate(node.OuterHtml);
-                            translation = DeepLTranslator.Translate(node.OuterHtml);
-                            //translation = CognitiveTranslator.Translate(node.OuterHtml);
-                            Console.WriteLine($"Zawartość: {node.OuterHtml.PadRight(10)}{Environment.NewLine}tłumaczenie: {translation.PadRight(10)}");
-                            result += translation;
-                        }
-
-                        item["text"]["content"] = result;
-                    }
-                }
-                else
-                {
-                    var pageContent = pack["content"].Value<string>();
-                    var htmlDoc = new HtmlDocument();
-                    htmlDoc.LoadHtml("<html>" + pageContent + "</html>");
-
-                    var result = string.Empty;
-                    foreach (var node in htmlDoc.DocumentNode.ChildNodes[0].ChildNodes)
-                    {
-                        //translation = GoogleTranslator.Translate(node.OuterHtml);
-                        translation = DeepLTranslator.Translate(node.OuterHtml);
-                        //translation = CognitiveTranslator.Translate(node.OuterHtml);
-                        Console.WriteLine($"Zawartość: {node.OuterHtml.PadRight(10)}{Environment.NewLine}tłumaczenie: {translation.PadRight(10)}");
-                        result += translation;
-                    }
-
-                    pack["content"] = result;
-                }
+                pack["flags"] = new JObject();
             }
-
-
-            foreach (var pack in packsJournal)
+            if (pack["flags"]["core"] == null)
             {
-                File.AppendAllLines($@"{Config.TranslationsPath}\{path}",
-                    new[] {JsonConvert.SerializeObject(pack, Formatting.None)});
+                pack["flags"]["core"] = new JObject();
+            }
+            pack["flags"]["core"]["sourceId"] = mapping.OriginFoundryId;
+            var pages = pack["pages"].ToArray();
+            foreach (JObject jObj in pages)
+            {
+                var resultId = jObj.Value<string>("_id");
+                var resultMapping = mapping.Pages.FirstOrDefault(x => x.FoundryId == resultId);
+                jObj["text"]["content"] = resultMapping.Content;
+                jObj["name"] = resultMapping.Name;
+            }
+            foreach (JProperty property in pack["flags"])
+            {
+                if (property.Value["initialization-folder"] != null)
+                {
+                    property.Value["initialization-folder"] = mapping.InitializationFolder;
+                    break;
+                }
             }
         }
-        
+
+        public void UpdateEntry(JObject pack, JournalEntry mapping)
+        {
+
+            if (string.IsNullOrEmpty(mapping.OriginalName))
+            {
+                mapping.OriginalName = pack.Value<string>("name");
+            }
+            else if (mapping.OriginalName == mapping.Name)
+            {
+                mapping.OriginalName = pack.Value<string>("name");
+            }
+            mapping.FoundryId = pack.Value<string>("_id");
+
+            mapping.OriginFoundryId = pack["flags"]?["core"]?["sourceId"]?.Value<string>();
+            mapping.Type = "journal";
+            var pages = pack["pages"].ToArray();
+            mapping.Pages = new List<JournalEntryPage>();
+            foreach (JObject jObj in pages)
+            {
+                var page = new JournalEntryPage();
+                new JournalPageReader().UpdateEntry(jObj, page);
+                mapping.Pages.Add(page);
+            }
+            foreach(JProperty property in pack["flags"])
+            {
+                if (property.Value["initialization-folder"] != null)
+                {
+                    mapping.InitializationFolder = property.Value["initialization-folder"].Value<string>();
+                    mapping.SourceType = property.Name;
+                    break;
+                }                
+            }
+        }
     }
 }

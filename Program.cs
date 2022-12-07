@@ -43,6 +43,7 @@ namespace WFRP4e.Translator
                         $"Konfiguracja:\nŚcieżka do podręcznika: {Config.PdfPath}\nŚcieżka do plików .db: {Config.PacksPath}\nŚcieżka do plików wyjściowych: {Config.TranslationsPath}");
             Console.WriteLine($"Ogarniam mapowanie");
 
+
             InitAllMappings();
             Console.WriteLine($"Generuję json dla oryginałów");
             ExtractJsonsToFiles(Config.PacksPath);
@@ -62,28 +63,7 @@ namespace WFRP4e.Translator
             Console.WriteLine();
             if (input.KeyChar == '1')
             {
-                new TalentsParser().Parse(@"wfrp4e-core\packs\talents.db");
-                new SkillsParser().Parse(@"wfrp4e-core\packs\skills.db");
-                new CareersParser().Parse(@"wfrp4e-core\packs\careers.db");
-                new TraitsParser().Parse(@"wfrp4e-core\packs\traits.db");
-                new CriticalsParser().Parse(@"wfrp4e-core\packs\criticals.db");
-                new InjuriesParser().Parse(@"wfrp4e-core\packs\injuries.db");
-                new MutationsParser().Parse(@"wfrp4e-core\packs\mutations.db");
-                new MutationsParser().Parse(@"wfrp4e-eis\packs\expandedmutations.db");
-                new PrayersParser().Parse(@"wfrp4e-core\packs\prayers.db");
-                new PsychologiesParser().Parse(@"wfrp4e-core\packs\psychologies.db");
-                new SpellsParser().Parse(@"wfrp4e-core\packs\spells.db");
-                new SpellsParser().Parse(@"wfrp4e-eis\packs\eisspells.db");
-                new TrappingsParser().Parse(@"wfrp4e-core\packs\trappings.db");
-                new DiseasesParser().Parse(@"wfrp4e-core\packs\diseases.db");
-                new CreatureParser().Parse(@"wfrp4e-core\packs\bestiary.db");
-                new MixedCompendiumParser().Parse(@"wfrp4e-eis\packs\eisitems.db");
-                new MixedCompendiumParser().Parse(@"wfrp4e-horned-rat\packs\horned-rat-items.db");
-                new CreatureParser().Parse(@"wfrp4e-eis\packs\eisactors.db");
-                new CreatureParser().Parse(@"wfrp4e-horned-rat\packs\horned-rat-actors.db");
-                new RollTableParser().Parse(@"wfrp4e-eis\packs\tables.db");
-                new RollTableParser().Parse(@"wfrp4e-core\packs\tables.db");
-                new RollTableParser().Parse(@"wfrp4e-horned-rat\packs\horned-rat-tables.db");
+                TransformPackages(Config.PacksPath, Config.TranslationsPath, Config.TranslationsPath + "\\wfrp4e-jsons");
             }
             else if (input.KeyChar == '2')
             {
@@ -100,7 +80,6 @@ namespace WFRP4e.Translator
                 EffectsExtractor.ExtractEffects(@"wfrp4e-core\packs\psychologies.db");
                 EffectsExtractor.ExtractEffects(@"wfrp4e-core\packs\traits.db");
 
-                EffectsExtractor.ExtractEffects(@"wfrp4e-horned-rat\packs\horned-rat-items.db");
 
                 EffectsExtractor.ExtractEffects(@"wfrp4e-eis\packs\expandedmutations.db");
                 EffectsExtractor.ExtractEffects(@"wfrp4e-eis\packs\eisspells.db");
@@ -124,21 +103,122 @@ namespace WFRP4e.Translator
 
                 EffectsUpdater.EffectsUpdate(@"wfrp4e-eis\packs\eisspells.db");
                 EffectsUpdater.EffectsUpdate(@"wfrp4e-eis\packs\expandedmutations.db");
-
-
-                //EffectsUpdater.EffectsUpdate(@"wfrp4e-core\packs\bestiary.db", true);
-                //                EffectsUpdater.EffectsUpdate("items.db");
-                //                EffectsUpdater.EffectsUpdate("actors.db", true);
             }
             else if (input.KeyChar == '4')
             {
-                new JournalParser().Parse(@"wfrp4e-eis\packs\eisjournals.db");
+                new JournalAutoTranslator().Parse(@"wfrp4e-eis\packs\eisjournals.db");
             }
-            else if(input.KeyChar == '5')
+            else if (input.KeyChar == '5')
             {
                 UpdateJsonMappingFiles(Config.PacksPath, Config.TranslationsPath, Config.TranslationsPath + "\\wfrp4e-jsons");
             }
             Console.WriteLine("Zakończono");
+        }
+
+        private static void SomeTransformationsOverTables()
+        {
+            var entries = JArray.Parse(File.ReadAllText("C:\\Code\\wfrp4core-pl\\wfrp4e-jsons\\wfrp4e.table.desc.json"));
+            var critcs = File.ReadAllLines("C:\\Code\\wfrp4e-core\\wfrp4e-core\\packs\\tables.db").Select(x => JObject.Parse(x)).ToList();
+            critcs.AddRange(File.ReadAllLines("C:\\Code\\wfrp4e-core\\wfrp4e-eis\\packs\\tables.db").Select(x => JObject.Parse(x)));
+            foreach (JObject entry in entries)
+            {
+                foreach (JObject result in (JArray)(entry["TableResults"]))
+                {
+                    if (result.Value<string>("Name") == null)
+                    {
+                        result["Name"] = result["OriginalName"];
+                        var entryId = entry.Value<string>("FoundryId");
+                        var resultId = result.Value<string>("FoundryId");
+
+                        var table = critcs.FirstOrDefault(x => x.Value<string>("_id") == entryId);
+                        if (table != null)
+                        {
+                            var resultDb = ((JArray)table["results"]).FirstOrDefault(x => x.Value<string>("_id") == resultId);
+                            if (resultDb != null)
+                            {
+                                var text = resultDb.Value<string>("text");
+                                result["OriginalName"] = text;
+                                if (text.StartsWith("@UUID[Compendium."))
+                                {
+                                    text = text.Substring(0, text.IndexOf("{")) + "{" + result["Name"] + "}";
+                                    result["Name"] = text;
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("NIE ODNALEZIONO RESULTATU: " + result["Name"] + " Z TABELI: " + entry["Name"]);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("NIE ODNALEZIONO TABELI: " + entry["Name"]);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            File.WriteAllText("C:\\Code\\wfrp4core-pl\\wfrp4e-jsons\\wfrp4e.table.desc.json", JsonConvert.SerializeObject(entries, Formatting.Indented));
+            // File.WriteAllText(targetPath, JsonConvert.SerializeObject(arr, Formatting.Indented));
+        }
+
+        private static void TransformPackages(string packsPath, string translationsPath, string v)
+        {
+            GenericReader.OriginalPacksProcessing = false;
+            var packs = Directory.EnumerateFiles(packsPath, "*.db", SearchOption.AllDirectories).ToList();
+            var translationsPaths = Directory.EnumerateFiles(translationsPath, "*.db", SearchOption.AllDirectories).ToList();
+            foreach (var pack in packs)
+            {
+                var translationPath = translationsPaths.FirstOrDefault(x => Path.GetFileName(x) == Path.GetFileName(pack));
+                var translations = new List<JObject>();
+                if (translationPath != null)
+                {
+                    var translationJsons = File.ReadAllLines(translationPath);
+                    foreach(var json in translationJsons)
+                    {
+                        translations.Add(JObject.Parse(json));
+                    }
+                }
+                translationPath = pack.Replace(packsPath, translationsPath);
+
+                var jsons = File.ReadAllLines(pack);
+                foreach (var jsonString in jsons)
+                {
+                    var obj = JObject.Parse(jsonString);
+                    var id = obj.GetValue("_id").Value<string>();
+                    var existingObj = translations.FirstOrDefault(x => x.GetValue("_id").Value<string>() == id);
+                    if (existingObj != null)
+                    {
+                        obj = existingObj;
+                    }
+                    else
+                    {
+                        translations.Add(obj);
+                    }
+                    var type = GenericReader.GetTypeFromJson(obj);
+                    if (Mappings.TypeToMappingDictonary.ContainsKey(type))
+                    {
+                        var dic = Mappings.TypeToMappingDictonary[type];
+                        if (dic.ContainsKey(id))
+                        {
+                            var entry = dic[id];
+                            var readerType = GenericReader.GetEntryType(type, typeof(GenericItemParser));
+                            if (readerType != null)
+                            {
+                                var reader = (GenericItemParser)readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                                reader.Parse(obj, entry);
+                            }
+                        }
+                    }
+                }
+
+                var content = new StringBuilder();
+                foreach (var obj in translations)
+                {
+                    content.AppendLine(JsonConvert.SerializeObject(obj, Formatting.None));
+                }
+                File.WriteAllText(translationPath, content.ToString());
+            }
         }
 
         private static void UpdateJsonMappingFiles(string packsPath, string translationsPath, string mappingJsons)
@@ -498,125 +578,6 @@ namespace WFRP4e.Translator
         }
 
 
-        private static void Wfrp08Update()
-        {
-            var file = File.ReadAllLines(@"C:\Users\ja\AppData\Local\FoundryVTT\Data\worlds\wfrp4\packs\oko-za-oko-aktorzy.db");
-            var data = new List<JObject>();
-            foreach (var line in file)
-            {
-                var actor = JObject.Parse(line);
-                data.Add(actor);
-                foreach (var item in (JArray)actor["items"])
-                {
-                    if (item["type"].Value<string>() == "weapon" || item["type"].Value<string>() == "armour" || item["type"].Value<string>() == "ammunition")
-                    {
-                        if (item["system"]["qualities"] != null && item["system"]["qualities"]["value"] != null)
-                        {
-                            var quals = item["system"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
-                            var qualsArr = new JArray();
-
-                            foreach (var qual in quals)
-                            {
-                                if (!string.IsNullOrEmpty(qual))
-                                {
-                                    var jQual = new JObject();
-                                    jQual["key"] = TrappingsParser.TranslateQualityFlawReverse(qual.Split(' ')[0]).ToLower();
-                                    jQual["name"] = TrappingsParser.TranslateQualityFlawReverse(qual.Split(' ')[0]).ToLower();
-                                    jQual["display"] = qual.Split(' ')[0];
-                                    jQual["value"] = qual.Contains(' ') ? qual.Split(' ')[1] : "";
-                                    qualsArr.Add(jQual);
-                                }
-                            }
-                            item["system"]["qualities"]["value"] = qualsArr;
-                        }
-                        if (item["system"]["flaws"] != null && item["system"]["flaws"]["value"] != null)
-                        {
-                            var flaws = item["system"]["flaws"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
-                            var flawsArr = new JArray();
-                            foreach (var flaw in flaws)
-                            {
-                                if (!string.IsNullOrEmpty(flaw))
-                                {
-                                    var jFlaw = new JObject();
-                                    jFlaw["key"] = TrappingsParser.TranslateQualityFlawReverse(flaw.Split(' ')[0]).ToLower();
-                                    jFlaw["name"] = TrappingsParser.TranslateQualityFlawReverse(flaw.Split(' ')[0]).ToLower();
-                                    jFlaw["display"] = flaw.Split(' ')[0];
-                                    jFlaw["value"] = flaw.Contains(' ') ? flaw.Split(' ')[1] : "";
-                                    flawsArr.Add(jFlaw);
-                                }
-                            }
-
-                            item["system"]["flaws"]["value"] = flawsArr;
-                        }
-                    }
-                }
-            }
-            foreach (var pack in data)
-            {
-                File.AppendAllLines(@"C:\Users\ja\AppData\Local\FoundryVTT\Data\worlds\wfrp4\packs\oko-za-oko-aktorzy-new.db",
-                    new[] { JsonConvert.SerializeObject(pack, Formatting.None) });
-            }
-        }
-
-        private static void Wfrp08UpdateData()
-        {
-            var file = File.ReadAllLines(@"C:\Users\ja\AppData\Local\FoundryVTT\Data\worlds\wfrp4\data\actors.db");
-            var data = new List<JObject>();
-            foreach (var line in file)
-            {
-                var actor = JObject.Parse(line);
-                data.Add(actor);
-                foreach (var item in (JArray)actor["items"])
-                {
-                    if (item["type"].Value<string>() == "weapon" || item["type"].Value<string>() == "armour" || item["type"].Value<string>() == "ammunition")
-                    {
-                        if (item["system"]["qualities"] != null && item["system"]["qualities"]["value"] != null)
-                        {
-                            var quals = item["system"]["qualities"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
-                            var qualsArr = new JArray();
-
-                            foreach (var qual in quals)
-                            {
-                                if (!string.IsNullOrEmpty(qual))
-                                {
-                                    var jQual = new JObject();
-                                    jQual["key"] = TrappingsParser.TranslateQualityFlawReverse(qual.Split(' ')[0]).ToLower();
-                                    jQual["name"] = TrappingsParser.TranslateQualityFlawReverse(qual.Split(' ')[0]).ToLower();
-                                    jQual["display"] = qual.Split(' ')[0];
-                                    jQual["value"] = qual.Contains(' ') ? qual.Split(' ')[1] : "";
-                                    qualsArr.Add(jQual);
-                                }
-                            }
-                            item["system"]["qualities"]["value"] = qualsArr;
-                        }
-                        if (item["system"]["flaws"] != null && item["system"]["flaws"]["value"] != null)
-                        {
-                            var flaws = item["system"]["flaws"]["value"].Value<string>().Split(',').Select(x => x.Trim()).ToList();
-                            var flawsArr = new JArray();
-                            foreach (var flaw in flaws)
-                            {
-                                if (!string.IsNullOrEmpty(flaw))
-                                {
-                                    var jFlaw = new JObject();
-                                    jFlaw["key"] = TrappingsParser.TranslateQualityFlawReverse(flaw.Split(' ')[0]).ToLower();
-                                    jFlaw["name"] = TrappingsParser.TranslateQualityFlawReverse(flaw.Split(' ')[0]).ToLower();
-                                    jFlaw["display"] = flaw.Split(' ')[0];
-                                    jFlaw["value"] = flaw.Contains(' ') ? flaw.Split(' ')[1] : "";
-                                    flawsArr.Add(jFlaw);
-                                }
-                            }
-
-                            item["system"]["flaws"]["value"] = flawsArr;
-                        }
-                    }
-                }
-            }
-            foreach (var pack in data)
-            {
-                File.AppendAllLines(@"C:\Users\ja\AppData\Local\FoundryVTT\Data\worlds\wfrp4\data\actors-new.db",
-                    new[] { JsonConvert.SerializeObject(pack, Formatting.None) });
-            }
-        }
 
         private static void ValidatingCareerTranslatiosn()
         {

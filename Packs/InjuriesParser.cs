@@ -9,99 +9,19 @@ using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs
 {
-    public class InjuriesParser : GenericParser<Entry>
+    [FoundryType("injury")]
+    public class InjuriesParser : GenericItemParser
     {
-        public override void TranslatePack(JObject pack)
+        public override void Parse(JObject pack, Entry entry)
         {
-            TranslatePack(pack, Mappings.TypeToMappingDictonary["injury"].Values.ToList());
-        }
+            base.Parse(pack, entry);
 
-        protected void TranslatePack(JObject pack, List<Entry> translations)
-        {
-            var name = pack.Value<string>("name");
-            var trans = GetEntry(pack, translations);
-            if (trans != null)
-            {
-                pack["system"]["location"]["value"] = TranslateLocation(pack["system"]["location"]["value"].ToString());
+            var pathToData = GenericReader.GetPathToData(pack);
+            var mapping = (InjuryEntry)entry;
 
-                if (pack["effects"] != null)
-                {
-                    foreach (var effect in (JArray)pack["effects"])
-                    {
-                        var el = effect["label"].ToString();
-                        if (el == name)
-                        {
-                            effect["label"] = trans.Name;
-                        }
-                        else if (el == "Broken Arm")
-                        {
-                            effect["label"] = "Złamana Ręka";
-                        }
-                        else if (el == "Broken Body")
-                        {
-                            effect["label"] = "Złamane Żebra";
-                        }
-                        else if (el == "Broken Leg")
-                        {
-                            effect["label"] = "Złamana Noga";
-                        }
-                        else if (el == "Broken Head")
-                        {
-                            effect["label"] = "Pęknięta Czaszka";
-                        }
-                        else if (el == "Lost Both Ears")
-                        {
-                            effect["label"] = "Utracone Oboje Uszu";
-                        }
-                        else if (el == "Lost Both Eyes")
-                        {
-                            effect["label"] = "Utracone Oboje Oczu";
-                        }
-                        else if (el == "Lost Ear")
-                        {
-                            effect["label"] = "Utracone Ucho";
-                        }
-                        else if (el == "Lost Eye")
-                        {
-                            effect["label"] = "Utracone Oko";
-                        }
-                        else if (el == "Lost Fingers")
-                        {
-                            effect["label"] = "Utracony Palec";
-                        }
-                        else if (el == "Movement Penalty")
-                        {
-                            effect["label"] = "Kara do Poruszania się";
-                        }
-                        else if (el == "Movement Halved")
-                        {
-                            effect["label"] = "Szybkość Zmniejszona o Połowę";
-                        }
-                        else if (el == "Torn Arm Muscle")
-                        {
-                            effect["label"] = "Naderwany Mięsień Ręki";
-                        }
-                        else if (el == "Torn Body Muscle")
-                        {
-                            effect["label"] = "Naderwany Mięsień Brzucha";
-                        }
-                        else if (el == "Torn Head Muscle")
-                        {
-                            effect["label"] = "Naderwany Mięsień Szyi";
-                        }
-                        else if (el == "Torn Leg Muscle")
-                        {
-                            effect["label"] = "Naderwany Mięsień Nogi";
-                        }
-                        else
-                        {
-                            Console.WriteLine("NIE ODNALEZIONO: " + effect["label"]);
-                        }
-                    }
-                }
-            }
 
-            TranslateDescriptions(pack, translations);
+            pack[pathToData]["penalty"]["value"] = mapping.Penalty;
+            pack[pathToData]["location"]["value"] = TranslateLocation(pack[pathToData]["location"]["value"].Value<string>());
         }
 
         public static string TranslateLocation(string location)
