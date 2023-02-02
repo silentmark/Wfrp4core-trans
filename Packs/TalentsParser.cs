@@ -17,10 +17,13 @@ namespace WFRP4e.Translator.Packs
         {
             base.Parse(pack, entry);
 
-            var pathToData = GenericReader.GetPathToData(pack);
             var mapping = (TalentEntry)entry;
 
-            pack[pathToData]["tests"]["value"] = mapping.Tests;
+            if (pack["system"]["tests"] == null)
+            {
+                pack["system"]["tests"] = new JObject();
+            }
+            pack["system"]["tests"]["value"] = mapping.Tests;
         }
     }
 }

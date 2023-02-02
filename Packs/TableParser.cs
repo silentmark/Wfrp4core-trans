@@ -16,7 +16,14 @@ namespace WFRP4e.Translator.Packs
         public override void Parse(JObject pack, Entry entry)
         {
             var mapping = (TableEntry)entry;
-            pack["name"] = mapping.Name;
+            if (string.IsNullOrEmpty(mapping.Name))
+            {
+                Console.WriteLine($"Nie odnaleziono tłumaczenia dla {mapping.OriginalName}, id {mapping.FoundryId} typu {mapping.Type}");
+            }
+            else
+            {
+                pack["name"] = mapping.Name;
+            }
             pack["description"] = mapping.Description;
             if (pack["flags"] == null)
             {
@@ -32,8 +39,14 @@ namespace WFRP4e.Translator.Packs
             {
                 var resultId = jObj.Value<string>("_id");
                 var resultMapping = mapping.TableResults.FirstOrDefault(x => x.FoundryId == resultId);
-                jObj["text"] = resultMapping.Name;
-
+                if (resultMapping != null && !string.IsNullOrWhiteSpace(resultMapping.Name))
+                {
+                    jObj["text"] = resultMapping.Name;
+                }
+                else
+                {
+                    Console.WriteLine($"Nie odnaleziono wpisu dla id {resultId} w tabeli {mapping.OriginalName}");
+                }
             }
             foreach (JProperty property in pack["flags"])
             {

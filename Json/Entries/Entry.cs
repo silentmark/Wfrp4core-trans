@@ -16,9 +16,13 @@
 
         public string OriginFoundryId { get; set; }
 
+        public bool Translated { get; set; }
+
+        public string InitializationFolder { get; set; }
+
         public override string ToString()
         {
-            return $"{FoundryId} - {OriginalName}   :   {Name}";
+            return $"{OriginFoundryId} - {OriginalName}   :   {Name}";
         }
     }
 }

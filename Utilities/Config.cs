@@ -10,19 +10,18 @@ namespace WFRP4e.Translator.Utilities
 {
     internal class Config
     {
-        public static IConfigurationRoot Configuration;       
+        public static IConfigurationRoot Configuration;
 
         public static string PacksPath { get => GetSection(); }
         public static string TranslationsPath { get => GetSection(); }
         public static string GoogleSigninKeyPath { get => GetSection(); }
-        public static string PdfPath { get => GetSection(); }
         public static string SourceJsons { get => GetSection(); }
         public static string DeepLAuthKey { get => GetSection(); }
-
+        public static string OpenAiKey { get => GetSection(); }
 
         private static string GetSection([CallerMemberName] string name = "")
         {
-           return Configuration.GetSection(name).Value;
+            return Configuration.GetSection(name).Value;
         }
     }
 }

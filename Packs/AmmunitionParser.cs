@@ -15,11 +15,8 @@ namespace WFRP4e.Translator.Packs
         public override void Parse(JObject pack, Entry entry)
         {
             base.Parse(pack, entry);
-
-            var pathToData = GenericReader.GetPathToData(pack);
             var mapping = (AmmunitionEntry)entry;
-
-            pack[pathToData]["special"]["value"] = mapping.Special;
+            pack["system"]["special"]["value"] = mapping.Special;
         }
     }
 }

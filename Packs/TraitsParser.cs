@@ -17,18 +17,17 @@ namespace WFRP4e.Translator.Packs
         {
             base.Parse(pack, entry);
 
-            var pathToData = GenericReader.GetPathToData(pack);
             var mapping = (TraitEntry)entry;
-                    
-            if (pack[pathToData]?["specification"]?["value"] != null)
+
+            if (pack["system"]?["specification"]?["value"] != null)
             {
-                var specification = pack[pathToData]?["specification"]?["value"].Value<string>();
+                var specification = pack["system"]?["specification"]?["value"].Value<string>();
                 var newSpec = TranslateSpecification(specification);
-                if(specification == newSpec)
+                if (specification == newSpec)
                 {
                     newSpec = mapping.Specification;
                 }
-                pack[pathToData]["specification"]["value"] = newSpec;
+                pack["system"]["specification"]["value"] = newSpec;
             }
         }
 
@@ -131,12 +130,11 @@ namespace WFRP4e.Translator.Packs
                 case "6+": return "6+";
                 case "9": return "9";
                 default:
-                {
-                    //Console.WriteLine("Nie odnaleziono effect data dla: " + spec);
-                    return spec;
-                }
+                    {
+                        //Console.WriteLine("Nie odnaleziono effect data dla: " + spec);
+                        return spec;
+                    }
             }
         }
-
     }
 }

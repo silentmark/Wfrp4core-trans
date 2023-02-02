@@ -15,13 +15,10 @@ namespace WFRP4e.Translator.Packs
         public override void Parse(JObject pack, Entry entry)
         {
             base.Parse(pack, entry);
-
-            var pathToData = GenericReader.GetPathToData(pack);
             var mapping = (InjuryEntry)entry;
 
-
-            pack[pathToData]["penalty"]["value"] = mapping.Penalty;
-            pack[pathToData]["location"]["value"] = TranslateLocation(pack[pathToData]["location"]["value"].Value<string>());
+            pack["system"]["penalty"]["value"] = mapping.Penalty;
+            pack["system"]["location"]["value"] = TranslateLocation(pack["system"]["location"]["value"].Value<string>());
         }
 
         public static string TranslateLocation(string location)
@@ -42,11 +39,26 @@ namespace WFRP4e.Translator.Packs
                 case "Foot": return "Stopa";
                 case "Hand": return "Dłoń";
                 case "Tongue": return "Język";
+
+                case "Ręka": return "Ręka";
+                case "Noga": return "Noga";
+                case "Korpus": return "Korpus";
+                case "Głowa": return "Głowa";
+                case "Oko": return "Oko";
+                case "Ucho": return "Ucho";
+                case "Nos": return "Nos";
+                case "Palec": return "Palec";
+                case "Palec u nogi": return "Palec u nogi";
+                case "Palce u nogi": return "Palce u nogi";
+                case "Zęby": return "Zęby";
+                case "Stopa": return "Stopa";
+                case "Dłoń": return "Dłoń";
+                case "Język": return "Język";
                 default:
-                {
-                    Console.WriteLine("NIE ODNALEZIONO LOKACJI: " + location);
-                    return location;
-                }
+                    {
+                        Console.WriteLine("NIE ODNALEZIONO LOKACJI: " + location);
+                        return location;
+                    }
             }
         }
     }

@@ -11,10 +11,10 @@ namespace WFRP4e.Translator.Packs
 {
     [FoundryType("mutation")]
     public class MutationReader : GenericReader
-    { 
-        public void UpdateEntry(JObject pack, MutationEntry mapping)
+    {
+        public bool UpdateEntry(JObject pack, MutationEntry mapping)
         {
-            UpdateItemEntry(pack, mapping);
+            return UpdateItemEntry(pack, mapping);
         }
     }
 }

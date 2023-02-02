@@ -16,10 +16,15 @@ namespace WFRP4e.Translator.Packs
         {
             base.Parse(pack, entry);
 
-            var pathToData = GenericReader.GetPathToData(pack);
             var mapping = (WeaponEntry)entry;
-
-            pack[pathToData]["special"]["value"] = mapping.Special;
+            if (!string.IsNullOrWhiteSpace(mapping.Special))
+            {
+                if (pack["system"]["special"] == null)
+                {
+                    pack["system"]["special"] = new JObject();
+                }
+                pack["system"]["special"]["value"] = mapping.Special;
+            }
         }
     }
 }

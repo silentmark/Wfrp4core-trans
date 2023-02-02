@@ -16,36 +16,35 @@ namespace WFRP4e.Translator.Packs
         {
             base.Parse(pack, entry);
 
-            var pathToData = GenericReader.GetPathToData(pack);
             var mapping = (DiseaseEntry)entry;
 
-            if (pack[pathToData]?["contraction"]?["value"] != null)
+            if (pack["system"]?["contraction"]?["value"] != null)
             {
-                pack[pathToData]["contraction"]["value"] = mapping.Contraction;
+                pack["system"]["contraction"]["value"] = mapping.Contraction;
             }
-            if (pack[pathToData]?["duration"]?["value"] != null)
+            if (pack["system"]?["duration"]?["value"] != null)
             {
-                pack[pathToData]["duration"]["value"] = mapping.Duration;
+                pack["system"]["duration"]["value"] = mapping.Duration;
             }
-            if (pack[pathToData]?["duration"]?["unit"] != null)
+            if (pack["system"]?["duration"]?["unit"] != null)
             {
-                pack[pathToData]["duration"]["unit"] = mapping.DurationUnit;
+                pack["system"]["duration"]["unit"] = mapping.DurationUnit;
             }
-            if (pack[pathToData]?["incubation"]?["value"] != null)
+            if (pack["system"]?["incubation"]?["value"] != null)
             {
-                pack[pathToData]["incubation"]["value"] = mapping.Incubation;
+                pack["system"]["incubation"]["value"] = mapping.Incubation;
             }
-            if (pack[pathToData]?["incubation"]?["unit"] != null)
+            if (pack["system"]?["incubation"]?["unit"] != null)
             {
-                pack[pathToData]["incubation"]["unit"] = mapping.IncubationUnit;
+                pack["system"]["incubation"]["unit"] = mapping.IncubationUnit;
             }
-            if (pack[pathToData]?["permanent"]?["value"] != null)
+            if (pack["system"]?["permanent"]?["value"] != null)
             {
-                pack[pathToData]["permanent"]["value"] = mapping.Permanent;
+                pack["system"]["permanent"]["value"] = mapping.Permanent;
             }
-            if (pack[pathToData]?["symptoms"]?["value"] != null)
+            if (pack["system"]?["symptoms"]?["value"] != null)
             {
-                pack[pathToData]["symptoms"]["value"] = mapping.Symptoms;
+                pack["system"]["symptoms"]["value"] = mapping.Symptoms;
             }
         }
     }

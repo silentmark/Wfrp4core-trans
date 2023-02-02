@@ -12,37 +12,38 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("table")]
     public class TableReader : GenericReader
     {
-        public void UpdateEntry(JObject pack, TableEntry mapping)
+        public bool UpdateEntry(JObject pack, TableEntry mapping)
         {
+            var result = false;
             if (string.IsNullOrEmpty(mapping.OriginalName))
             {
+                result = true;
                 mapping.OriginalName = pack.Value<string>("name");
             }
-            else if (mapping.OriginalName == mapping.Name)
-            {
-                mapping.OriginalName = pack.Value<string>("name");
-            }
-            mapping.FoundryId = pack.Value<string>("_id");
-            mapping.OriginFoundryId = pack["flags"]?["core"]?["sourceId"]?.Value<string>();
+
             mapping.Type = "table";
-            mapping.Description = pack.Value<string>("description");
-            var pages = pack["results"].ToArray();
-            mapping.TableResults = new List<TableResultEntry>();
-            foreach (JObject jObj in pages)
+            UpdateIfDifferent(mapping, pack["_id"].ToString(), nameof(mapping.FoundryId), ref result);
+            UpdateIfDifferent(mapping, pack["flags"]["core"]["sourceId"].ToString(), nameof(mapping.OriginFoundryId), ref result);
+            UpdateIfDifferent(mapping, pack["description"]?.ToString(), nameof(mapping.Description), ref result);
+
+            var subItems = pack["results"].ToArray();
+            var existingSubItems = mapping.TableResults.ToList();
+
+            foreach (JObject subItem in subItems)
             {
-                var result = new TableResultEntry();
-                new TableResultReader().UpdateEntry(jObj, result);
-                mapping.TableResults.Add(result);
-            }
-            foreach (JProperty property in pack["flags"])
-            {
-                if (property.Value["initialization-folder"] != null)
+                var newSubEntry = existingSubItems.FirstOrDefault(x => x.FoundryId == subItem.Value<string>("_id")) ?? new TableResultEntry();
+                if (string.IsNullOrEmpty(newSubEntry.OriginalName))
                 {
-                    mapping.InitializationFolder = property.Value["initialization-folder"].Value<string>();
-                    mapping.SourceType = property.Name;
-                    break;
+                    newSubEntry.OriginalName = subItem.Value<string>("text");
+                    existingSubItems.Add(newSubEntry);
+                    result = true;
                 }
+                result = new TableResultReader().UpdateEntry(subItem, newSubEntry) || result;
             }
+            mapping.TableResults = existingSubItems;
+
+            result = UpdateInitializationFolder(pack, mapping) || result;
+            return result;
         }
     }
 }

@@ -24,21 +24,25 @@ namespace WFRP4e.Translator.Packs
         {
             var type = GenericReader.GetTypeFromJson(pack);
             var id = pack.Value<string>("_id");
-            var mapping = (ItemEntry)Mappings.TypeToMappingDictonary[type][id];
+            var mapping = (ItemEntry)(Mappings.TypeToMappingDictonary[type].First(x => x.Value.FoundryId == id).Value);
             return mapping;
         }
-
 
         public virtual void Parse(JObject pack, Entry mapping)
         {
             var type = GenericReader.GetTypeFromJson(pack);
-            var pathToData = GenericReader.GetPathToData(pack);
 
             var id = pack.Value<string>("_id");
-
-            pack["name"] = mapping.Name;
-            pack[pathToData]["description"]["value"] = mapping.Description;
-            pack[pathToData]["gmdescription"]["value"] = mapping.GmDescription;
+            if (string.IsNullOrEmpty(mapping.Name))
+            {
+                Console.WriteLine($"Nie odnaleziono tłumaczenia dla {mapping.OriginalName}, id {mapping.FoundryId} typu {mapping.Type}");
+            }
+            else
+            {
+                pack["name"] = mapping.Name;
+            }
+            pack["system"]["description"]["value"] = mapping.Description;
+            pack["system"]["gmdescription"]["value"] = mapping.GmDescription;
             if (pack["flags"] == null)
             {
                 pack["flags"] = new JObject();
@@ -49,17 +53,17 @@ namespace WFRP4e.Translator.Packs
             }
             pack["flags"]["core"]["sourceId"] = mapping.OriginFoundryId;
 
-            if(pack["effects"] == null)
+            if (pack["effects"] == null)
             {
                 pack["effects"] = new JArray();
             }
 
-            foreach(JObject effect in (JArray)pack["effects"])
+            foreach (JObject effect in (JArray)pack["effects"])
             {
-                var mappingEffect = ((ItemEntry) mapping).Effects.FirstOrDefault(x => x.FoundryId == effect.Value<string>("_id"));
+                var mappingEffect = ((ItemEntry)mapping).Effects.FirstOrDefault(x => x.FoundryId == effect.Value<string>("_id"));
                 if (mappingEffect == null)
                 {
-                    Console.WriteLine($"NIE ODNALEZIONO EFEKTU: {effect.Value<string>("label")} DLA: {mapping}");
+                    Console.WriteLine($"Nie odnaleziono tłumaczenia dla efektu: {effect.Value<string>("label")} o id: {effect.Value<string>("_id")} - Posiadane mapowanie: {mapping}");
                 }
                 else
                 {

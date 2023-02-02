@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;
 
@@ -15,7 +12,14 @@ namespace WFRP4e.Translator.Packs
         public override void Parse(JObject pack, Entry entry)
         {
             var mapping = (JournalEntry)entry;
-            pack["name"] = mapping.Name;
+            if (string.IsNullOrEmpty(mapping.Name))
+            {
+                Console.WriteLine($"Nie odnaleziono tłumaczenia dla {mapping.OriginalName}, id {mapping.FoundryId} typu {mapping.Type}");
+            }
+            else
+            {
+                pack["name"] = mapping.Name;
+            }
             pack["description"] = mapping.Description;
             if (pack["flags"] == null)
             {
@@ -32,7 +36,14 @@ namespace WFRP4e.Translator.Packs
                 var resultId = jObj.Value<string>("_id");
                 var resultMapping = mapping.Pages.FirstOrDefault(x => x.FoundryId == resultId);
                 jObj["text"]["content"] = resultMapping.Content;
-                jObj["name"] = resultMapping.Name;
+                if (string.IsNullOrEmpty(resultMapping.Name))
+                {
+                    Console.WriteLine($"Nie odnaleziono tłumaczenia dla {resultMapping.OriginalName}, id {resultMapping.FoundryId} typu {resultMapping.Type}");
+                }
+                else
+                {
+                    jObj["name"] = resultMapping.Name;
+                }
             }
             foreach (JProperty property in pack["flags"])
             {
@@ -41,40 +52,6 @@ namespace WFRP4e.Translator.Packs
                     property.Value["initialization-folder"] = mapping.InitializationFolder;
                     break;
                 }
-            }
-        }
-
-        public void UpdateEntry(JObject pack, JournalEntry mapping)
-        {
-
-            if (string.IsNullOrEmpty(mapping.OriginalName))
-            {
-                mapping.OriginalName = pack.Value<string>("name");
-            }
-            else if (mapping.OriginalName == mapping.Name)
-            {
-                mapping.OriginalName = pack.Value<string>("name");
-            }
-            mapping.FoundryId = pack.Value<string>("_id");
-
-            mapping.OriginFoundryId = pack["flags"]?["core"]?["sourceId"]?.Value<string>();
-            mapping.Type = "journal";
-            var pages = pack["pages"].ToArray();
-            mapping.Pages = new List<JournalEntryPage>();
-            foreach (JObject jObj in pages)
-            {
-                var page = new JournalEntryPage();
-                new JournalPageReader().UpdateEntry(jObj, page);
-                mapping.Pages.Add(page);
-            }
-            foreach(JProperty property in pack["flags"])
-            {
-                if (property.Value["initialization-folder"] != null)
-                {
-                    mapping.InitializationFolder = property.Value["initialization-folder"].Value<string>();
-                    mapping.SourceType = property.Name;
-                    break;
-                }                
             }
         }
     }

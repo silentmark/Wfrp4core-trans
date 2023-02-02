@@ -16,23 +16,21 @@ namespace WFRP4e.Translator.Packs
         {
             base.Parse(pack, entry);
 
-            var pathToData = GenericReader.GetPathToData(pack);
             var mapping = (CareerEntry)entry;
 
-            pack[pathToData]["careergroup"]["value"] = mapping.CarrerGroup;
-            pack[pathToData]["class"]["value"] = mapping.Class;
+            pack["system"]["careergroup"]["value"] = mapping.CarrerGroup;
+            pack["system"]["class"]["value"] = mapping.Class;
             var skills = new JArray();
             foreach (var itm in mapping.Skills) skills.Add(itm);
-            pack[pathToData]["skills"] = skills;
+            pack["system"]["skills"] = skills;
 
             var talents = new JArray();
             foreach (var itm in mapping.Talents) talents.Add(itm);
-            pack[pathToData]["talents"] = talents;
+            pack["system"]["talents"] = talents;
 
             var trappings = new JArray();
             foreach (var itm in mapping.Trappings) trappings.Add(itm);
-            pack[pathToData]["trappings"] = trappings;
-
+            pack["system"]["trappings"] = trappings;
         }
     }
 }

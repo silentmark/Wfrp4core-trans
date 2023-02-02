@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;
 
@@ -11,13 +6,14 @@ namespace WFRP4e.Translator.Packs
 {
     [FoundryType("talent")]
     public class TalentReader : GenericReader
-    { 
-        public void UpdateEntry(JObject pack, TalentEntry mapping)
+    {
+        public bool UpdateEntry(JObject pack, TalentEntry mapping)
         {
-            UpdateItemEntry(pack, mapping);
+            var result = UpdateItemEntry(pack, mapping);
 
-            var pathToData = GetPathToData(pack);
-            mapping.Tests = pack[pathToData]?["tests"]?["value"]?.Value<string>();
+            UpdateIfDifferent(mapping, pack["system"]?["tests"]?["value"]?.ToString(), nameof(mapping.Tests), ref result);
+
+            return result;
         }
     }
 }

@@ -1,9 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;
 
@@ -12,38 +9,36 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("journal")]
     public class JournalReader : GenericReader
     {
-        public void UpdateEntry(JObject pack, JournalEntry mapping)
+        public bool UpdateEntry(JObject pack, JournalEntry mapping)
         {
-
+            var result = false;
             if (string.IsNullOrEmpty(mapping.OriginalName))
             {
+                result = true;
                 mapping.OriginalName = pack.Value<string>("name");
             }
-            else if (mapping.OriginalName == mapping.Name)
-            {
-                mapping.OriginalName = pack.Value<string>("name");
-            }
-            mapping.FoundryId = pack.Value<string>("_id");
-
-            mapping.OriginFoundryId = pack["flags"]?["core"]?["sourceId"]?.Value<string>();
             mapping.Type = "journal";
+            UpdateIfDifferent(mapping, pack["_id"].ToString(), nameof(mapping.FoundryId), ref result);
+            UpdateIfDifferent(mapping, pack["flags"]["core"]["sourceId"].ToString(), nameof(mapping.OriginFoundryId), ref result);
+
             var pages = pack["pages"].ToArray();
-            mapping.Pages = new List<JournalEntryPage>();
-            foreach (JObject jObj in pages)
+            var existingPages = (mapping.Pages ?? new List<JournalEntryPage>()).ToList();
+
+            foreach (JObject page in pages)
             {
-                var page = new JournalEntryPage();
-                new JournalPageReader().UpdateEntry(jObj, page);
-                mapping.Pages.Add(page);
-            }
-            foreach(JProperty property in pack["flags"])
-            {
-                if (property.Value["initialization-folder"] != null)
+                var newPage = existingPages.FirstOrDefault(x => x.FoundryId == page.Value<string>("_id")) ?? new JournalEntryPage();
+                if (string.IsNullOrEmpty(newPage.OriginalName))
                 {
-                    mapping.InitializationFolder = property.Value["initialization-folder"].Value<string>();
-                    mapping.SourceType = property.Name;
-                    break;
-                }                
+                    newPage.OriginalName = page.Value<string>("name");
+                    existingPages.Add(newPage);
+                    result = true;
+                }
+                result = new JournalPageReader().UpdateEntry(page, newPage) || result;
             }
+            mapping.Pages = existingPages;
+
+            result = UpdateInitializationFolder(pack, mapping) || result;
+            return result;
         }
     }
 }
