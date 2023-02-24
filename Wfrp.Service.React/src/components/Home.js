@@ -14,9 +14,20 @@ export default function Home() {
   const { avatarUrl, name, publicRepos, followers, following } = state.user
 
   const handleLogout = () => {
-    dispatch({
-      type: "LOGOUT"
-    });
+    fetch("/signout", {
+      method: "GET",
+      headers: { 'Content-Type': 'application/json' }
+    })
+      .then(_ => {
+        dispatch({
+          type: "LOGOUT"
+        });
+      })
+      .catch(error => {
+        dispatch({
+          type: "LOGOUT"
+        });
+      });
   } 
 
   return (

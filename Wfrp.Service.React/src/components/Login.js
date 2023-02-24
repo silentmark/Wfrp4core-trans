@@ -51,14 +51,7 @@ export default function Login() {
                 {
                   // Link to request GitHub access
                 }
-                <a
-                  className="login-link"
-                  href="/signin"
-                  //href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=user%20repo`}
-                  //</>onClick={() => {
-                    //setData({ ...data, errorMessage: "" });
-                  //}}
-                >
+                <a className="login-link" href="/signin" >
                   <GithubIcon />
                   <span>Login with GitHub</span>
                 </a>

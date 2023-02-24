@@ -2,12 +2,17 @@ const fs = require("fs")
 const path = require("path")
 import copy from 'rollup-plugin-copy-watch'
 import jscc from 'rollup-plugin-jscc'
+import del from 'rollup-plugin-delete'
 
 let manifest = JSON.parse(fs.readFileSync("./build/asset-manifest.json"))
 let input = "./build/" + manifest.files["main.js"];
+let output = "../Wfrp.Service/static/js/" + manifest.files["main.js"];
 
 export default {
     input: [input],
+    output: {
+        file: output
+    },
     watch : {
         clearScreen: true
     },
@@ -15,6 +20,7 @@ export default {
         jscc({      
             values : {_ENV :  process.env.NODE_ENV}
         }),
+        del({ targets: '../Wfrp.Service/static/*', force: true }),
         copy({
             targets : [
                 {src : "./build/*", dest : "../Wfrp.Service"},

@@ -54,23 +54,6 @@ namespace Wfrp.Service
                 o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
             .AddCookie( /* config moved to ConfigureApplicationCookie */)
-            //.AddCookie(o =>
-            //{
-            //    // set the path for the authentication challenge
-            //    o.LoginPath = "/signin";
-            //    // set the path for the sign out
-            //    o.LogoutPath = "/signout";
-            //    o.ExpireTimeSpan = TimeSpan.FromMinutes(120);
-            //    o.SlidingExpiration = true;
-            //    o.Cookie.Domain = "localhost";
-            //    CookieAuthenticationEvents events1 = new CookieAuthenticationEvents();
-            //    events1.OnValidatePrincipal = new Func<CookieValidatePrincipalContext, Task>(cookieStuff =>
-            //    {
-            //        Console.WriteLine(cookieStuff);
-            //        return SecurityStampValidator.ValidatePrincipalAsync(cookieStuff);
-            //    });
-            //    o.Events = events1;
-            //}).
             .AddGitHub(o =>
             {
                 o.ClientId = configuration["github:clientId"];
