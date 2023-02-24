@@ -1,5 +1,4 @@
 const fs = require("fs")
-const path = require("path")
 import copy from 'rollup-plugin-copy-watch'
 import jscc from 'rollup-plugin-jscc'
 import del from 'rollup-plugin-delete'

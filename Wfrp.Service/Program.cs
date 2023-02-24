@@ -1,3 +1,5 @@
+using Azure.Core;
+using ElCamino.AspNetCore.Identity.AzureTable;
 using ElCamino.AspNetCore.Identity.AzureTable.Model;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -23,7 +25,7 @@ namespace Wfrp.Service
 
             // Add services to the container.
 
-            builder.Services.AddControllers();//.AddNewtonsoftJson();
+            builder.Services.AddControllers().AddNewtonsoftJson();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -67,15 +69,29 @@ namespace Wfrp.Service
 
                 // Optional
                 // if you need an access token to call GitHub Apis
-                o.Events.OnCreatingTicket += context =>
+                o.Events.OnCreatingTicket += async context =>
                 {
                     if (context.AccessToken is { })
                     {
                         context.Identity?.AddClaim(new Claim("access_token", context.AccessToken));
+                        var client = new GitHubClient(new ProductHeaderValue("test"))
+                        {
+                            Credentials = new Credentials(context.AccessToken)
+                        };
+                        var githubUser = await client.User.Current();
+                        var repo = await client.Repository.Get("silentmark", "wfrp4core-pl");
+                        if (repo != null)
+                        {
+                            context.Identity?.AddClaim(new Claim("contributor", "true"));
+                        }
                     }
-
-                    return Task.CompletedTask;
                 };
+            });
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Contributor", policy => policy
+                    .RequireAuthenticatedUser()
+                    .RequireClaim("contributor"));
             });
             builder.Services.ConfigureApplicationCookie(options =>
             {
@@ -86,6 +102,7 @@ namespace Wfrp.Service
                 options.LogoutPath = "/signout";
                 options.Cookie.SameSite = SameSiteMode.Lax;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.AccessDeniedPath = new PathString("/static/index.html");
             });
 
             builder.Services.Configure<CookiePolicyOptions>(options =>

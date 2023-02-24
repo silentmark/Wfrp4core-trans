@@ -11,7 +11,7 @@ export default function Home() {
     return <Redirect to="/login" />;
   }
 
-  const { avatarUrl, name, publicRepos, followers, following } = state.user
+  const { AvatarUrl, Name, PublicRepos, Followers, Following, Contributor } = state.user
 
   const handleLogout = () => {
     fetch("/signout", {
@@ -36,11 +36,16 @@ export default function Home() {
         <button onClick={()=> handleLogout()}>Logout</button>
         <div>
           <div className="content">
-            <img src={avatarUrl} alt="Avatar"/>
-            <span>{name}</span>
-            <span>{publicRepos} Repos</span>
-            <span>{followers} Followers</span>
-            <span>{following} Following</span>
+            <img src={AvatarUrl} alt="Avatar"/>
+            <span>{Name}</span>
+            <span>{PublicRepos} Repos</span>
+            <span>{Followers} Followers</span>
+            <span>{Following} Following</span>
+            if (state.user.Contributor) {
+               <span>Contributor to wfrp4core-pl</span>
+            } else {
+              <span>Limited Access - you are not contributor to wfrp4core-pl</span>
+            }
           </div>
         </div>
       </div>

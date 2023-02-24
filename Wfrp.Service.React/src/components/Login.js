@@ -10,24 +10,26 @@ export default function Login() {
   const [data, setData] = useState({ errorMessage: "", isLoading: false });
 
   useEffect(() => {
-    // Use code parameter and other parameters to make POST request to proxy_server
-    fetch("/profile", {
-      method: "GET",
-      headers: { 'Content-Type': 'application/json' }
-    })
-      .then(response => response.json())
-      .then(data => {
-        dispatch({
-          type: "LOGIN",
-          payload: { user: data, isLoggedIn: true }
+    const match = document.cookie.match(new RegExp('(^| )IsAuthenticated=([^;]+)'));
+    if (match && match[2] === "true") {
+      fetch("/profile", {
+          method: "GET",
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+          dispatch({
+            type: "LOGIN",
+            payload: { user: data, isLoggedIn: true }
+          });
+        })
+        .catch(error => {
+          setData({
+            isLoading: false,
+            errorMessage: "Sorry! Login failed"
+          });
         });
-      })
-      .catch(error => {
-        setData({
-          isLoading: false,
-          errorMessage: "Sorry! Login failed"
-        });
-      });
+    }
   }, [state, dispatch, data]);
 
   if (state.isLoggedIn) {
