@@ -1,0 +1,55 @@
+{
+  "name": "login-with-github",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "react-app-rewired build && cross-env NODE_ENV=development rollup --config rollup.config.js --watch",
+    "build": "react-app-rewired build && cross-env NODE_ENV=production rollup --config rollup.config.js",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.11.9",
+    "@testing-library/react": "^11.2.3",
+    "@testing-library/user-event": "^12.6.0",
+    "body-parser": "^1.19.0",
+    "concurrently": "^5.1.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "form-data": "^3.0.0",
+    "mdi-react": "^7.0.0",
+    "node-fetch": "^2.6.1",
+    "react": "^17.0.1",
+    "react-app-rewired": "^2.2.1",
+    "react-dom": "^17.0.1",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "5.0.1",
+    "styled-components": "^5.0.1"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "fs": "^0.0.1-security",
+    "fs-extra": "^10.1.0",
+    "joi": "^17.2.1",
+    "path": "^0.12.7",
+    "rollup": "^2.79.1",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-copy-watch": "^0.0.1",
+    "rollup-plugin-jscc": "^2.0.0"
+  }
+}
