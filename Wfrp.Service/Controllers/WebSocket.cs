@@ -6,7 +6,7 @@ namespace Wfrp.Service.Controllers
 {
     public class WebSocket : ControllerBase
     {
-        // [Authorize(AuthenticationSchemes = "Identity.External")]
+        [Authorize(Policy = "Contributor")]
         [Route("/ws")]
         public async Task Get()
         {

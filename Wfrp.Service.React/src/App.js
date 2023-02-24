@@ -1,7 +1,8 @@
 import React, { createContext, useReducer } from 'react';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Home from "./components/Home";
 import Login from "./components/Login";
+import Download from "./components/Download";
 import { initialState, reducer } from "./store/reducer";
 
 
@@ -17,12 +18,14 @@ function App() {
         dispatch
       }}
     >
-    <Router>
-      <Switch>
-        <Route path="/login" component={Login}/>
-        <Route path="/" component={Home}/>
-      </Switch>
-    </Router>
+    <BrowserRouter>
+      <Routes>
+        <Route path="*" element={<Navigate to="/" />}/>
+        <Route path="/" element={<Home />}/>
+        <Route path="/login" element={<Login />}/>
+        <Route path="/download" element={<Download />}/>
+      </Routes>
+    </BrowserRouter>
     </AuthContext.Provider>
   );
 }

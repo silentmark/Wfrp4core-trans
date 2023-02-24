@@ -4,8 +4,8 @@ import jscc from 'rollup-plugin-jscc'
 import del from 'rollup-plugin-delete'
 
 let manifest = JSON.parse(fs.readFileSync("./build/asset-manifest.json"))
-let input = "./build/" + manifest.files["main.js"];
-let output = "../Wfrp.Service/static/js/" + manifest.files["main.js"];
+let input = "./build" + manifest.files["main.js"];
+let output = "../Wfrp.Service" + manifest.files["main.js"];
 
 export default {
     input: [input],

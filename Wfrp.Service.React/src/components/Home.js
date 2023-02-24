@@ -1,17 +1,18 @@
 import React, { useContext } from "react";
-import { Redirect } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import Styled from "styled-components";
 import { AuthContext } from "../App";
 
 
 export default function Home() {
   const { state, dispatch } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   if (!state.isLoggedIn) {
-    return <Redirect to="/login" />;
+    return <Navigate to="/login" />;
   }
 
-  const { AvatarUrl, Name, PublicRepos, Followers, Following, Contributor } = state.user
+  const { AvatarUrl, Name, PublicRepos, Followers, Following } = state.user
 
   const handleLogout = () => {
     fetch("/signout", {
@@ -41,11 +42,9 @@ export default function Home() {
             <span>{PublicRepos} Repos</span>
             <span>{Followers} Followers</span>
             <span>{Following} Following</span>
-            if (state.user.Contributor) {
-               <span>Contributor to wfrp4core-pl</span>
-            } else {
-              <span>Limited Access - you are not contributor to wfrp4core-pl</span>
-            }
+            {state.user.Contributor && <span>Contributor to wfrp4core-pl</span>}
+            {state.user.Contributor && <div><button onClick={() => navigate("/download")}>Download Translation</button></div>}
+            {!state.user.Contributor && <span>Limited Access - you are not contributor to wfrp4core-pl</span>}
           </div>
         </div>
       </div>

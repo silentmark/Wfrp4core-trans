@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import Styled from "styled-components";
 import GithubIcon from "mdi-react/GithubIcon";
 import { AuthContext } from "../App";
@@ -33,7 +33,7 @@ export default function Login() {
   }, [state, dispatch, data]);
 
   if (state.isLoggedIn) {
-    return <Redirect to="/" />;
+    return <Navigate to="/" />;
   }
 
   return (
