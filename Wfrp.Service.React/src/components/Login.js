@@ -4,7 +4,6 @@ import Styled from "styled-components";
 import GithubIcon from "mdi-react/GithubIcon";
 import { AuthContext } from "../App";
 
-
 export default function Login() {
   const { state, dispatch } = useContext(AuthContext);
   const [data, setData] = useState({ errorMessage: "", isLoading: false });
@@ -12,7 +11,7 @@ export default function Login() {
   useEffect(() => {
     const match = document.cookie.match(new RegExp('(^| )IsAuthenticated=([^;]+)'));
     if (match && match[2] === "true") {
-      fetch("/profile", {
+      fetch("/api/profile", {
           method: "GET",
           headers: { 'Content-Type': 'application/json' }
         })
@@ -53,7 +52,7 @@ export default function Login() {
                 {
                   // Link to request GitHub access
                 }
-                <a className="login-link" href="/signin" >
+                <a className="login-link" href="/api/signin" >
                   <GithubIcon />
                   <span>Login with GitHub</span>
                 </a>

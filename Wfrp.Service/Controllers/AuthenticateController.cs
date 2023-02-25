@@ -6,42 +6,37 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Octokit;
-using System.Net;
-using System.Security.Claims;
-using System.Text.Json;
-using System.Web;
 using Wfrp.Service.Data;
 using IdentityRole = ElCamino.AspNetCore.Identity.AzureTable.Model.IdentityRole;
 using IdentityUser = ElCamino.AspNetCore.Identity.AzureTable.Model.IdentityUser;
 
 namespace Wfrp.Service.Controllers
 {
-    [Route("")]
-    public class Authenticate : ControllerBase
+    [Route("api")]
+    public class AuthenticateController : ControllerBase
     {
         private readonly UserStore<IdentityUser, IdentityRole, ApplicationDbContext> _userStore;
 
-        public Authenticate(IUserStore<IdentityUser> userStore)
+        public AuthenticateController(IUserStore<IdentityUser> userStore)
         {
             _userStore = (UserStore<IdentityUser, IdentityRole, ApplicationDbContext>)userStore;
         }
 
         [HttpGet]
         [AllowAnonymous]
-        [Route("/signin")]
-        public async Task<IActionResult> Login()
+        [Route("signin")]
+        public IActionResult Login()
         {
             return new ChallengeResult(GitHubAuthenticationDefaults.DisplayName, new AuthenticationProperties
             {
-                RedirectUri = "/postsignin"
+                RedirectUri = "/api/postsignin"
             });
         }
 
         [HttpGet]
         [Authorize]
-        [Route("/postsignin")]
+        [Route("postsignin")]
         public async Task<IActionResult> PostLogin()
         {
             // 6. From GitHub
@@ -69,12 +64,12 @@ namespace Wfrp.Service.Controllers
                 cookieOptions.IsEssential = true;
                 Response.Cookies.Append("IsAuthenticated", "true", cookieOptions);
             }
-            return new RedirectResult("/static/index.html");
+            return new RedirectResult("/");
         }
 
         [HttpGet]
         [Authorize]
-        [Route("/profile")]
+        [Route("profile")]
         public async Task<IActionResult> GetProfile()
         {
             // 6. From GitHub
@@ -87,11 +82,15 @@ namespace Wfrp.Service.Controllers
                 var githubUser = await client.User.Current();
                 var repo = await client.Repository.Get("silentmark", "wfrp4core-pl");
                 string str = JsonConvert.SerializeObject(githubUser);
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
                 dynamic obj = JsonConvert.DeserializeObject(str);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
                 if (repo != null)
                 {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
                     obj.Contributor = true;
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
                 }
 
                 return new JsonResult(obj);
@@ -101,16 +100,18 @@ namespace Wfrp.Service.Controllers
 
         [HttpGet]
         [Authorize]
-        [Route("/signout")]
+        [Route("signout")]
         public async Task<IActionResult> SignOutAction()
         {
             await HttpContext.SignOutAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             new AuthenticationProperties
             {
-                RedirectUri = "/static/index.html"
+                RedirectUri = "/"
             });
-            return base.SignOut();
+            Response.Cookies.Delete("IsAuthenticated");
+            base.SignOut();
+            return Redirect("/");
         }
     }
 }

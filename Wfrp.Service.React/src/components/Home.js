@@ -15,7 +15,7 @@ export default function Home() {
   const { AvatarUrl, Name, PublicRepos, Followers, Following } = state.user
 
   const handleLogout = () => {
-    fetch("/signout", {
+    fetch("/api/signout", {
       method: "GET",
       headers: { 'Content-Type': 'application/json' }
     })

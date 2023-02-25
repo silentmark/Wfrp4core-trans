@@ -58,8 +58,10 @@ namespace Wfrp.Service
             .AddCookie( /* config moved to ConfigureApplicationCookie */)
             .AddGitHub(o =>
             {
+#pragma warning disable CS8601 // Possible null reference assignment.
                 o.ClientId = configuration["github:clientId"];
                 o.ClientSecret = configuration["github:clientSecret"];
+#pragma warning restore CS8601 // Possible null reference assignment.
                 o.CallbackPath = "/signin-github";
 
                 // Grants access to read a user's profile data.
@@ -128,7 +130,9 @@ namespace Wfrp.Service
             app.UseAuthorization();
 
             var assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+#pragma warning disable CS8604 // Possible null reference argument.
             var assetDirectory = Path.Combine(assemblyDirectory, "static");
+#pragma warning restore CS8604 // Possible null reference argument.
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(assetDirectory),

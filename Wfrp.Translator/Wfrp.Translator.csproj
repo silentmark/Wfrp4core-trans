@@ -18,6 +18,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Betalgo.OpenAI.GPT3" Version="6.6.6" />
     <PackageReference Include="CognitiveServices.Translator.Client" Version="1.0.31" />
     <PackageReference Include="DeepL.net" Version="1.6.0" />
