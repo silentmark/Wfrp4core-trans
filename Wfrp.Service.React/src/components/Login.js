@@ -1,10 +1,78 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Navigate } from "react-router-dom";
-import Styled from "styled-components";
-import GithubIcon from "mdi-react/GithubIcon";
+import { createStyles, Container, Text, Button, Group } from '@mantine/core';
+import { GithubIcon, DiscordIcon } from '@mantine/ds';
 import { AuthContext } from "../App";
 
+const BREAKPOINT = '@media (max-width: 755px)';
+
+const useStyles = createStyles((theme) => ({
+  wrapper: {
+    position: 'relative',
+    boxSizing: 'border-box',
+    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.white,
+  },
+
+  inner: {
+    position: 'relative',
+    paddingTop: 200,
+    paddingBottom: 120,
+
+    [BREAKPOINT]: {
+      paddingBottom: 80,
+      paddingTop: 80,
+    },
+  },
+
+  title: {
+    fontFamily: `Greycliff CF, ${theme.fontFamily}`,
+    fontSize: 62,
+    fontWeight: 900,
+    lineHeight: 1.1,
+    margin: 0,
+    padding: 0,
+    color: theme.colorScheme === 'dark' ? theme.white : theme.black,
+
+    [BREAKPOINT]: {
+      fontSize: 42,
+      lineHeight: 1.2,
+    },
+  },
+
+  description: {
+    marginTop: theme.spacing.xl,
+    fontSize: 24,
+
+    [BREAKPOINT]: {
+      fontSize: 18,
+    },
+  },
+
+  controls: {
+    marginTop: theme.spacing.xl * 2,
+
+    [BREAKPOINT]: {
+      marginTop: theme.spacing.xl,
+    },
+  },
+
+  control: {
+    height: 54,
+    paddingLeft: 38,
+    paddingRight: 38,
+
+    [BREAKPOINT]: {
+      height: 54,
+      paddingLeft: 18,
+      paddingRight: 18,
+      flex: 1,
+    },
+  },
+}));
+
 export default function Login() {
+
+  const { classes } = useStyles();
   const { state, dispatch } = useContext(AuthContext);
   const [data, setData] = useState({ errorMessage: "", isLoading: false });
 
@@ -36,118 +104,44 @@ export default function Login() {
   }
 
   return (
-    <Wrapper>
-      <section className="container">
-        <div>
-          <h1>Welcome</h1>
-          <span>Super amazing app</span>
-          <span>{data.errorMessage}</span>
-          <div className="login-container">
-            {data.isLoading ? (
-              <div className="loader-container">
-                <div className="loader"></div>
-              </div>
-            ) : (
-              <>
-                {
-                  // Link to request GitHub access
-                }
-                <a className="login-link" href="/api/signin" >
-                  <GithubIcon />
-                  <span>Login with GitHub</span>
-                </a>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-    </Wrapper>
+    <div className={classes.wrapper}>
+      <Container size={700} className={classes.inner}>
+        <h1 className={classes.title}>
+          Polska Wersja{' '}
+          <Text component="span" variant="gradient" gradient={{ from: 'blue', to: 'cyan' }} inherit>
+            dla Foundry VTT
+          </Text>{' '}
+          Systemu Warhammer Fantasy Roleplay 4ed.
+        </h1>
+
+        <Text className={classes.description} color="dimmed">
+          Aby uzyskać dostęp do tłumaczenia, musisz posiadać konto na github oraz dołączyć do prywatnego <a href='https://github.com/silentmark/wfrp4core-pl'>repozytorium</a>. 
+        </Text>
+
+        <Group className={classes.controls}>
+        <Button
+            component="a"
+            href="/api/signin"
+            size="xl"
+            variant="default"
+            className={classes.control}
+            leftIcon={<GithubIcon size={20} />}
+          >
+                    Zaloguj
+          </Button>
+          <Button
+            size="xl"
+            component="a"
+            href="https://discordapp.com/users/579575046775767040"
+            className={classes.control}
+            variant="gradient"
+            gradient={{ from: 'blue', to: 'cyan' }}
+            leftIcon={<DiscordIcon size={20} />}
+          >
+            Znajdź mnie na Discord
+          </Button>
+        </Group>
+      </Container>
+    </div>
   );
 }
-
-const Wrapper = Styled.section`
-  .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    font-family: Arial;
-    
-
-    > div:nth-child(1) {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
-      transition: 0.3s;
-      width: 25%;
-      height: 45%;
-
-      > h1 {
-        font-size: 2rem;
-        margin-bottom: 20px;
-      }
-
-      > span:nth-child(2) {
-        font-size: 1.1rem;
-        color: #808080;
-        margin-bottom: 70px;
-      }
-
-      > span:nth-child(3) {
-        margin: 10px 0 20px;
-        color: red;
-      }
-
-      .login-container {
-        background-color: #000;
-        width: 70%;
-        border-radius: 3px;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        > .login-link {
-          text-decoration: none;
-          color: #fff;
-          text-transform: uppercase;
-          cursor: default;
-          display: flex;
-          align-items: center;          
-          height: 40px;
-
-          > span:nth-child(2) {
-            margin-left: 5px;
-          }
-        }
-
-        .loader-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;          
-          height: 40px;
-        }
-
-        .loader {
-          border: 4px solid #f3f3f3;
-          border-top: 4px solid #3498db;
-          border-radius: 50%;
-          width: 12px;
-          height: 12px;
-          animation: spin 2s linear infinite;
-        }
-
-        @keyframes spin {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-      }
-    }
-  }
-`;

@@ -20,10 +20,13 @@ export default {
             values : {_ENV :  process.env.NODE_ENV}
         }),
         del({ targets: '../Wfrp.Service/static/*', force: true }),
+        del({ targets: '../Wfrp.Service/bin/Debug/net7.0/static/*', force: true }),
         copy({
             targets : [
                 {src : "./build/*", dest : "../Wfrp.Service"},
-                {src : "./build/index.html", dest : "../Wfrp.Service/static"}
+                {src : "./build/index.html", dest : "../Wfrp.Service/static"},
+                {src : "./build/*", dest : "../Wfrp.Service/bin/Debug/net7.0"},                
+                {src : "./build/index.html", dest : "../Wfrp.Service/bin/Debug/net7.0/static"}
             ],
             watch: process.env.NODE_ENV == "production" ? false : ["./build/*/**"]
         })

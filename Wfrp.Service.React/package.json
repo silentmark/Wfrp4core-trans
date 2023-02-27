@@ -9,6 +9,12 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@mantine/core": "^5.10.5",
+    "@mantine/ds": "^5.10.5",
+    "@mantine/hooks": "^5.10.5",
+    "@mantine/notifications": "^5.10.5",
+    "@tabler/icons": "1.115.0",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.3",
     "@testing-library/user-event": "^12.6.0",
