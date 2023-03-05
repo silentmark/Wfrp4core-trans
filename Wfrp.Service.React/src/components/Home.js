@@ -7,7 +7,7 @@ import useWebSocket from "react-use-websocket";
 import { wssUrl } from "../helpers/utilities";
 
 
-const BREAKPOINT = '@media (max-width: 755px)';
+const BREAKPOINT = '@media (max-width: 1200px)';
 
 const useStyles = createStyles((theme) => ({
   icon: {
@@ -27,7 +27,7 @@ const useStyles = createStyles((theme) => ({
 
   inner: {
     position: 'relative',
-    paddingTop: 200,
+    paddingTop: 30,
     paddingBottom: 120,
 
     [BREAKPOINT]: {
@@ -57,6 +57,39 @@ const useStyles = createStyles((theme) => ({
     height: 54,
     paddingLeft: 38,
     paddingRight: 38
+  },
+
+  console: {
+    marginTop: theme.spacing.xl * 2,
+    backgroundColor: 'black',
+    backgroundImage: 'radial-gradient(rgba(0, 150, 0, 0.75), black 120%)',
+    overflow: 'hidden',
+    padding: '20px',
+    color: 'white',
+    font: '12px Inconsolata, monospace',
+    textShadow: '0 0 5px #C8C8C8',
+    '&::after': {
+      content: "",
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      background: `repeating-linear-gradient(
+        0deg,
+        rgba(black, 0.15),
+        rgba(black, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+      )`,
+      pointerEvents: 'none',
+    }
+  },
+  '::selection': {
+    background: '#0080FF',
+    textShadow: 'none'
+  },
+  pre: {    
+    whiteSpace: 'pre-wrap', 
+    margin: 0
   }
 }));
 
@@ -65,6 +98,7 @@ export default function Home() {
   const navigate = useNavigate();
   const { classes } = useStyles();
   const [logs, setLogs] = useState([]);
+  const [downloadDisabled, setDowmnloadDisabled] = useState(false);
 
   if (!state.isLoggedIn) {
     return <Navigate to="/login" />;
@@ -102,16 +136,8 @@ export default function Home() {
 
     // websocket onclose event listener
     ws.onclose = e => {
-        console.log(
-            `Socket is closed. Reconnect will be attempted in ${Math.min(
-                10000 / 1000,
-                (timeout + timeout) / 1000
-            )} second.`,
-            e.reason
-        );
-
-        timeout = timeout + timeout; //increment retry interval
-        connectInterval = setTimeout(connect, Math.min(10000, timeout)); //call check function after timeout
+        console.log("Socket is closed: " + e.reason);
+        setDowmnloadDisabled(false);
     };
 
     // websocket onerror event listener
@@ -133,12 +159,13 @@ export default function Home() {
   };
   
   const handleDownload = () => {
+    setDowmnloadDisabled(true);
     connect();
   }
 
   return (
     <div className={classes.wrapper}>
-      <Container size={700} className={classes.inner}>
+      <Container size={1200} className={classes.inner}>
         <Group>
           <Group noWrap>
             <Avatar src={AvatarUrl} size={94} radius="md" />
@@ -172,6 +199,7 @@ export default function Home() {
                   onClick={() => handleDownload()}
                   size="xl"
                   variant="default"
+                  disabled={downloadDisabled}
                   className={classes.control}
                   leftIcon={<IconDownload size={20}/>}>
                 Pobierz
@@ -188,10 +216,12 @@ export default function Home() {
             </Button>
           </Group>
         </Group>
-        <Group>
-          <ul>
-            {logs.map((log) => (<li>{log}</li>))}
-          </ul>
+        <Group className={classes.console}>
+          <pre>
+            <output>
+            {logs.join("\n")}
+            </output>
+          </pre>
         </Group>
       </Container>
     </div>

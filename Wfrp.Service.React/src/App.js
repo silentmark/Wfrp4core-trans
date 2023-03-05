@@ -2,7 +2,6 @@ import React, { createContext, useReducer } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Home from "./components/Home";
 import Login from "./components/Login";
-import Download from "./components/Download";
 import { initialState, reducer } from "./store/reducer";
 
 
@@ -23,7 +22,6 @@ function App() {
         <Route path="*" element={<Navigate to="/" />}/>
         <Route path="/" element={<Home />}/>
         <Route path="/login" element={<Login />}/>
-        <Route path="/download" element={<Download />}/>
       </Routes>
     </BrowserRouter>
     </AuthContext.Provider>

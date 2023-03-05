@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
 using System.Text;
+using Wfrp.Library.Services;
 
 namespace Wfrp.Service.Controllers
 {
@@ -27,17 +28,46 @@ namespace Wfrp.Service.Controllers
             }
         }
 
-        private static async Task Echo(WebSocket webSocket)
+        private async Task Echo(WebSocket webSocket)
         {
-            var counter = 0;
-            while (!webSocket.CloseStatus.HasValue || webSocket.CloseStatus.Value == WebSocketCloseStatus.Empty)
+            var action = (object? sender, GenericEventArgs<string> arg) =>
             {
-                counter++;
-                var bytes = Encoding.Default.GetBytes("Sending some messages: " + counter);
-                var arraySegment = new ArraySegment<byte>(bytes);
-                await webSocket.SendAsync(arraySegment, WebSocketMessageType.Text, true, CancellationToken.None);
-                await Task.Delay(10000);
+                if (webSocket.State == WebSocketState.Open)
+                {
+                    SendText(webSocket, arg.EventData).Wait();
+                }
+            };
+            try
+            {
+                PackageUpdater.ProgressUpdated += action.Invoke;
+                await SendText(webSocket, $"Ogarniam mapowanie");
+                PackageUpdater.InitAllMappings(Config.SourceJsons);
+
+                await SendText(webSocket, $"Generuję json dla oryginałów");
+                PackageUpdater.ExtractJsonsToFilesAndCorrectIds(Config.PacksPath);
+                await SendText(webSocket, $"Generuję json dla tłumaczeń");
+                PackageUpdater.ExtractJsonsToFilesAndCorrectIds(Config.TranslationsPath);
+                await SendText(webSocket, $"Aktualizuję pliki .db");
+                PackageUpdater.TransformPackagesBasedOnTranslationFile(Config.PacksPath, Config.TranslationsPath);
+                await SendText(webSocket, $"Przygotowuję paczkę .zip");
+                await SendText(webSocket, $"Gotowe");
             }
+            catch (Exception ex)
+            {
+                await SendText(webSocket, $"Wystąpił błąd: {ex}");
+            }
+            finally
+            {
+                PackageUpdater.ProgressUpdated -= action.Invoke;
+                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Gotowe", CancellationToken.None);
+            }
+        }
+
+        private async Task SendText(WebSocket webSocket, string message)
+        {
+            var bytes = Encoding.Default.GetBytes(message);
+            var arraySegment = new ArraySegment<byte>(bytes);
+            await webSocket.SendAsync(arraySegment, WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }
 }

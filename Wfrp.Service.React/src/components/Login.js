@@ -4,7 +4,7 @@ import { createStyles, Container, Text, Button, Group } from '@mantine/core';
 import { GithubIcon, DiscordIcon } from '@mantine/ds';
 import { AuthContext } from "../App";
 
-const BREAKPOINT = '@media (max-width: 755px)';
+const BREAKPOINT = '@media (max-width: 1200px)';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -15,7 +15,7 @@ const useStyles = createStyles((theme) => ({
 
   inner: {
     position: 'relative',
-    paddingTop: 200,
+    paddingTop: 30,
     paddingBottom: 120,
 
     [BREAKPOINT]: {
@@ -105,7 +105,7 @@ export default function Login() {
 
   return (
     <div className={classes.wrapper}>
-      <Container size={700} className={classes.inner}>
+      <Container size={1200} className={classes.inner}>
         <h1 className={classes.title}>
           Polska Wersja{' '}
           <Text component="span" variant="gradient" gradient={{ from: 'blue', to: 'cyan' }} inherit>

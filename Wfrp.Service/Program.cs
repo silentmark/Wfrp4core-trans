@@ -10,6 +10,7 @@ using Octokit;
 using System.Net;
 using System.Reflection;
 using System.Security.Claims;
+using Wfrp.Library.Services;
 using Wfrp.Service.Data;
 using IdentityRole = ElCamino.AspNetCore.Identity.AzureTable.Model.IdentityRole;
 using IdentityUser = ElCamino.AspNetCore.Identity.AzureTable.Model.IdentityUser;
@@ -20,6 +21,11 @@ namespace Wfrp.Service
     {
         public static void Main(string[] args)
         {
+            Config.Configuration = new ConfigurationBuilder()
+                 .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
+                 .AddJsonFile("appsettings.json", false)
+                 .Build();
+
             var builder = WebApplication.CreateBuilder(args);
             var configuration = builder.Configuration;
 

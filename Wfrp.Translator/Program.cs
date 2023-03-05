@@ -13,6 +13,8 @@ using System.Reflection;
 using DeepL;
 using WFRP4e.Translator.Json.Entries;
 using System.Text;
+using Wfrp.Library.Services;
+using Config = WFRP4e.Translator.Utilities.Config;
 
 namespace WFRP4e.Translator
 {
@@ -41,15 +43,16 @@ namespace WFRP4e.Translator
             Console.WriteLine(
                         $"Konfiguracja:\nŚcieżka do plików .db: {Config.PacksPath}\nŚcieżka do plików wyjściowych: {Config.TranslationsPath}");
             Console.WriteLine($"Ogarniam mapowanie");
-            InitAllMappings();
+            PackageUpdater.ProgressUpdated += (sender, message) => Console.WriteLine(message.EventData);
+            PackageUpdater.InitAllMappings(Config.SourceJsons);
 
             ConsoleKeyInfo input;
             do
             {
                 Console.WriteLine($"Generuję json dla oryginałów");
-                ExtractJsonsToFilesAndCorrectIds(Config.PacksPath);
+                PackageUpdater.ExtractJsonsToFilesAndCorrectIds(Config.PacksPath);
                 Console.WriteLine($"Generuję json dla tłumaczeń");
-                ExtractJsonsToFilesAndCorrectIds(Config.TranslationsPath);
+                PackageUpdater.ExtractJsonsToFilesAndCorrectIds(Config.TranslationsPath);
 
                 Console.WriteLine(
                     @"
@@ -62,7 +65,7 @@ namespace WFRP4e.Translator
                 Console.WriteLine();
                 if (input.KeyChar == '1')
                 {
-                    TransformPackagesBasedOnTranslationFile(Config.PacksPath, Config.TranslationsPath);
+                    PackageUpdater.TransformPackagesBasedOnTranslationFile(Config.PacksPath, Config.TranslationsPath);
                 }
                 else if (input.KeyChar == '2')
                 {
@@ -116,66 +119,6 @@ namespace WFRP4e.Translator
                     content.AppendLine(JsonConvert.SerializeObject(originalObj, Formatting.None));
                 }
                 File.WriteAllText(pack, content.ToString());
-            }
-        }
-
-        private static void TransformPackagesBasedOnTranslationFile(string packsPath, string translationsPath)
-        {
-            var packs = Directory.EnumerateFiles(packsPath, "*.db", SearchOption.AllDirectories).ToList();
-            var translationsPaths = Directory.EnumerateFiles(translationsPath, "*.db", SearchOption.AllDirectories).ToList();
-            foreach (var pack in packs)
-            {
-                var module = Path.GetFileName(Path.GetDirectoryName(Path.GetDirectoryName(pack)));
-                var translationPath = translationsPaths.FirstOrDefault(x => Path.GetFileName(Path.GetDirectoryName(Path.GetDirectoryName(x))) == module && Path.GetFileName(x) == Path.GetFileName(pack));
-                var existingTranslations = new List<JObject>();
-                var newTranslations = new List<JObject>();
-                if (translationPath != null)
-                {
-                    var translationJsons = File.ReadAllLines(translationPath);
-                    foreach (var json in translationJsons)
-                    {
-                        existingTranslations.Add(JObject.Parse(json));
-                    }
-                }
-                translationPath = pack.Replace(packsPath, translationsPath);
-
-                var originalPacks = File.ReadAllLines(pack);
-                foreach (var originalPack in originalPacks)
-                {
-                    var originalObj = JObject.Parse(originalPack);
-                    var id = originalObj.GetValue("_id").Value<string>();
-                    var originalSourceId = originalObj["flags"]["core"]["sourceId"].ToString();
-                    var translatedObj = existingTranslations.FirstOrDefault(x => x.GetValue("_id").Value<string>() == id);
-
-                    var type = GenericReader.GetTypeFromJson(originalObj);
-                    if (Mappings.TypeToMappingDictonary.ContainsKey(type))
-                    {
-                        var dic = Mappings.TypeToMappingDictonary[type];
-                        if (dic.ContainsKey(originalSourceId))
-                        {
-                            var entry = dic[originalSourceId];
-                            var readerType = GenericReader.GetEntryType(type, typeof(GenericItemParser));
-                            if (readerType != null)
-                            {
-                                var reader = (GenericItemParser)readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
-                                reader.Parse(originalObj, entry);
-                            }
-                        }
-                    }
-
-                    if (translatedObj != null)
-                    {
-                        //TODO: Do some comparison between original and translated obj?;
-                    }
-                    newTranslations.Add(originalObj);
-                }
-
-                var content = new StringBuilder();
-                foreach (var obj in newTranslations)
-                {
-                    content.AppendLine(JsonConvert.SerializeObject(obj, Formatting.None));
-                }
-                File.WriteAllText(translationPath, content.ToString());
             }
         }
 
@@ -355,180 +298,6 @@ namespace WFRP4e.Translator
                     var fileName = string.Join("-", newItem.OriginalName.Split(Path.GetInvalidFileNameChars()));
                     var filePath = Path.Combine(path, $"{(fileName.Length > 20 ? fileName.Substring(0, 20) : fileName)}_{newItem.FoundryId}.json");
                     File.WriteAllText(filePath, JsonConvert.SerializeObject(newItem, Formatting.Indented));
-                }
-            }
-        }
-
-        private static void ExtractJsonsToFilesAndCorrectIds(string packsPath)
-        {
-            var dic = new Dictionary<string, Dictionary<string, JObject>>();
-            var packs = Directory.EnumerateFiles(packsPath, "*.db", SearchOption.AllDirectories).ToList();
-
-            CleanupJsonAndUpdateSourceId(packsPath, dic, packs);
-            UpdateChildItemSourceIds(dic);
-            GenertingEntryJsonFiles(packsPath, dic);
-            RegenerateCleanDBFile(packsPath, dic);
-        }
-
-        private static void RegenerateCleanDBFile(string packsPath, Dictionary<string, Dictionary<string, JObject>> dic)
-        {
-            foreach (var dictionaries in dic)
-            {
-                var itemsToUpdate = dictionaries.Value.Select(x => x.Value).OrderBy(x => x["_id"].ToString()).ToList();
-
-                var content = new StringBuilder();
-                foreach (var entry in itemsToUpdate)
-                {
-                    content.AppendLine(JsonConvert.SerializeObject(entry, Formatting.None));
-                }
-                var parts = dictionaries.Key.Split(".");
-                if (!Directory.Exists(packsPath + "\\" + parts[1] + "\\packs\\jsons\\" + parts[2]))
-                {
-                    Directory.CreateDirectory(packsPath + "\\" + parts[1] + "\\packs\\jsons\\" + parts[2]);
-                }
-                var targetPath = packsPath + "\\" + parts[1] + "\\packs\\" + parts[2] + ".db";
-                File.Delete(targetPath);
-                File.WriteAllText(targetPath, content.ToString());
-            }
-        }
-
-        private static void GenertingEntryJsonFiles(string packsPath, Dictionary<string, Dictionary<string, JObject>> dic)
-        {
-            foreach (var dictionaries in dic)
-            {
-                foreach (var entry in dictionaries.Value)
-                {
-                    var obj = entry.Value;
-                    var id = obj.GetValue("_id").Value<string>();
-                    obj.Remove("_stats");
-                    var parts = dictionaries.Key.Split(".");
-                    if (!Directory.Exists(packsPath + "\\" + parts[1] + "\\packs\\jsons\\" + parts[2]))
-                    {
-                        Directory.CreateDirectory(packsPath + "\\" + parts[1] + "\\packs\\jsons\\" + parts[2]);
-                    }
-                    var targetPath = packsPath + "\\" + parts[1] + "\\packs\\jsons\\" + parts[2] + "\\" + id + ".json";
-                    File.WriteAllText(targetPath, JsonConvert.SerializeObject(obj, Formatting.Indented));
-                }
-            }
-        }
-
-        private static void UpdateChildItemSourceIds(Dictionary<string, Dictionary<string, JObject>> dic)
-        {
-            foreach (var dictionaries in dic)
-            {
-                foreach (var entry in dictionaries.Value.Where(x => x.Value.Value<string>("type") == "creature"
-                || x.Value.Value<string>("type") == "npc"
-                || x.Value.Value<string>("type") == "character"
-                || x.Value.Value<string>("type") == "vehicle"))
-                {
-                    var items = entry.Value.Value<JArray>("items");
-                    var entryId = entry.Value["flags"]["core"]["sourceId"].Value<string>();
-                    foreach (var item in items)
-                    {
-                        var type = item.Value<string>("type");
-                        var name = item.Value<string>("name");
-                        var sourceId = item["flags"]?["core"]?["sourceId"]?.Value<string>();
-                        var newSourceId = string.Empty;
-                        if (string.IsNullOrEmpty(sourceId) || sourceId.Split(".").Length != 4)
-                        {
-                            var success = false;
-                            var matchingItems = dic.Values.SelectMany(x => x.Values).ToList().Where(x => x.Value<string>("type") == type && x.Value<string>("name") == name).ToList();
-                            if (matchingItems.Count == 1)
-                            {
-                                success = true;
-                                newSourceId = matchingItems[0]["flags"]["core"]["sourceId"].ToString();
-                            }
-                            if (matchingItems.Count > 1 && matchingItems.All(x => x["flags"]["core"]["sourceId"].ToString() != newSourceId))
-                            {
-                                Console.WriteLine($"{entryId} - Nie można dopasować sourceId, pasujace itemy: {matchingItems.Count}");
-                            }
-                            if (success && newSourceId != sourceId)
-                            {
-                                Console.WriteLine($"{entryId} - Aktualizuję sourceId dla elementu: {item.Value<string>("_id")} na {newSourceId}");
-                                item["flags"]["core"] = new JObject();
-                                item["flags"]["core"]["sourceId"] = newSourceId;
-                            }
-                        }
-                        else
-                        {
-                            var existingSourceId = item["flags"]["core"]["sourceId"].Value<string>();
-                            var dicKey = string.Join(".", existingSourceId.Split(".").Take(3));
-                            if (dic.ContainsKey(dicKey))
-                            {
-                                var itemDictionary = dic[dicKey];
-                                var existingItemId = existingSourceId.Split(".")[3];
-                                var sourceItem = itemDictionary.Values.FirstOrDefault(x => x.Value<string>("type") == type && x.Value<string>("_id") == existingItemId);
-                                if (sourceItem == null)
-                                {
-                                    Console.WriteLine("Source Id dla elementu: " + item.Value<string>("name") + " nie może być odnalezione " + existingSourceId);
-                                    ((JObject)(item["flags"]["core"])).Remove("sourceid");
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Source Id dla elementu: " + item.Value<string>("name") + " nie może być odnalezione " + existingSourceId);
-                                ((JObject)(item["flags"]["core"])).Remove("sourceid");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private static void CleanupJsonAndUpdateSourceId(string packsPath, Dictionary<string, Dictionary<string, JObject>> dic, List<string> packs)
-        {
-            foreach (var pack in packs)
-            {
-                var module = pack.Replace(packsPath, "").Split("\\", StringSplitOptions.RemoveEmptyEntries)[0];
-                var packName = Path.GetFileNameWithoutExtension(pack);
-                var compendiumPrefix = "Compendium." + module + "." + packName;
-                if (!dic.ContainsKey(compendiumPrefix))
-                {
-                    dic[compendiumPrefix] = new Dictionary<string, JObject>();
-                }
-                var jsons = File.ReadAllLines(pack);
-                foreach (var jsonString in jsons)
-                {
-                    var obj = JObject.Parse(jsonString);
-                    var id = obj.GetValue("_id").Value<string>();
-                    obj.Remove("_stats");
-                    obj.Remove("ownership");
-                    dic[compendiumPrefix][id] = obj;
-                    if (obj["flags"] == null)
-                    {
-                        obj["flags"] = new JObject();
-                    }
-                    if (obj["flags"]["core"] == null)
-                    {
-                        obj["flags"]["core"] = new JObject();
-                    }
-                    obj["flags"]["core"]["sourceId"] = compendiumPrefix + "." + id;
-                }
-            }
-        }
-
-        private static void InitAllMappings()
-        {
-            var listOfSources = Directory.GetDirectories(Config.SourceJsons);
-            foreach (var source in listOfSources)
-            {
-                var listOfDirectories = Directory.GetDirectories(source);
-                foreach (var directory in listOfDirectories)
-                {
-                    var type = Path.GetFileName(directory);
-                    if (!Mappings.TypeToMappingDictonary.ContainsKey(type))
-                    {
-                        Mappings.TypeToMappingDictonary.Add(type, new Dictionary<string, Entry>());
-                    }
-                    var dictionary = Mappings.TypeToMappingDictonary[type];
-                    var targtetType = GenericReader.GetEntryType(type, typeof(Entry));
-
-                    var listOfJsons = Directory.EnumerateFiles(directory, "*.json", SearchOption.TopDirectoryOnly).ToList();
-                    foreach (var json in listOfJsons)
-                    {
-                        var element = JsonConvert.DeserializeObject(File.ReadAllText(json), targtetType) as Entry;
-                        dictionary.Add(element.OriginFoundryId, element);
-                    }
                 }
             }
         }

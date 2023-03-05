@@ -31,4 +31,7 @@
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Wfrp.Library\Wfrp.Library.csproj" />
+  </ItemGroup>
 </Project>
