@@ -8,6 +8,7 @@ namespace WFRP4e.Translator.Json
 {
     public static class Mappings
     {
-        public static Dictionary<string, Dictionary<string, Entry>> TypeToMappingDictonary { get; } = new Dictionary<string, Dictionary<string, Entry>>();
+        public static Dictionary<string, Dictionary<string, BaseEntry>> OriginalTypeToMappingDictonary { get; } = new Dictionary<string, Dictionary<string, BaseEntry>>();
+        public static Dictionary<string, Dictionary<string, BaseEntry>> TranslatedTypeToMappingDictonary { get; } = new Dictionary<string, Dictionary<string, BaseEntry>>();
     }
 }

@@ -23,9 +23,9 @@ namespace Wfrp.Library.Services
             }
         }
 
-        public static void InitAllMappings(string sourceJsons)
+        public static void InitAllMappings(string sourceJsons, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDictionary)
         {
-            Mappings.TypeToMappingDictonary.Clear();
+            typeToMappingDictionary.Clear();
             var listOfSources = Directory.GetDirectories(sourceJsons);
             foreach (var source in listOfSources)
             {
@@ -33,17 +33,17 @@ namespace Wfrp.Library.Services
                 foreach (var directory in listOfDirectories)
                 {
                     var type = Path.GetFileName(directory);
-                    if (!Mappings.TypeToMappingDictonary.ContainsKey(type))
+                    if (!typeToMappingDictionary.ContainsKey(type))
                     {
-                        Mappings.TypeToMappingDictonary.Add(type, new Dictionary<string, Entry>());
+                        typeToMappingDictionary.Add(type, new Dictionary<string, BaseEntry>());
                     }
-                    var dictionary = Mappings.TypeToMappingDictonary[type];
-                    var targtetType = GenericReader.GetEntryType(type, typeof(Entry));
+                    var dictionary = typeToMappingDictionary[type];
+                    var targtetType = GenericReader.GetEntryType(type, typeof(BaseEntry));
 
                     var listOfJsons = Directory.EnumerateFiles(directory, "*.json", SearchOption.TopDirectoryOnly).ToList();
                     foreach (var json in listOfJsons)
                     {
-                        var element = JsonConvert.DeserializeObject(File.ReadAllText(json), targtetType) as Entry;
+                        var element = JsonConvert.DeserializeObject(File.ReadAllText(json), targtetType) as BaseEntry;
                         dictionary.Add(element.OriginFoundryId, element);
                     }
                 }
@@ -80,9 +80,9 @@ namespace Wfrp.Library.Services
                     var translatedObj = existingTranslations.FirstOrDefault(x => x.GetValue("_id").Value<string>() == id);
 
                     var type = GenericReader.GetTypeFromJson(originalObj);
-                    if (Mappings.TypeToMappingDictonary.ContainsKey(type))
+                    if (Mappings.TranslatedTypeToMappingDictonary.ContainsKey(type))
                     {
-                        var dic = Mappings.TypeToMappingDictonary[type];
+                        var dic = Mappings.TranslatedTypeToMappingDictonary[type];
                         if (dic.ContainsKey(originalSourceId))
                         {
                             var entry = dic[originalSourceId];

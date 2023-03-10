@@ -13,7 +13,7 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("trait")]
     public class TraitsParser : GenericItemParser
     {
-        public override void Parse(JObject pack, Entry entry)
+        public override void Parse(JObject pack, BaseEntry entry)
         {
             base.Parse(pack, entry);
 
@@ -131,7 +131,7 @@ namespace WFRP4e.Translator.Packs
                 case "9": return "9";
                 default:
                     {
-                        //Console.WriteLine("Nie odnaleziono effect data dla: " + spec);
+                        Console.WriteLine("Nie odnaleziono effect data dla: " + spec);
                         return spec;
                     }
             }

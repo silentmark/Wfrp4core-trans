@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace WFRP4e.Translator.Json.Entries
 {
-    public class ActorEntry : Entry
+    public class ActorEntry : BaseEntry
     {
         [JsonConverter(typeof(ItemEntryJsonConverter))]
-        public List<ItemEntry> Items { get; set; } = new List<ItemEntry>();
+        public List<Entry> Items { get; set; } = new List<Entry>();
 
         public string Species { get; set; }
 

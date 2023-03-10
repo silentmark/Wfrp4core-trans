@@ -7,9 +7,9 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("money")]
     public class MoneyReader : GenericReader
     {
-        public bool UpdateEntry(JObject pack, MoneyEntry mapping)
+        public void UpdateEntry(JObject pack, MoneyEntry mapping)
         {
-            return UpdateItemEntry(pack, mapping);
+            UpdateItemEntry(pack, mapping);
         }
     }
 }

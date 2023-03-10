@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
 using System.Text;
 using Wfrp.Library.Services;
+using WFRP4e.Translator.Json;
 
 namespace Wfrp.Service.Controllers
 {
@@ -41,7 +42,8 @@ namespace Wfrp.Service.Controllers
             {
                 PackageUpdater.ProgressUpdated += action.Invoke;
                 await SendText(webSocket, $"Ogarniam mapowanie");
-                PackageUpdater.InitAllMappings(Config.SourceJsons);
+                PackageUpdater.InitAllMappings(Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary);
+                PackageUpdater.InitAllMappings(Config.SourceJsonsPl, Mappings.TranslatedTypeToMappingDictonary);
 
                 await SendText(webSocket, $"Generuję json dla oryginałów");
                 PackageUpdater.ExtractJsonsToFilesAndCorrectIds(Config.PacksPath);

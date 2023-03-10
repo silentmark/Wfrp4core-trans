@@ -7,13 +7,10 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("trait")]
     public class TraitReader : GenericReader
     {
-        public bool UpdateEntry(JObject pack, TraitEntry mapping)
+        public void UpdateEntry(JObject pack, TraitEntry mapping)
         {
-            var result = UpdateItemEntry(pack, mapping);
-
-            UpdateIfDifferent(mapping, pack["system"]?["specification"]?["value"]?.ToString(), nameof(mapping.Specification), ref result);
-
-            return result;
+            UpdateItemEntry(pack, mapping);
+            UpdateIfDifferent(mapping, pack["system"]?["specification"]?["value"]?.ToString(), nameof(mapping.Specification));
         }
     }
 }

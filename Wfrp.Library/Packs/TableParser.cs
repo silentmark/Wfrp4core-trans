@@ -13,17 +13,10 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("table")]
     public class TableParser : GenericItemParser
     {
-        public override void Parse(JObject pack, Entry entry)
+        public override void Parse(JObject pack, BaseEntry entry)
         {
             var mapping = (TableEntry)entry;
-            if (string.IsNullOrEmpty(mapping.Name))
-            {
-                Console.WriteLine($"Nie odnaleziono tłumaczenia dla {mapping.OriginalName}, id {mapping.FoundryId} typu {mapping.Type}");
-            }
-            else
-            {
-                pack["name"] = mapping.Name;
-            }
+            pack["name"] = mapping.Name;
             pack["description"] = mapping.Description;
             if (pack["flags"] == null)
             {
@@ -38,15 +31,8 @@ namespace WFRP4e.Translator.Packs
             foreach (JObject jObj in results)
             {
                 var resultId = jObj.Value<string>("_id");
-                var resultMapping = mapping.TableResults.FirstOrDefault(x => x.FoundryId == resultId);
-                if (resultMapping != null && !string.IsNullOrWhiteSpace(resultMapping.Name))
-                {
-                    jObj["text"] = resultMapping.Name;
-                }
-                else
-                {
-                    Console.WriteLine($"Nie odnaleziono wpisu dla id {resultId} w tabeli {mapping.OriginalName}");
-                }
+                var resultMapping = mapping.TableResults.First(x => x.FoundryId == resultId);
+                jObj["text"] = resultMapping.Name;
             }
             foreach (JProperty property in pack["flags"])
             {

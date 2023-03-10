@@ -12,7 +12,7 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("prayer")]
     public class PrayersParser : GenericItemParser
     {
-        public override void Parse(JObject pack, Entry entry)
+        public override void Parse(JObject pack, BaseEntry entry)
         {
             base.Parse(pack, entry);
             var mapping = (PrayerEntry)entry;

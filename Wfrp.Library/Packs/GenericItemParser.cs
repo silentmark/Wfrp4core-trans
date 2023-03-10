@@ -20,29 +20,13 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("container")]
     public class GenericItemParser
     {
-        public static Entry GetEntryFromMappingDictionary(JObject pack)
-        {
-            var type = GenericReader.GetTypeFromJson(pack);
-            var id = pack.Value<string>("_id");
-            var mapping = (ItemEntry)(Mappings.TypeToMappingDictonary[type].First(x => x.Value.FoundryId == id).Value);
-            return mapping;
-        }
-
-        public virtual void Parse(JObject pack, Entry mapping)
+        public virtual void Parse(JObject pack, BaseEntry mapping)
         {
             var type = GenericReader.GetTypeFromJson(pack);
 
             var id = pack.Value<string>("_id");
-            if (string.IsNullOrEmpty(mapping.Name))
-            {
-                Console.WriteLine($"Nie odnaleziono tłumaczenia dla {mapping.OriginalName}, id {mapping.FoundryId} typu {mapping.Type}");
-            }
-            else
-            {
-                pack["name"] = mapping.Name;
-            }
+            pack["name"] = mapping.Name;
             pack["system"]["description"]["value"] = mapping.Description;
-            pack["system"]["gmdescription"]["value"] = mapping.GmDescription;
             if (pack["flags"] == null)
             {
                 pack["flags"] = new JObject();

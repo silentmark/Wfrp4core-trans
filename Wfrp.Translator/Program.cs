@@ -44,7 +44,8 @@ namespace WFRP4e.Translator
                         $"Konfiguracja:\nŚcieżka do plików .db: {Config.PacksPath}\nŚcieżka do plików wyjściowych: {Config.TranslationsPath}");
             Console.WriteLine($"Ogarniam mapowanie");
             PackageUpdater.ProgressUpdated += (sender, message) => Console.WriteLine(message.EventData);
-            PackageUpdater.InitAllMappings(Config.SourceJsons);
+            PackageUpdater.InitAllMappings(Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary);
+            PackageUpdater.InitAllMappings(Config.SourceJsonsPl, Mappings.TranslatedTypeToMappingDictonary);
 
             ConsoleKeyInfo input;
             do
@@ -57,8 +58,8 @@ namespace WFRP4e.Translator
                 Console.WriteLine(
                     @"
                   Wciśnij 1. aby zmodyfikować pliki .db na podstawie plików json.
-                  Wciśnij 2. aby przetłumaczyć journal entries.
-                  Wciśnij 3. aby zwalidować i zaktualizować mapowania.
+                  Wciśnij 2. aby zwalidować i zaktualizować pliki źródłowe EN.
+                  Wciśnij 3. aby zwalidować i zaktualizować mapowania PL.
                   "
     );
                 input = Console.ReadKey();
@@ -69,11 +70,11 @@ namespace WFRP4e.Translator
                 }
                 else if (input.KeyChar == '2')
                 {
-                    new JournalAutoTranslator().Parse(Config.SourceJsons + "\\wfrp4e-eis\\journal");
+                    UpdateJsonMappingFiles(Config.PacksPath, Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary);
                 }
                 else if (input.KeyChar == '3')
                 {
-                    UpdateJsonMappingFiles();
+                    UpdateJsonMappingFiles(Config.TranslationsPath, Config.SourceJsonsPl, Mappings.TranslatedTypeToMappingDictonary);
                 }
             }
             while (input.KeyChar != 'x');
@@ -123,11 +124,11 @@ namespace WFRP4e.Translator
         }
 
         //TODO: REVIEW THIS METHOD AS IT SUCKS.
-        private static void UpdateJsonMappingFiles()
+        private static void UpdateJsonMappingFiles(string dbPath, string jsonPath, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDirectory)
         {
-            var packs = Directory.EnumerateFiles(Config.TranslationsPath, "*.db", SearchOption.AllDirectories).ToList();
+            var packs = Directory.EnumerateFiles(dbPath, "*.db", SearchOption.AllDirectories).ToList();
 
-            var newTypeToJsonListDic = new Dictionary<string, List<Entry>>();
+            var newTypeToJsonListDic = new Dictionary<string, List<BaseEntry>>();
 
             foreach (var pack in packs)
             {
@@ -143,11 +144,11 @@ namespace WFRP4e.Translator
                 {
                     var id = itemJson.GetValue("_id").Value<string>();
                     var type = GenericReader.GetTypeFromJson(itemJson);
-                    var targtetType = GenericReader.GetEntryType(type, typeof(Entry));
+                    var targtetType = GenericReader.GetEntryType(type, typeof(BaseEntry));
 
                     var name = itemJson.GetValue("name").Value<string>();
 
-                    var sourceCompendium = pack.Replace(Config.TranslationsPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[0];
+                    var sourceCompendium = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[0];
                     var packName = Path.GetFileNameWithoutExtension(pack);
                     var originalSourceId = itemJson["flags"]["core"]["sourceId"].ToString();
                     var correctSourceId = $"Compendium.{sourceCompendium}.{packName}.{id}";
@@ -157,48 +158,46 @@ namespace WFRP4e.Translator
                         continue;
                     }
 
-                    if (Mappings.TypeToMappingDictonary.ContainsKey(type))
+                    if (!typeToMappingDirectory.ContainsKey(type))
                     {
-                        var dic = Mappings.TypeToMappingDictonary[type];
-                        if (!dic.ContainsKey(correctSourceId))
+                        typeToMappingDirectory[type] = new Dictionary<string, BaseEntry>();
+                    }
+                    var dic = typeToMappingDirectory[type];
+                    if (!dic.ContainsKey(correctSourceId))
+                    {
+                        //TRY CREATE EMPTY:
+                        Console.WriteLine($"Nie odnalazłem wpisu dla: {correctSourceId} - {type} - {name}");
+                        var entry = targtetType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as BaseEntry;
+                        var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
+                        if (readerType != null)
                         {
-                            //TRY CREATE EMPTY:
-                            Console.WriteLine($"Nie odnalazłem wpisu dla: {correctSourceId} - {type} - {name}");
-                            var entry = targtetType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as Entry;
-                            var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
-                            if (readerType != null)
-                            {
-                                var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
-                                var method = readerType.GetMethod("UpdateEntry");
-                                method.Invoke(reader, new object[] { itemJson, entry });
+                            var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                            var method = readerType.GetMethod("UpdateEntry");
+                            method.Invoke(reader, new object[] { itemJson, entry });
 
-                                dic.Add(entry.OriginFoundryId, entry);
-                                if (!newTypeToJsonListDic.ContainsKey(type))
-                                {
-                                    newTypeToJsonListDic[type] = new List<Entry>();
-                                }
-                                newTypeToJsonListDic[type].Add(entry);
-                            }
-                        }
-                        else
-                        {
-                            //GET AND UPDATE IF NEEDED;
-                            var entry = dic[correctSourceId];
-                            var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
-                            if (readerType != null)
+                            dic.Add(entry.OriginFoundryId, entry);
+                            if (!newTypeToJsonListDic.ContainsKey(type))
                             {
-                                var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
-                                var method = readerType.GetMethod("UpdateEntry");
-                                var updated = (bool)method.Invoke(reader, new object[] { itemJson, entry });
-                                if (updated)
-                                {
-                                    if (!newTypeToJsonListDic.ContainsKey(type))
-                                    {
-                                        newTypeToJsonListDic[type] = new List<Entry>();
-                                    }
-                                    newTypeToJsonListDic[type].Add(entry);
-                                }
+                                newTypeToJsonListDic[type] = new List<BaseEntry>();
                             }
+                            newTypeToJsonListDic[type].Add(entry);
+                        }
+                    }
+                    else
+                    {
+                        //GET AND UPDATE IF NEEDED;
+                        var entry = dic[correctSourceId];
+                        var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
+                        if (readerType != null)
+                        {
+                            var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                            var method = readerType.GetMethod("UpdateEntry");
+                            method.Invoke(reader, new object[] { itemJson, entry });
+                            if (!newTypeToJsonListDic.ContainsKey(type))
+                            {
+                                newTypeToJsonListDic[type] = new List<BaseEntry>();
+                            }
+                            newTypeToJsonListDic[type].Add(entry);
                         }
                     }
                 }
@@ -218,11 +217,11 @@ namespace WFRP4e.Translator
                 {
                     var id = actorJson.GetValue("_id").Value<string>();
                     var type = GenericReader.GetTypeFromJson(actorJson);
-                    var targtetType = GenericReader.GetEntryType(type, typeof(Entry));
+                    var targtetType = GenericReader.GetEntryType(type, typeof(BaseEntry));
 
                     var name = actorJson.GetValue("name").Value<string>();
 
-                    var sourceCompendium = pack.Replace(Config.TranslationsPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[0];
+                    var sourceCompendium = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[0];
                     var packName = Path.GetFileNameWithoutExtension(pack);
                     var originalSourceId = actorJson["flags"]["core"]["sourceId"].ToString();
                     var correctSourceId = $"Compendium.{sourceCompendium}.{packName}.{id}";
@@ -232,48 +231,46 @@ namespace WFRP4e.Translator
                         continue;
                     }
 
-                    if (Mappings.TypeToMappingDictonary.ContainsKey(type))
+                    if (!typeToMappingDirectory.ContainsKey(type))
                     {
-                        var dic = Mappings.TypeToMappingDictonary[type];
-                        if (!dic.ContainsKey(correctSourceId))
+                        typeToMappingDirectory[type] = new Dictionary<string, BaseEntry>();
+                    }
+                    var dic = typeToMappingDirectory[type];
+                    if (!dic.ContainsKey(correctSourceId))
+                    {
+                        //TRY CREATE EMPTY:
+                        Console.WriteLine($"Nie odnalazłem wpisu dla: {correctSourceId} - {type} - {name}");
+                        var entry = targtetType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as ActorEntry;
+                        var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
+                        if (readerType != null)
                         {
-                            //TRY CREATE EMPTY:
-                            Console.WriteLine($"Nie odnalazłem wpisu dla: {correctSourceId} - {type} - {name}");
-                            var entry = targtetType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as ActorEntry;
-                            var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
-                            if (readerType != null)
-                            {
-                                var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
-                                var method = readerType.GetMethod("UpdateEntry");
-                                method.Invoke(reader, new object[] { actorJson, entry });
+                            var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                            var method = readerType.GetMethod("UpdateEntry");
+                            method.Invoke(reader, new object[] { actorJson, entry });
 
-                                dic.Add(entry.OriginFoundryId, entry);
-                                if (!newTypeToJsonListDic.ContainsKey(type))
-                                {
-                                    newTypeToJsonListDic[type] = new List<Entry>();
-                                }
-                                newTypeToJsonListDic[type].Add(entry);
-                            }
-                        }
-                        else
-                        {
-                            //GET AND UPDATE IF NEEDED;
-                            var entry = dic[correctSourceId];
-                            var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
-                            if (readerType != null)
+                            dic.Add(entry.OriginFoundryId, entry);
+                            if (!newTypeToJsonListDic.ContainsKey(type))
                             {
-                                var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
-                                var method = readerType.GetMethod("UpdateEntry");
-                                var updated = (bool)method.Invoke(reader, new object[] { actorJson, entry });
-                                if (updated)
-                                {
-                                    if (!newTypeToJsonListDic.ContainsKey(type))
-                                    {
-                                        newTypeToJsonListDic[type] = new List<Entry>();
-                                    }
-                                    newTypeToJsonListDic[type].Add(entry);
-                                }
+                                newTypeToJsonListDic[type] = new List<BaseEntry>();
                             }
+                            newTypeToJsonListDic[type].Add(entry);
+                        }
+                    }
+                    else
+                    {
+                        //GET AND UPDATE IF NEEDED;
+                        var entry = dic[correctSourceId];
+                        var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
+                        if (readerType != null)
+                        {
+                            var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                            var method = readerType.GetMethod("UpdateEntry");
+                            method.Invoke(reader, new object[] { actorJson, entry });
+                            if (!newTypeToJsonListDic.ContainsKey(type))
+                            {
+                                newTypeToJsonListDic[type] = new List<BaseEntry>();
+                            }
+                            newTypeToJsonListDic[type].Add(entry);
                         }
                     }
                 }
@@ -284,31 +281,25 @@ namespace WFRP4e.Translator
                 foreach (var newItem in newTypeToJsonListDic[type])
                 {
                     var folder = newItem.OriginFoundryId.Split('.')[1];
-                    var dictionaryPath = Path.Combine(Config.SourceJsons, folder, type);
+                    var dictionaryPath = Path.Combine(jsonPath, folder, type);
                     if (!Directory.Exists(dictionaryPath))
                     {
                         Directory.CreateDirectory(dictionaryPath);
                     }
 
-                    var path = Config.SourceJsons + "\\" + newItem.OriginFoundryId.Split(".")[1] + "\\" + type;
+                    var path = jsonPath + "\\" + newItem.OriginFoundryId.Split(".")[1] + "\\" + type;
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);
                     }
-                    var fileName = string.Join("-", newItem.OriginalName.Split(Path.GetInvalidFileNameChars()));
-                    var filePath = Path.Combine(path, $"{(fileName.Length > 20 ? fileName.Substring(0, 20) : fileName)}_{newItem.FoundryId}.json");
+                    var fileName = string.Join("-", newItem.Name.Split(Path.GetInvalidFileNameChars()));
+                    var filePath = Path.Combine(path, $"{newItem.FoundryId}.json");
                     File.WriteAllText(filePath, JsonConvert.SerializeObject(newItem, Formatting.Indented));
                 }
             }
         }
 
         #region Various
-
-        private static string GetTypeFromJsonPath(string json)
-        {
-            var type = Path.GetDirectoryName(json).Replace(Config.SourceJsons, "").Trim('\\');
-            return type;
-        }
 
         private static void CreateDeeplGlossary()
         {
@@ -318,7 +309,7 @@ namespace WFRP4e.Translator
             var props = typeof(Mappings).GetFields(BindingFlags.Public | BindingFlags.Static).ToList();
             foreach (var prop in props)
             {
-                var dic = prop.GetValue(null) as Dictionary<string, Entry>;
+                var dic = prop.GetValue(null) as Dictionary<string, BaseEntry>;
                 if (dic != null)
                 {
                     foreach (var value in dic.Keys)
@@ -343,7 +334,7 @@ namespace WFRP4e.Translator
         {
             var packs = Directory.EnumerateFiles(Config.TranslationsPath, "*.db", SearchOption.AllDirectories).ToList();
             var packsOriginal = Directory.EnumerateFiles(Config.PacksPath, "*.db", SearchOption.AllDirectories).ToList();
-            var effectsObjects = new List<Entry>();
+            var effectsObjects = new List<BaseEntry>();
             foreach (var pack in packsOriginal)
             {
                 var fileName = Path.GetFileName(pack);
@@ -374,11 +365,10 @@ namespace WFRP4e.Translator
                                 if (!string.IsNullOrEmpty(effect["flags"]?["wfrp4e"]?["script"]?.ToString()))
                                 {
                                     var effectId = effect["_id"].Value<string>();
-                                    effectsObjects.Add(new Entry
+                                    effectsObjects.Add(new BaseEntry
                                     {
                                         FoundryId = $"{id}.{type}.{effectId}",
                                         Name = $"{name} - {label}",
-                                        OriginalName = $"{name} - {label}",
                                         Description = effect["flags"]?["wfrp4e"]?["script"]?.ToString()
                                     });
                                 }
@@ -440,7 +430,7 @@ namespace WFRP4e.Translator
             {
                 if (file.Contains("wfrp4e") && file.Contains("json"))
                 {
-                    var list = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText(file));
+                    var list = JsonConvert.DeserializeObject<List<BaseEntry>>(File.ReadAllText(file));
 
                     foreach (var entry in list)
                     {
@@ -464,7 +454,7 @@ namespace WFRP4e.Translator
             var critLeg = JObject.Parse(File.ReadAllText("Tables\\critleg.json"));
             var list = new List<JObject> { critArm, critBody, critHead, critLeg };
 
-            var entries = JsonConvert.DeserializeObject<List<Entry>>(File.ReadAllText("Final\\wfrp4e.critical.desc.json"));
+            var entries = JsonConvert.DeserializeObject<List<BaseEntry>>(File.ReadAllText("Final\\wfrp4e.critical.desc.json"));
             foreach (var entry in entries)
             {
                 JObject row = null;

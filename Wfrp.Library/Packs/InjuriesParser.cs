@@ -12,7 +12,7 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("injury")]
     public class InjuriesParser : GenericItemParser
     {
-        public override void Parse(JObject pack, Entry entry)
+        public override void Parse(JObject pack, BaseEntry entry)
         {
             base.Parse(pack, entry);
             var mapping = (InjuryEntry)entry;

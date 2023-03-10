@@ -12,7 +12,7 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("armour")]
     public class ArmourParser : GenericItemParser
     {
-        public override void Parse(JObject pack, Entry entry)
+        public override void Parse(JObject pack, BaseEntry entry)
         {
             base.Parse(pack, entry);
             var mapping = (ArmourEntry)entry;

@@ -53,7 +53,7 @@ namespace WFRP4e.Translator.Utilities
                         }
                     }
                     page.Content = result;
-                    page.Name = page.OriginalName + " (OpenAI)";
+                    page.Name = page.Name + " (OpenAI)";
                 }
                 var text = JsonConvert.SerializeObject(entry, Formatting.Indented);
                 File.WriteAllText(file, text);

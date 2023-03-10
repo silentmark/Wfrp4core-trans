@@ -17,11 +17,11 @@ namespace WFRP4e.Translator.Scanners
 
         public virtual int EndPage => 132;
 
-        public virtual List<Entry> Run(string filePath)
+        public virtual List<BaseEntry> Run(string filePath)
         {
             using var file = new File(filePath);
             var document = file.Document;
-            var entries = new List<Entry>();
+            var entries = new List<BaseEntry>();
             for (var i = StartPage; i < EndPage; i++)
             {
                 var page = document.Pages[i];
@@ -31,13 +31,13 @@ namespace WFRP4e.Translator.Scanners
 
             if (entries.Last().Name != currentSkill)
             {
-                entries.Add(new Entry {Name = currentSkill, Description = currentDescription});
+                entries.Add(new BaseEntry {Name = currentSkill, Description = currentDescription});
             }
 
             return entries;
         }
 
-        private void Extract(ContentScanner level, List<Entry> entries)
+        private void Extract(ContentScanner level, List<BaseEntry> entries)
         {
             if (level != null)
             {
@@ -58,7 +58,7 @@ namespace WFRP4e.Translator.Scanners
                             {
                                 if (currentSkill != "")
                                 {
-                                    entries.Add(new Entry {Name = currentSkill, Description = currentDescription});
+                                    entries.Add(new BaseEntry {Name = currentSkill, Description = currentDescription});
                                 }
 
                                 currentSkill = text.TextStrings[0].Text;
@@ -87,7 +87,7 @@ namespace WFRP4e.Translator.Scanners
                                     {
                                         if (currentSkill != "")
                                         {
-                                            entries.Add(new Entry { Name = currentSkill, Description = currentDescription });
+                                            entries.Add(new BaseEntry { Name = currentSkill, Description = currentDescription });
                                         }
 
                                         currentSkill = text.TextStrings[i].Text;

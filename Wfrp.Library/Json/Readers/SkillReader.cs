@@ -7,9 +7,9 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("skill")]
     public class SkillReader : GenericReader
     {
-        public bool UpdateEntry(JObject pack, SkillEntry mapping)
+        public void UpdateEntry(JObject pack, SkillEntry mapping)
         {
-            return UpdateItemEntry(pack, mapping);
+            UpdateItemEntry(pack, mapping);
         }
     }
 }

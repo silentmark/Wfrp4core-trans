@@ -7,9 +7,9 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("critical")]
     public class CriticalReader : GenericReader
     {
-        public bool UpdateEntry(JObject pack, CriticalEntry mapping)
+        public void UpdateEntry(JObject pack, CriticalEntry mapping)
         {
-            return UpdateItemEntry(pack, mapping);
+            UpdateItemEntry(pack, mapping);
         }
     }
 }

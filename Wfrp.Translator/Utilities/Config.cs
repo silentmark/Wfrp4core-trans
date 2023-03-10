@@ -14,8 +14,9 @@ namespace WFRP4e.Translator.Utilities
 
         public static string PacksPath { get => GetSection(); }
         public static string TranslationsPath { get => GetSection(); }
+        public static string SourceJsonsEn { get => GetSection(); }
+        public static string SourceJsonsPl { get => GetSection(); }
         public static string GoogleSigninKeyPath { get => GetSection(); }
-        public static string SourceJsons { get => GetSection(); }
         public static string DeepLAuthKey { get => GetSection(); }
         public static string OpenAiKey { get => GetSection(); }
 

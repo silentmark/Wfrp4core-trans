@@ -7,13 +7,10 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("armour")]
     public class ArmourReader : GenericReader
     {
-        public bool UpdateEntry(JObject pack, ArmourEntry mapping)
+        public void UpdateEntry(JObject pack, ArmourEntry mapping)
         {
-            var result = UpdateItemEntry(pack, mapping);
-
-            UpdateIfDifferent(mapping, pack["system"]?["special"]?["value"]?.ToString(), nameof(mapping.Special), ref result);
-
-            return result;
+            UpdateItemEntry(pack, mapping);
+            UpdateIfDifferent(mapping, pack["system"]?["special"]?["value"]?.ToString(), nameof(mapping.Special));
         }
     }
 }

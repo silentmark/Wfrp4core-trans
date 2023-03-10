@@ -7,9 +7,9 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("container")]
     public class ContainerReader : GenericReader
     {
-        public bool UpdateEntry(JObject pack, ContainerEntry mapping)
+        public void UpdateEntry(JObject pack, ContainerEntry mapping)
         {
-            return UpdateItemEntry(pack, mapping);
+            UpdateItemEntry(pack, mapping);
         }
     }
 }

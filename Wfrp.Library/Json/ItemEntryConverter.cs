@@ -24,7 +24,7 @@ namespace WFRP4e.Translator.Json
 
         public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
-            var result = new List<ItemEntry>();
+            var result = new List<Entry>();
 
             // deserialze the array
             if (reader.TokenType != JsonToken.Null)
@@ -36,8 +36,8 @@ namespace WFRP4e.Translator.Json
                     {
                         var foundryType = item.Value<string>("Type");
 
-                        var type = GenericReader.GetEntryType(foundryType, typeof(ItemEntry));
-                        var entry = (ItemEntry)item.ToObject(type);
+                        var type = GenericReader.GetEntryType(foundryType, typeof(Entry));
+                        var entry = (Entry)item.ToObject(type);
                         result.Add(entry);
                     }
                 }

@@ -14,7 +14,8 @@ namespace Wfrp.Library.Services
 
         public static string PacksPath { get => GetSection(); }
         public static string TranslationsPath { get => GetSection(); }
-        public static string SourceJsons { get => GetSection(); }
+        public static string SourceJsonsEn { get => GetSection(); }
+        public static string SourceJsonsPl { get => GetSection(); }
 
         private static string GetSection([CallerMemberName] string name = "")
         {

@@ -7,9 +7,9 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("psychology")]
     public class PsychologyReader : GenericReader
     {
-        public bool UpdateEntry(JObject pack, PsychologyEntry mapping)
+        public void UpdateEntry(JObject pack, PsychologyEntry mapping)
         {
-            return UpdateItemEntry(pack, mapping);
+            UpdateItemEntry(pack, mapping);
         }
     }
 }
