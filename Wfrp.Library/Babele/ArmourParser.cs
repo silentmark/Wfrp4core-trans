@@ -10,14 +10,14 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("armour")]
-    public class ArmourParser : GenericItemParser
+    public class ArmourBabeleGenerator : GenericItemBabeleGenerator
     {
-        public override void Parse(JObject pack, BaseEntry entry)
+        public override void Parse(JObject entity, JObject originalDbEntity, BaseEntry entry)
         {
-            base.Parse(pack, entry);
+            base.Parse(entity, originalDbEntity, entry);
             var mapping = (ArmourEntry)entry;
-            pack["system"]["special"]["value"] = mapping.Special;
-            pack["system"]["penalty"]["value"] = mapping.Penalty;
+            entity["special"] = mapping.Special;
+            entity["penalty"] = mapping.Penalty;
         }
     }
 }

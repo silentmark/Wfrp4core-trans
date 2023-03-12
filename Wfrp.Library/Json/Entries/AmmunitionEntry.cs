@@ -4,5 +4,7 @@
     public class AmmunitionEntry : ItemEntry
     {
         public string Special { get; set; }
+
+        public string Range { get; set; }
     }
 }

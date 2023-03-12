@@ -258,5 +258,55 @@ namespace Wfrp.Library.Services
                 }
             }
         }
+
+        public static void GenerateBabeleJsonFiles(string originalPacksPath, string sourceJsonsPl, string babeleTargetLocation)
+        {
+            var compendiumToEntriesDictionary = new Dictionary<string, Dictionary<string, JObject>>();
+            var packs = Directory.EnumerateFiles(originalPacksPath, "*.db", SearchOption.AllDirectories).ToList();
+            foreach (var pack in packs)
+            {
+                var packName = Path.GetFileNameWithoutExtension(pack);
+                var module = Path.GetFileName(Path.GetDirectoryName(Path.GetDirectoryName(pack)));
+                compendiumToEntriesDictionary[module + "." + packName] = new Dictionary<string, JObject>();
+                OnProgressUpdated($"Przetwarzam {Path.GetFileName(pack)} z modułu {module}");
+
+                var originalPacks = File.ReadAllLines(pack);
+                foreach (var originalPack in originalPacks)
+                {
+                    var originalObj = JObject.Parse(originalPack);
+                    var id = originalObj.GetValue("_id").Value<string>();
+                    var originalSourceId = originalObj["flags"]["core"]["sourceId"].ToString();
+                    var type = GenericReader.GetTypeFromJson(originalObj);
+
+                    if (Mappings.TranslatedTypeToMappingDictonary.ContainsKey(type))
+                    {
+                        var dic = Mappings.TranslatedTypeToMappingDictonary[type];
+                        if (dic.ContainsKey(originalSourceId))
+                        {
+                            var newBabeleEntry = new JObject();
+                            var entry = dic[originalSourceId];
+                            var readerType = GenericReader.GetEntryType(type, typeof(GenericItemBabeleGenerator));
+                            if (readerType != null)
+                            {
+                                var reader = (GenericItemBabeleGenerator)readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                                reader.Parse(newBabeleEntry, originalObj, entry);
+                                compendiumToEntriesDictionary[module + "." + packName][entry.FoundryId] = newBabeleEntry;
+                            }
+                        }
+                    }
+                }
+                var babeleTranslationPath = babeleTargetLocation + "\\" + module + "." + packName + ".json";
+                var babeleTranslationObj = JObject.Parse(File.ReadAllText(babeleTranslationPath));
+
+                var entries = compendiumToEntriesDictionary[module + "." + packName].Values.ToArray();
+                var entriesjArr = new JArray();
+                foreach (var entry in entries)
+                {
+                    entriesjArr.Add(entry);
+                }
+                babeleTranslationObj["entries"] = entriesjArr;
+                File.WriteAllText(babeleTranslationPath, JsonConvert.SerializeObject(babeleTranslationObj, Formatting.Indented));
+            }
+        }
     }
 }

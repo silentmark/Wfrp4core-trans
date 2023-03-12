@@ -39,7 +39,7 @@ namespace WFRP4e.Translator.Json.Entries
                         ((CareerEntry)newSubEntry).Talents = career.Talents;
                         ((CareerEntry)newSubEntry).Skills = career.Skills;
                         ((CareerEntry)newSubEntry).Class = career.Class;
-                        ((CareerEntry)newSubEntry).CarrerGroup = career.CarrerGroup;
+                        ((CareerEntry)newSubEntry).CareerGroup = career.CareerGroup;
                         break;
                     }
                 case InjuryEntry injury:

@@ -16,6 +16,7 @@ namespace Wfrp.Library.Services
         public static string TranslationsPath { get => GetSection(); }
         public static string SourceJsonsEn { get => GetSection(); }
         public static string SourceJsonsPl { get => GetSection(); }
+        public static object BabeleLocation { get => GetSection(); }
 
         private static string GetSection([CallerMemberName] string name = "")
         {

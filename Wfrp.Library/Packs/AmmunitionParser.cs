@@ -17,6 +17,7 @@ namespace WFRP4e.Translator.Packs
             base.Parse(pack, entry);
             var mapping = (AmmunitionEntry)entry;
             pack["system"]["special"]["value"] = mapping.Special;
+            pack["system"]["range"]["value"] = mapping.Range;
         }
     }
 }

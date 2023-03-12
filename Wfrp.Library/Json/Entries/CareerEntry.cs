@@ -3,8 +3,8 @@
     [FoundryType("career")]
     public class CareerEntry : ItemEntry
     {
-        public string CarrerGroup { get; set; } 
-        
+        public string CareerGroup { get; set; }
+
         public string Class { get; set; }
         public string[] Skills { get; set; }
         public string[] Talents { get; set; }

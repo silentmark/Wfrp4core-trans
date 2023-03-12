@@ -18,7 +18,7 @@ namespace WFRP4e.Translator.Packs
 
             var mapping = (CareerEntry)entry;
 
-            pack["system"]["careergroup"]["value"] = mapping.CarrerGroup;
+            pack["system"]["careergroup"]["value"] = mapping.CareerGroup;
             pack["system"]["class"]["value"] = mapping.Class;
             var skills = new JArray();
             foreach (var itm in mapping.Skills) skills.Add(itm);

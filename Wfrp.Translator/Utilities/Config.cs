@@ -19,6 +19,7 @@ namespace WFRP4e.Translator.Utilities
         public static string GoogleSigninKeyPath { get => GetSection(); }
         public static string DeepLAuthKey { get => GetSection(); }
         public static string OpenAiKey { get => GetSection(); }
+        public static string BabeleLocation { get => GetSection(); }
 
         private static string GetSection([CallerMemberName] string name = "")
         {

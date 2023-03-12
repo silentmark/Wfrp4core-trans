@@ -12,7 +12,7 @@ namespace WFRP4e.Translator.Packs
         {
             UpdateItemEntry(pack, mapping);
 
-            UpdateIfDifferent(mapping, pack["system"]?["careergroup"]?["value"]?.ToString(), nameof(mapping.CarrerGroup));
+            UpdateIfDifferent(mapping, pack["system"]?["careergroup"]?["value"]?.ToString(), nameof(mapping.CareerGroup));
             UpdateIfDifferent(mapping, pack["system"]?["class"]?["value"]?.ToString(), nameof(mapping.Class));
 
             var skills = ((JArray)pack["system"]["skills"]).Values<string>().ToArray();

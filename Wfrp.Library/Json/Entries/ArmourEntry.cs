@@ -5,5 +5,6 @@
     {
         public string Special { get; set; }
 
+        public string Penalty { get; set; }
     }
 }

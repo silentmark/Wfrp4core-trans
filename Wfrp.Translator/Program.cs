@@ -58,8 +58,9 @@ namespace WFRP4e.Translator
                 Console.WriteLine(
                     @"
                   Wciśnij 1. aby zmodyfikować pliki .db na podstawie plików json.
-                  Wciśnij 2. aby zwalidować i zaktualizować pliki źródłowe EN.
-                  Wciśnij 3. aby zwalidować i zaktualizować mapowania PL.
+                  Wciśnij 2. aby wygenerować pliki .json do tłumaczenia babele.
+                  Wciśnij 3. aby zwalidować i zaktualizować pliki źródłowe EN.
+                  Wciśnij 4. aby zwalidować i zaktualizować mapowania PL.
                   "
     );
                 input = Console.ReadKey();
@@ -70,9 +71,13 @@ namespace WFRP4e.Translator
                 }
                 else if (input.KeyChar == '2')
                 {
-                    UpdateJsonMappingFiles(Config.PacksPath, Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary);
+                    PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.SourceJsonsPl, Config.BabeleLocation);
                 }
                 else if (input.KeyChar == '3')
+                {
+                    UpdateJsonMappingFiles(Config.PacksPath, Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary);
+                }
+                else if (input.KeyChar == '4')
                 {
                     UpdateJsonMappingFiles(Config.TranslationsPath, Config.SourceJsonsPl, Mappings.TranslatedTypeToMappingDictonary);
                 }
