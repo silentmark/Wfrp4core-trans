@@ -3,6 +3,6 @@
     [FoundryType("scene")]
     public class SceneEntry : BaseEntry
     {
-
+        public string SceneNote { get; set; }
     }
 }

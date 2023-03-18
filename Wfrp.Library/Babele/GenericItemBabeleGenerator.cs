@@ -16,6 +16,7 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("psychology")]
     [FoundryType("trapping")]
     [FoundryType("vehicleMod")]
+    [FoundryType("critical")]
     [FoundryType("container")]
     public class GenericItemBabeleGenerator
     {
@@ -37,6 +38,7 @@ namespace WFRP4e.Translator.Packs
                         jEffect["label"] = effect.Name;
                         jEffect["script"] = effect.Script;
                         jEffect["id"] = effect.FoundryId;
+                        arr.Add(jEffect);
                     }
                     entry["effects"] = arr;
                 }

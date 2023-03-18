@@ -23,7 +23,12 @@ namespace WFRP4e.Translator.Packs
             {
                 pack["system"]["tests"] = new JObject();
             }
+            if (pack["system"]["specification"] == null)
+            {
+                pack["system"]["specification"] = new JObject();
+            }
             pack["system"]["tests"]["value"] = mapping.Tests;
+            pack["system"]["specification"]["value"] = mapping.Specification;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WFRP4e.Translator.Packs
 {
@@ -11,6 +12,7 @@ namespace WFRP4e.Translator.Packs
         {
             UpdateItemEntry(pack, mapping);
             UpdateIfDifferent(mapping, pack["system"]?["tests"]?["value"]?.ToString(), nameof(mapping.Tests));
+            UpdateIfDifferent(mapping, pack["system"]?["specification"]?["value"]?.ToString(), nameof(mapping.Specification));
         }
     }
 }

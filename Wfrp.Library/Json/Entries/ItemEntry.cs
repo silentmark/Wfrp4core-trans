@@ -21,6 +21,7 @@ namespace WFRP4e.Translator.Json.Entries
                 case TalentEntry talent:
                     {
                         ((TalentEntry)newSubEntry).Tests = talent.Tests;
+                        ((TalentEntry)newSubEntry).Specification = talent.Specification;
                         break;
                     }
                 case DiseaseEntry disease:
