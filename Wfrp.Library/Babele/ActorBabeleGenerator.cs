@@ -25,22 +25,20 @@ namespace WFRP4e.Translator.Packs
 
             if (mapping.Effects?.Count > 0)
             {
-                var arr = new JArray();
+                var jEffect = new JObject();
                 foreach (var effect in mapping.Effects)
                 {
-                    var jEffect = new JObject();
                     jEffect[effect.FoundryId] = new JObject()
                     {
                         ["id"] = effect.FoundryId,
                         ["label"] = effect.Name,
                         ["script"] = effect.Script
                     };
-                    arr.Add(jEffect);
                 }
-                entry["effects"] = arr;
+                entry["effects"] = jEffect;
             }
-            var items = new JArray();
-            entry["items"] = items;
+            var jItem = new JObject();
+            entry["items"] = jItem;
             foreach (var item in mapping.Items)
             {
                 if (!(item is ReferenceEntry))
@@ -49,11 +47,9 @@ namespace WFRP4e.Translator.Packs
                     var jPackItem = ((JArray)originalDbEntity["items"]).FirstOrDefault(x => x["_id"].Value<string>() == item.FoundryId) as JObject;
                     if (babeleType != null && jPackItem != null)
                     {
-                        var jItem = new JObject();
                         jItem[item.FoundryId] = new JObject();
                         var parser = (GenericItemBabeleGenerator)babeleType.GetConstructor(new Type[] { }).Invoke(new object[] { });
                         parser.Parse((JObject)jItem[item.FoundryId], jPackItem, (BaseEntry)item);
-                        items.Add(jItem);
                     }
                     else
                     {

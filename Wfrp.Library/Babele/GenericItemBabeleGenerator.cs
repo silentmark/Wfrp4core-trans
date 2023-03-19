@@ -30,19 +30,17 @@ namespace WFRP4e.Translator.Packs
                 var item = (ItemEntry)mapping;
                 if (item.Effects?.Count > 0)
                 {
-                    var arr = new JArray();
+                    var jEffect = new JObject();
                     foreach (var effect in item.Effects)
                     {
-                        var jEffect = new JObject();
                         jEffect[effect.FoundryId] = new JObject()
                         {
                             ["id"] = effect.FoundryId,
                             ["label"] = effect.Name,
                             ["script"] = effect.Script
                         };
-                        arr.Add(jEffect);
                     }
-                    entry["effects"] = arr;
+                    entry["effects"] = jEffect;
                 }
             }
             if (!string.IsNullOrEmpty(mapping.InitializationFolder))

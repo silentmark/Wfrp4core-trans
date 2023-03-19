@@ -21,17 +21,15 @@ namespace WFRP4e.Translator.Packs
             entity["name"] = mapping.Name;
             if (mapping.Notes.Count > 0)
             {
-                var arr = new JArray();
+                var jNote = new JObject();
                 foreach (var note in mapping.Notes)
                 {
-                    var jNote = new JObject();
                     jNote[note.FoundryId] = new JObject()
                     {
                         ["text"] = note.Text
                     };
-                    arr.Add(jNote);
                 }
-                entity["notes"] = arr;
+                entity["notes"] = jNote;
             }
 
             if (!string.IsNullOrEmpty(mapping.SceneNote))
