@@ -15,7 +15,22 @@ namespace WFRP4e.Translator.Packs
             mapping.Type = "scene";
             UpdateIfDifferent(mapping, pack["_id"].ToString(), nameof(mapping.FoundryId));
             UpdateIfDifferent(mapping, pack["flags"]["core"]["sourceId"].ToString(), nameof(mapping.OriginFoundryId));
-            UpdateIfDifferent(mapping, pack["flags"]["wfrp4e-core"]["scene-note"].ToString(), nameof(mapping.SceneNote));
+            if (pack["flags"]["wfrp4e-core"]?["scene-note"] != null)
+            {
+                UpdateIfDifferent(mapping, pack["flags"]["wfrp4e-core"]["scene-note"].ToString(), nameof(mapping.SceneNote));
+            }
+            if (pack["notes"] != null)
+            {
+                var arr = (JArray)pack["notes"];
+                mapping.Notes = new List<NoteEntry>();
+                foreach (JObject note in arr)
+                {
+                    var noteEntry = new NoteEntry();
+                    noteEntry.Text = note["text"].ToString();
+                    noteEntry.FoundryId = note["_id"].ToString();
+                    mapping.Notes.Add(noteEntry);
+                }
+            }
 
             UpdateInitializationFolder(pack, mapping);
         }

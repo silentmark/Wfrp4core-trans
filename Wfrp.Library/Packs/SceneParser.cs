@@ -31,6 +31,18 @@ namespace WFRP4e.Translator.Packs
             {
                 pack["flags"]["wfrp4e-core"] = new JObject();
             }
+
+            if (pack["notes"] != null)
+            {
+                foreach (var note in mapping.Notes)
+                {
+                    var jNote = ((JArray)pack["notes"]).FirstOrDefault(x => x["_id"].ToString() == note.FoundryId);
+                    if (jNote != null)
+                    {
+                        jNote["text"] = note.Text;
+                    }
+                }
+            }
             pack["flags"]["wfrp4e-core"]["scene-note"] = mapping.SceneNote;
             foreach (JProperty property in pack["flags"])
             {

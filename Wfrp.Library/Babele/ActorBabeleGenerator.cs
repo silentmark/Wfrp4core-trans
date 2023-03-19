@@ -1,0 +1,70 @@
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Linq;
+using WFRP4e.Translator.Json;
+using WFRP4e.Translator.Json.Entries;
+
+namespace WFRP4e.Translator.Packs
+{
+    [FoundryType("npc")]
+    [FoundryType("character")]
+    [FoundryType("creature")]
+    public class ActorBabeleGenerator : GenericItemBabeleGenerator
+    {
+        public override void Parse(JObject entry, JObject originalDbEntity, BaseEntry entity)
+        {
+            var mapping = (ActorEntry)entity;
+
+            entry["id"] = mapping.FoundryId;
+            entry["name"] = mapping.Name;
+            entry["description"] = mapping.Description;
+            entry["sourceId"] = mapping.OriginFoundryId;
+
+            entry["gender"] = mapping.Species;
+            entry["species"] = mapping.Gender;
+
+            if (mapping.Effects?.Count > 0)
+            {
+                var arr = new JArray();
+                foreach (var effect in mapping.Effects)
+                {
+                    var jEffect = new JObject();
+                    jEffect[effect.FoundryId] = new JObject()
+                    {
+                        ["id"] = effect.FoundryId,
+                        ["label"] = effect.Name,
+                        ["script"] = effect.Script
+                    };
+                    arr.Add(jEffect);
+                }
+                entry["effects"] = arr;
+            }
+            var items = new JArray();
+            entry["items"] = items;
+            foreach (var item in mapping.Items)
+            {
+                if (!(item is ReferenceEntry))
+                {
+                    var babeleType = GenericReader.GetEntryType(item.Type, typeof(GenericItemBabeleGenerator));
+                    var jPackItem = ((JArray)originalDbEntity["items"]).FirstOrDefault(x => x["_id"].Value<string>() == item.FoundryId) as JObject;
+                    if (babeleType != null && jPackItem != null)
+                    {
+                        var jItem = new JObject();
+                        jItem[item.FoundryId] = new JObject();
+                        var parser = (GenericItemBabeleGenerator)babeleType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                        parser.Parse((JObject)jItem[item.FoundryId], jPackItem, (BaseEntry)item);
+                        items.Add(jItem);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Nie udało się znaleźć przedmiotu dla mapowania: {item} u aktora: {mapping}");
+                    }
+                }
+            }
+            if (!string.IsNullOrEmpty(mapping.InitializationFolder))
+            {
+                entry["initialization_folder"] = mapping.InitializationFolder;
+            }
+        }
+    }
+}

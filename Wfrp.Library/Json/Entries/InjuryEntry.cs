@@ -4,5 +4,6 @@
     public class InjuryEntry : ItemEntry
     {
         public string Penalty { get; set; }
+        public string Location { get; set; }
     }
 }

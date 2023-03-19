@@ -11,6 +11,7 @@ namespace WFRP4e.Translator.Packs
         {
             UpdateItemEntry(pack, mapping);
             UpdateIfDifferent(mapping, pack["system"]?["penalty"]?["value"]?.ToString(), nameof(mapping.Penalty));
+            UpdateIfDifferent(mapping, pack["system"]?["location"]?["value"]?.ToString(), nameof(mapping.Location));
         }
     }
 }

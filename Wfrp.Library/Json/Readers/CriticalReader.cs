@@ -10,6 +10,8 @@ namespace WFRP4e.Translator.Packs
         public void UpdateEntry(JObject pack, CriticalEntry mapping)
         {
             UpdateItemEntry(pack, mapping);
+            UpdateIfDifferent(mapping, pack["system"]?["wounds"]?["value"]?.ToString(), nameof(mapping.Wounds));
+            UpdateIfDifferent(mapping, pack["system"]?["location"]?["value"]?.ToString(), nameof(mapping.Location));
         }
     }
 }

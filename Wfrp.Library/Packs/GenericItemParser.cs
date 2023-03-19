@@ -11,7 +11,6 @@ using WFRP4e.Translator.Json.Entries;
 namespace WFRP4e.Translator.Packs
 {
     [FoundryType("skill")]
-    [FoundryType("critical")]
     [FoundryType("money")]
     [FoundryType("mutation")]
     [FoundryType("psychology")]

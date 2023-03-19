@@ -55,6 +55,17 @@ namespace WFRP4e.Translator.Packs
             }
             mapping.Items = newMappingItems;
 
+            var effects = pack["effects"].ToArray();
+            var existinEffects = new List<EffectEntry>();
+
+            foreach (JObject effect in effects)
+            {
+                var newEffect = new EffectEntry();
+                existinEffects.Add(newEffect);
+                new EffectReader().UpdateEntry(effect, newEffect);
+            }
+            mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
+
             UpdateInitializationFolder(pack, mapping);
         }
     }

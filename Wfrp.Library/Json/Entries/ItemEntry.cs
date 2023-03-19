@@ -46,6 +46,13 @@ namespace WFRP4e.Translator.Json.Entries
                 case InjuryEntry injury:
                     {
                         ((InjuryEntry)newSubEntry).Penalty = injury.Penalty;
+                        ((InjuryEntry)newSubEntry).Location = injury.Location;
+                        break;
+                    }
+                case CriticalEntry injury:
+                    {
+                        ((CriticalEntry)newSubEntry).Location = injury.Location;
+                        ((CriticalEntry)newSubEntry).Wounds = injury.Wounds;
                         break;
                     }
                 case SpellEntry spell:

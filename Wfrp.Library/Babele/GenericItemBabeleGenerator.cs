@@ -16,7 +16,6 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("psychology")]
     [FoundryType("trapping")]
     [FoundryType("vehicleMod")]
-    [FoundryType("critical")]
     [FoundryType("container")]
     public class GenericItemBabeleGenerator
     {
@@ -35,13 +34,20 @@ namespace WFRP4e.Translator.Packs
                     foreach (var effect in item.Effects)
                     {
                         var jEffect = new JObject();
-                        jEffect["label"] = effect.Name;
-                        jEffect["script"] = effect.Script;
-                        jEffect["id"] = effect.FoundryId;
+                        jEffect[effect.FoundryId] = new JObject()
+                        {
+                            ["id"] = effect.FoundryId,
+                            ["label"] = effect.Name,
+                            ["script"] = effect.Script
+                        };
                         arr.Add(jEffect);
                     }
                     entry["effects"] = arr;
                 }
+            }
+            if (!string.IsNullOrEmpty(mapping.InitializationFolder))
+            {
+                entry["initialization_folder"] = mapping.InitializationFolder;
             }
         }
     }
