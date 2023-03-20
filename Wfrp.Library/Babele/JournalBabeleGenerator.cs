@@ -19,13 +19,16 @@ namespace WFRP4e.Translator.Packs
                 entity["initialization_folder"] = mapping.InitializationFolder;
             }
 
+            entity["id"] = mapping.FoundryId;
+            entity["originalName"] = originalDbEntity["name"].ToString();
             entity["name"] = mapping.Name;
             if (mapping.Pages.Count > 0)
             {
                 var jP = new JObject();
                 foreach (var p in mapping.Pages)
                 {
-                    jP[p.FoundryId] = new JObject()
+                    var jPage = (JObject)((JArray)originalDbEntity["pages"]).First(x => x["_id"].ToString() == p.FoundryId);
+                    jP[jPage["name"].ToString()] = new JObject()
                     {
                         ["name"] = p.Name,
                         ["text"] = p.Content

@@ -20,6 +20,7 @@ namespace WFRP4e.Translator.Packs
 
             entity["id"] = mapping.FoundryId;
             entity["name"] = mapping.Name;
+            entity["originalName"] = originalDbEntity["name"].ToString();
             entity["description"] = mapping.Description;
 
             var jRes = new JObject();

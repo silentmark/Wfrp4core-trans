@@ -18,6 +18,8 @@ namespace WFRP4e.Translator.Packs
                 entity["initialization_folder"] = mapping.InitializationFolder;
             }
 
+            entity["id"] = mapping.FoundryId;
+            entity["originalName"] = originalDbEntity["name"].ToString();
             entity["name"] = mapping.Name;
             if (mapping.Notes.Count > 0)
             {

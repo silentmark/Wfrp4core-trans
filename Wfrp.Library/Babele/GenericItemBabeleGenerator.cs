@@ -24,6 +24,7 @@ namespace WFRP4e.Translator.Packs
             entry["id"] = mapping.FoundryId;
             entry["name"] = mapping.Name;
             entry["description"] = mapping.Description;
+            entry["originalName"] = originalDbEntity["name"].ToString();
             entry["sourceId"] = mapping.OriginFoundryId;
             if (mapping is ItemEntry)
             {

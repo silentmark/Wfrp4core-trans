@@ -17,6 +17,7 @@ namespace WFRP4e.Translator.Packs
 
             entry["id"] = mapping.FoundryId;
             entry["name"] = mapping.Name;
+            entry["originalName"] = originalDbEntity["name"].ToString();
             entry["description"] = mapping.Description;
             entry["sourceId"] = mapping.OriginFoundryId;
 
@@ -47,9 +48,33 @@ namespace WFRP4e.Translator.Packs
                     var jPackItem = ((JArray)originalDbEntity["items"]).FirstOrDefault(x => x["_id"].Value<string>() == item.FoundryId) as JObject;
                     if (babeleType != null && jPackItem != null)
                     {
-                        jItem[item.FoundryId] = new JObject();
+                        var key = jPackItem["name"].ToString();
+                        jItem[key] = new JObject();
                         var parser = (GenericItemBabeleGenerator)babeleType.GetConstructor(new Type[] { }).Invoke(new object[] { });
-                        parser.Parse((JObject)jItem[item.FoundryId], jPackItem, (BaseEntry)item);
+                        parser.Parse((JObject)jItem[key], jPackItem, (BaseEntry)item);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Nie udało się znaleźć przedmiotu dla mapowania: {item} u aktora: {mapping}");
+                    }
+                }
+                else
+                {
+                    var jPackItem = (JObject)((JArray)originalDbEntity["items"]).FirstOrDefault(x => x["_id"].Value<string>() == item.FoundryId);
+                    if (jPackItem != null)
+                    {
+                        var key = jPackItem["name"].ToString();
+                        var itemType = GenericReader.GetTypeFromJson(jPackItem);
+                        var translatedItem = Mappings.TranslatedTypeToMappingDictonary[itemType][item.OriginFoundryId];
+                        var originalMapping = Mappings.OriginalTypeToMappingDictonary[itemType][item.OriginFoundryId];
+                        if (originalMapping.Name != jPackItem["name"].ToString())
+                        {
+                            jItem[key] = new JObject();
+                            var parserType = GenericReader.GetEntryType(itemType, typeof(GenericItemBabeleGenerator));
+                            var parser = (GenericItemBabeleGenerator)parserType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                            parser.Parse((JObject)jItem[key], jPackItem, translatedItem);
+                            jItem[key]["id"] = item.FoundryId;
+                        }
                     }
                     else
                     {

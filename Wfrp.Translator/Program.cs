@@ -128,7 +128,6 @@ namespace WFRP4e.Translator
             }
         }
 
-        //TODO: REVIEW THIS METHOD AS IT SUCKS.
         private static void UpdateJsonMappingFiles(string dbPath, string jsonPath, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDirectory)
         {
             var packs = Directory.EnumerateFiles(dbPath, "*.db", SearchOption.AllDirectories).ToList();

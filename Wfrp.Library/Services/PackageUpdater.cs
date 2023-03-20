@@ -299,10 +299,12 @@ namespace Wfrp.Library.Services
                 var babeleTranslationObj = JObject.Parse(File.ReadAllText(babeleTranslationPath));
 
                 var entries = compendiumToEntriesDictionary[module + "." + packName].Values.ToArray();
-                var entriesjArr = new JArray();
+                var entriesjArr = new JObject();
                 foreach (var entry in entries)
                 {
-                    entriesjArr.Add(entry);
+                    var key = entry["originalName"].ToString();
+                    entry.Remove("originalName");
+                    entriesjArr[key] = entry;
                 }
                 babeleTranslationObj["entries"] = entriesjArr;
                 File.WriteAllText(babeleTranslationPath, JsonConvert.SerializeObject(babeleTranslationObj, Formatting.Indented));
