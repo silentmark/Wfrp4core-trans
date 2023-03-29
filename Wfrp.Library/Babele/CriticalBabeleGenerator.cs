@@ -16,8 +16,8 @@ namespace WFRP4e.Translator.Packs
         {
             base.Parse(entity, originalDbEntity, entry);
             var mapping = (CriticalEntry)entry;
-            entity["wounds"] = mapping.Wounds;
-            entity["location"] = mapping.Location;
+            entity["wounds"] = mapping.Wounds ?? string.Empty;
+            entity["location"] = mapping.Location ?? string.Empty;
         }
     }
 }

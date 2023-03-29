@@ -16,7 +16,10 @@ namespace WFRP4e.Translator.Packs
         {
             base.Parse(entity, originalDbEntity, entry);
             var mapping = (WeaponEntry)entry;
-            entity["special"] = mapping.Special;
+            if (!string.IsNullOrEmpty(mapping.Special))
+            {
+                entity["special"] = mapping.Special;
+            }
         }
     }
 }

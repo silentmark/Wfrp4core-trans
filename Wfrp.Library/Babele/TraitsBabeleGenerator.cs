@@ -16,7 +16,10 @@ namespace WFRP4e.Translator.Packs
         {
             base.Parse(entity, originalDbEntity, entry);
             var mapping = (TraitEntry)entry;
-            entity["specification"] = mapping.Specification;
+            if (!string.IsNullOrEmpty(mapping.Specification))
+            {
+                entity["specification"] = mapping.Specification;
+            }
         }
     }
 }

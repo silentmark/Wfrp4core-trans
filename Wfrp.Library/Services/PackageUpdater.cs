@@ -8,6 +8,7 @@ using WFRP4e.Translator.Json.Entries;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Packs;
 using Newtonsoft.Json.Linq;
+using System.Windows.Markup;
 
 namespace Wfrp.Library.Services
 {
@@ -259,10 +260,10 @@ namespace Wfrp.Library.Services
             }
         }
 
-        public static void GenerateBabeleJsonFiles(string originalPacksPath, string sourceJsonsPl, string babeleTargetLocation)
+        public static void GenerateBabeleJsonFiles(string packsPath, string sourceJsons, string babeleTargetLocation, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDictionary)
         {
             var compendiumToEntriesDictionary = new Dictionary<string, Dictionary<string, JObject>>();
-            var packs = Directory.EnumerateFiles(originalPacksPath, "*.db", SearchOption.AllDirectories).ToList();
+            var packs = Directory.EnumerateFiles(packsPath, "*.db", SearchOption.AllDirectories).ToList();
             foreach (var pack in packs)
             {
                 var packName = Path.GetFileNameWithoutExtension(pack);
@@ -278,9 +279,9 @@ namespace Wfrp.Library.Services
                     var originalSourceId = originalObj["flags"]["core"]["sourceId"].ToString();
                     var type = GenericReader.GetTypeFromJson(originalObj);
 
-                    if (Mappings.TranslatedTypeToMappingDictonary.ContainsKey(type))
+                    if (typeToMappingDictionary.ContainsKey(type))
                     {
-                        var dic = Mappings.TranslatedTypeToMappingDictonary[type];
+                        var dic = typeToMappingDictionary[type];
                         if (dic.ContainsKey(originalSourceId))
                         {
                             var newBabeleEntry = new JObject();
@@ -307,7 +308,16 @@ namespace Wfrp.Library.Services
                     entriesjArr[key] = entry;
                 }
                 babeleTranslationObj["entries"] = entriesjArr;
-                File.WriteAllText(babeleTranslationPath, JsonConvert.SerializeObject(babeleTranslationObj, Formatting.Indented));
+
+                using FileStream fs = File.Open(babeleTranslationPath, FileMode.Create);
+                using StreamWriter sw = new StreamWriter(fs);
+                using JsonTextWriter jw = new JsonTextWriter(sw);
+
+                jw.Formatting = Formatting.Indented;
+                jw.IndentChar = ' ';
+                jw.Indentation = 4;
+
+                babeleTranslationObj.WriteTo(jw);
             }
         }
     }

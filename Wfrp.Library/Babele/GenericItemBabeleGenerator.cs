@@ -23,9 +23,9 @@ namespace WFRP4e.Translator.Packs
         {
             entry["id"] = mapping.FoundryId;
             entry["name"] = mapping.Name;
-            entry["description"] = mapping.Description;
+            entry["description"] = mapping.Description ?? string.Empty;
             entry["originalName"] = originalDbEntity["name"].ToString();
-            entry["sourceId"] = mapping.OriginFoundryId;
+            entry["sourceId"] = mapping.OriginFoundryId ?? string.Empty;
             if (mapping is ItemEntry)
             {
                 var item = (ItemEntry)mapping;
@@ -38,8 +38,11 @@ namespace WFRP4e.Translator.Packs
                         {
                             ["id"] = effect.FoundryId,
                             ["label"] = effect.Name,
-                            ["script"] = effect.Script
                         };
+                        if (!string.IsNullOrEmpty(effect.Script))
+                        {
+                            jEffect[effect.FoundryId]["script"] = effect.Script;
+                        }
                     }
                     entry["effects"] = jEffect;
                 }

@@ -18,11 +18,11 @@ namespace WFRP4e.Translator.Packs
             entry["id"] = mapping.FoundryId;
             entry["name"] = mapping.Name;
             entry["originalName"] = originalDbEntity["name"].ToString();
-            entry["description"] = mapping.Description;
-            entry["sourceId"] = mapping.OriginFoundryId;
+            entry["description"] = mapping.Description ?? string.Empty;
+            entry["sourceId"] = mapping.OriginFoundryId ?? string.Empty;
 
-            entry["gender"] = mapping.Species;
-            entry["species"] = mapping.Gender;
+            entry["gender"] = mapping.Species ?? string.Empty;
+            entry["species"] = mapping.Gender ?? string.Empty;
 
             if (mapping.Effects?.Count > 0)
             {
@@ -32,9 +32,12 @@ namespace WFRP4e.Translator.Packs
                     jEffect[effect.FoundryId] = new JObject()
                     {
                         ["id"] = effect.FoundryId,
-                        ["label"] = effect.Name,
-                        ["script"] = effect.Script
+                        ["label"] = effect.Name
                     };
+                    if (!string.IsNullOrEmpty(effect.Script))
+                    {
+                        jEffect[effect.FoundryId]["script"] = effect.Script;
+                    }
                 }
                 entry["effects"] = jEffect;
             }

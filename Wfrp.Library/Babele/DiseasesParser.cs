@@ -16,13 +16,13 @@ namespace WFRP4e.Translator.Packs
         {
             base.Parse(entity, originalDbEntity, entry);
             var mapping = (DiseaseEntry)entry;
-            entity["duration_value"] = mapping.Duration;
-            entity["duration_unit"] = mapping.DurationUnit;
-            entity["contraction"] = mapping.Contraction;
-            entity["incubation_value"] = mapping.Incubation;
-            entity["incubation_unit"] = mapping.IncubationUnit;
-            entity["symptoms"] = mapping.Symptoms;
-            entity["permanent"] = mapping.Permanent;
+            entity["duration_value"] = mapping.Duration ?? string.Empty;
+            entity["duration_unit"] = mapping.DurationUnit ?? string.Empty;
+            entity["contraction"] = mapping.Contraction ?? string.Empty;
+            entity["incubation_value"] = mapping.Incubation ?? string.Empty;
+            entity["incubation_unit"] = mapping.IncubationUnit ?? string.Empty;
+            entity["symptoms"] = mapping.Symptoms ?? string.Empty;
+            entity["permanent"] = mapping.Permanent ?? string.Empty;
         }
     }
 }

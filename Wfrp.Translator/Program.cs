@@ -71,7 +71,8 @@ namespace WFRP4e.Translator
                 }
                 else if (input.KeyChar == '2')
                 {
-                    PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.SourceJsonsPl, Config.BabeleLocation);
+                    PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.SourceJsonsPl, Config.BabeleLocationPl, Mappings.TranslatedTypeToMappingDictonary);
+                    PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.SourceJsonsEn, Config.BabeleLocationEn, Mappings.OriginalTypeToMappingDictonary);
                 }
                 else if (input.KeyChar == '3')
                 {

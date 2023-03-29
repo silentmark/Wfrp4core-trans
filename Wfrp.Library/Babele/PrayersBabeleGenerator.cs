@@ -16,9 +16,18 @@ namespace WFRP4e.Translator.Packs
         {
             base.Parse(entity, originalDbEntity, entry);
             var mapping = (PrayerEntry)entry;
-            entity["duration"] = mapping.Duration;
-            entity["target"] = mapping.Target;
-            entity["range"] = mapping.Range;
+            if (!string.IsNullOrEmpty(mapping.Duration))
+            {
+                entity["duration"] = mapping.Duration;
+            }
+            if (!string.IsNullOrEmpty(mapping.Target))
+            {
+                entity["target"] = mapping.Target;
+            }
+            if (!string.IsNullOrEmpty(mapping.Range))
+            {
+                entity["range"] = mapping.Range;
+            }
         }
     }
 }

@@ -16,8 +16,15 @@ namespace WFRP4e.Translator.Packs
         {
             base.Parse(entity, originalDbEntity, entry);
             var mapping = (InjuryEntry)entry;
-            entity["penalty"] = mapping.Penalty;
-            entity["location"] = mapping.Location;
+            if (!string.IsNullOrEmpty(mapping.Penalty))
+            {
+                entity["penalty"] = mapping.Penalty;
+            }
+
+            if (!string.IsNullOrEmpty(mapping.Location))
+            {
+                entity["location"] = mapping.Location;
+            }
         }
     }
 }
