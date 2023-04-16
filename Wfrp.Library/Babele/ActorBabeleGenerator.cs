@@ -49,24 +49,19 @@ namespace WFRP4e.Translator.Packs
                 {
                     var babeleType = GenericReader.GetEntryType(item.Type, typeof(GenericItemBabeleGenerator));
                     var jPackItem = ((JArray)originalDbEntity["items"]).FirstOrDefault(x => x["_id"].Value<string>() == item.FoundryId) as JObject;
-                    if (babeleType != null && jPackItem != null)
-                    {
-                        var key = jPackItem["name"].ToString();
-                        jItem[key] = new JObject();
-                        var parser = (GenericItemBabeleGenerator)babeleType.GetConstructor(new Type[] { }).Invoke(new object[] { });
-                        parser.Parse((JObject)jItem[key], jPackItem, (BaseEntry)item);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Nie udało się znaleźć przedmiotu dla mapowania: {item} u aktora: {mapping}");
-                    }
+
+                    var key = jPackItem["_id"].ToString();
+                    jItem[key] = new JObject();
+                    var parser = (GenericItemBabeleGenerator)babeleType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                    parser.Parse((JObject)jItem[key], jPackItem, (BaseEntry)item);
+
                 }
                 else
                 {
                     var jPackItem = (JObject)((JArray)originalDbEntity["items"]).FirstOrDefault(x => x["_id"].Value<string>() == item.FoundryId);
                     if (jPackItem != null)
                     {
-                        var key = jPackItem["name"].ToString();
+                        var key = jPackItem["_id"].ToString();
                         var itemType = GenericReader.GetTypeFromJson(jPackItem);
                         var translatedItem = Mappings.TranslatedTypeToMappingDictonary[itemType][item.OriginFoundryId];
                         var originalMapping = Mappings.OriginalTypeToMappingDictonary[itemType][item.OriginFoundryId];

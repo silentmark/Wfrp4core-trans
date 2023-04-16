@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Wfrp.Library.Services;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;
 
@@ -34,23 +36,77 @@ namespace WFRP4e.Translator.Packs
                 var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
                 var method = readerType.GetMethod("UpdateEntry");
                 var itemId = item.Value<string>("_id");
+                var originalSpecification = item["system"]["specification"]?["value"]?.ToString() ?? string.Empty;
+                string specification = string.Empty;
 
                 var value = Mappings.OriginalTypeToMappingDictonary[type].Where(x => x.Value.Name == item.Value<string>("name")).ToList();
-                value.AddRange(Mappings.TranslatedTypeToMappingDictonary[type].Where(x => x.Value.Name == item.Value<string>("name")).ToList());
-                if (value.Count > 0)
+                var matchingValue = value.FirstOrDefault(x => x.Value.OriginFoundryId.Replace("Compendium.", "").Split(".")[0] == mapping.OriginFoundryId.Replace("Compendium.", "").Split(".")[0]);
+                if (matchingValue.Key == null)
+                {
+                    matchingValue = value.FirstOrDefault();
+                }
+                if (matchingValue.Key != null)
+                {
+                    var prop = matchingValue.Value.GetType().GetProperty("Specification");
+                    if (prop != null)
+                    {
+                        specification = prop.GetValue(matchingValue.Value, null) as string ?? string.Empty;
+                    }
+                }
+                if (matchingValue.Value != null && specification == originalSpecification)
                 {
                     newMappingItems.Add(new ReferenceEntry
                     {
                         FoundryId = itemId,
-                        OriginFoundryId = string.Join(";", value.Select(x => x.Value.OriginFoundryId).Distinct())
+                        OriginFoundryId = matchingValue.Value.OriginFoundryId
                     });
                 }
                 else
                 {
-                    var newSubEntry = (ItemEntry)GetEntryType(type, typeof(ItemEntry)).GetConstructor(new Type[] { }).Invoke(new object[] { });
-                    newSubEntry.Type = type;
-                    newMappingItems.Add(newSubEntry);
-                    method.Invoke(reader, new object[] { item, newSubEntry });
+                    value = Mappings.TranslatedTypeToMappingDictonary[type].Where(x => x.Value.Name == item.Value<string>("name")).ToList();
+                    matchingValue = value.FirstOrDefault(x => x.Value.OriginFoundryId.Replace("Compendium.", "").Split(".")[0] == mapping.OriginFoundryId.Replace("Compendium.", "").Split(".")[0]);
+                    if (matchingValue.Key == null)
+                    {
+                        matchingValue = value.FirstOrDefault();
+                    }
+                    if (matchingValue.Key != null)
+                    {
+                        var prop = matchingValue.Value.GetType().GetProperty("Specification");
+                        if (prop != null)
+                        {
+                            specification = prop.GetValue(matchingValue.Value, null) as string ?? string.Empty;
+                        }
+                    }
+                    if (matchingValue.Value != null && specification == originalSpecification)
+                    {
+                        var module = mapping.OriginFoundryId.Replace("Compendium.", "").Split('.')[0];
+                        var pathToSource = Path.Combine(Config.SourceJsonsEn, module, mapping.Type, mapping.FoundryId + ".json");
+                        var originalActor = JsonConvert.DeserializeObject<ActorEntry>(File.ReadAllText(pathToSource));
+
+                        var originalItem = originalActor.Items.FirstOrDefault(x => x.FoundryId == itemId);
+                        if (originalItem as ReferenceEntry != null)
+                        {
+                            newMappingItems.Add(new ReferenceEntry
+                            {
+                                FoundryId = itemId,
+                                OriginFoundryId = matchingValue.Value.OriginFoundryId
+                            });
+                        }
+                        else
+                        {
+                            var newSubEntry = (ItemEntry)GetEntryType(type, typeof(ItemEntry)).GetConstructor(new Type[] { }).Invoke(new object[] { });
+                            newSubEntry.Type = type;
+                            newMappingItems.Add(newSubEntry);
+                            method.Invoke(reader, new object[] { item, newSubEntry });
+                        }
+                    }
+                    else
+                    {
+                        var newSubEntry = (ItemEntry)GetEntryType(type, typeof(ItemEntry)).GetConstructor(new Type[] { }).Invoke(new object[] { });
+                        newSubEntry.Type = type;
+                        newMappingItems.Add(newSubEntry);
+                        method.Invoke(reader, new object[] { item, newSubEntry });
+                    }
                 }
             }
             mapping.Items = newMappingItems;

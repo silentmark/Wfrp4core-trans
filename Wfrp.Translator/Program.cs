@@ -47,6 +47,9 @@ namespace WFRP4e.Translator
             PackageUpdater.InitAllMappings(Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary);
             PackageUpdater.InitAllMappings(Config.SourceJsonsPl, Mappings.TranslatedTypeToMappingDictonary);
 
+            Wfrp.Library.Services.Config.SourceJsonsEn = Config.SourceJsonsEn;
+            Wfrp.Library.Services.Config.SourceJsonsPl = Config.SourceJsonsPl;
+
             ConsoleKeyInfo input;
             do
             {
