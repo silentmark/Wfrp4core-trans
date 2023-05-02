@@ -33,5 +33,30 @@ namespace WFRP4e.Translator.Packs
                 mapping.Trappings = trappings;
             }
         }
+
+        public void UpdateEntryFromBabele(JObject pack, CareerEntry mapping)
+        {
+            UpdateItemEntryFromBabele(pack, mapping);
+            UpdateIfDifferent(mapping, pack["careergroup"]?.ToString(), nameof(mapping.CareerGroup));
+            UpdateIfDifferent(mapping, pack["class"]?.ToString(), nameof(mapping.Class));
+
+            var skills = ((JArray)pack["skills"]).Values<string>().ToArray();
+            if (!Enumerable.SequenceEqual(mapping.Skills ?? new string[] { }, skills))
+            {
+                mapping.Skills = skills;
+            }
+
+            var talents = ((JArray)pack["talents"]).Values<string>().ToArray();
+            if (!Enumerable.SequenceEqual(mapping.Talents ?? new string[] { }, talents))
+            {
+                mapping.Talents = talents;
+            }
+
+            var trappings = ((JArray)pack["trappings"]).Values<string>().ToArray();
+            if (!Enumerable.SequenceEqual(mapping.Trappings ?? new string[] { }, trappings))
+            {
+                mapping.Trappings = trappings;
+            }
+        }
     }
 }

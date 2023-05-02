@@ -264,6 +264,11 @@ namespace Wfrp.Library.Services
         {
             var compendiumToEntriesDictionary = new Dictionary<string, Dictionary<string, JObject>>();
             var packs = Directory.EnumerateFiles(packsPath, "*.db", SearchOption.AllDirectories).ToList();
+
+            //var packs = Directory.EnumerateFiles(packsPath, "bestiary.db", SearchOption.AllDirectories).ToList();
+
+            //var pathToBabele = "C:\\source-code\\WFRP\\wfrp4e-core-pl-source\\locales\\pl\\wfrp4e-core.bestiary.json";
+            //var originalBabele = JObject.Parse(File.ReadAllText(pathToBabele));
             foreach (var pack in packs)
             {
                 var packName = Path.GetFileNameWithoutExtension(pack);
@@ -285,6 +290,8 @@ namespace Wfrp.Library.Services
                         if (dic.ContainsKey(originalSourceId))
                         {
                             var newBabeleEntry = new JObject();
+                            //var newBabeleEntry = (JObject)originalBabele["entries"][originalObj["name"].ToString()];
+
                             var entry = dic[originalSourceId];
                             var readerType = GenericReader.GetEntryType(type, typeof(GenericItemBabeleGenerator));
                             if (readerType != null)
@@ -318,6 +325,79 @@ namespace Wfrp.Library.Services
                 jw.Indentation = 4;
 
                 babeleTranslationObj.WriteTo(jw);
+            }
+        }
+
+        public static void GenerateJsonFilesFromBabele(string sourceJsons, string babeleLocation, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDictonary)
+        {
+            var babeleJsons = Directory.EnumerateFiles(babeleLocation, "*.json", SearchOption.AllDirectories).ToList();
+            foreach (var babelePath in babeleJsons)
+            {
+                var babeleName = Path.GetFileNameWithoutExtension(babelePath);
+                var module = babeleName.Split('.')[0];
+                var packName = babeleName.Split('.')[1];
+                OnProgressUpdated($"Przetwarzam {Path.GetFileName(packName)} z modułu {module}");
+
+                var babele = JObject.Parse(File.ReadAllText(babelePath));
+                var entries = (JObject)babele["entries"];
+                foreach (var property in entries.Properties())
+                {
+                    var sourceId = ((JObject)property.Value).Value<string>("sourceId");
+                    var babeleEntry = (JObject)property.Value;
+                    if (!string.IsNullOrEmpty(sourceId))
+                    {
+                        var dictionary = typeToMappingDictonary.Values.FirstOrDefault(x => x.ContainsKey(sourceId));
+                        if (dictionary != null)
+                        {
+                            var baseObject = dictionary[sourceId];
+                            var readerType = GenericReader.GetEntryType(baseObject.Type, typeof(GenericReader));
+                            if (readerType != null)
+                            {
+                                var reader = (GenericReader)readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                                var method = readerType.GetMethod("UpdateEntryFromBabele");
+                                method.Invoke(reader, new object[] { babeleEntry, baseObject });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var id = ((JObject)property.Value).Value<string>("id");
+                        sourceId = $"Compendium.{module}.{packName}.{id}";
+                        var dictionary = typeToMappingDictonary.Values.FirstOrDefault(x => x.ContainsKey(sourceId));
+                        if (dictionary != null)
+                        {
+                            var baseObject = dictionary[sourceId];
+                            var readerType = GenericReader.GetEntryType(baseObject.Type, typeof(GenericReader));
+                            if (readerType != null)
+                            {
+                                var reader = (GenericReader)readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                                // var method = readerType.GetMethod("UpdateEntryFromBabele");
+                                //  method.Invoke(reader, new object[] { babeleEntry, baseObject });
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (var type in typeToMappingDictonary.Keys)
+            {
+                foreach (var newItem in typeToMappingDictonary[type])
+                {
+                    var folder = newItem.Value.OriginFoundryId.Split('.')[1];
+                    var dictionaryPath = Path.Combine(sourceJsons, folder, type);
+                    if (!Directory.Exists(dictionaryPath))
+                    {
+                        Directory.CreateDirectory(dictionaryPath);
+                    }
+
+                    var path = sourceJsons + "\\" + newItem.Value.OriginFoundryId.Split(".")[1] + "\\" + type;
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+                    var fileName = string.Join("-", newItem.Value.Name.Split(Path.GetInvalidFileNameChars()));
+                    var filePath = Path.Combine(path, $"{newItem.Value.FoundryId}.json");
+                    File.WriteAllText(filePath, JsonConvert.SerializeObject(newItem.Value, Formatting.Indented));
+                }
             }
         }
     }

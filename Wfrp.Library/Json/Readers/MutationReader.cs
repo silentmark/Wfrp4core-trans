@@ -16,5 +16,10 @@ namespace WFRP4e.Translator.Packs
         {
             UpdateItemEntry(pack, mapping);
         }
+
+        public void UpdateEntryFromBabele(JObject pack, MutationEntry mapping)
+        {
+            UpdateItemEntryFromBabele(pack, mapping);
+        }
     }
 }

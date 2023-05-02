@@ -17,6 +17,11 @@ namespace WFRP4e.Translator.Packs
             UpdateActorEntry(pack, mapping);
         }
 
+        public void UpdateEntryFromBabele(JObject pack, ActorEntry mapping)
+        {
+            UpdateActorEntryFromBabele(pack, mapping);
+        }
+
         protected void UpdateActorEntry(JObject pack, ActorEntry mapping)
         {
             mapping.Name = pack.Value<string>("name");
@@ -123,6 +128,77 @@ namespace WFRP4e.Translator.Packs
             mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
 
             UpdateInitializationFolder(pack, mapping);
+        }
+
+        protected void UpdateActorEntryFromBabele(JObject babeleEntry, ActorEntry mapping)
+        {
+            mapping.Name = babeleEntry.Value<string>("name");
+            UpdateIfDifferent(mapping, babeleEntry["description"].ToString(), nameof(mapping.Description));
+            UpdateIfDifferent(mapping, babeleEntry["species"]?.ToString(), nameof(mapping.Species));
+            UpdateIfDifferent(mapping, babeleEntry["gender"]?.ToString(), nameof(mapping.Gender));
+
+            var items = (JObject)babeleEntry["items"];
+            //var newMappingItems = new List<Entry>();
+
+            foreach (var item in items.Properties())
+            {
+                var foundryId = item.Name;
+                var jItem = (JObject)item.Value;
+                var mappingItem = mapping.Items.FirstOrDefault(x => x.FoundryId == foundryId);
+                if (mappingItem != null)
+                {
+                    if (mappingItem.Type == "trait")
+                    {
+                        if (!string.IsNullOrEmpty(jItem.Value<string>("name")))
+                        {
+                            new TraitReader().UpdateEntryFromBabele(jItem, (TraitEntry)mappingItem);
+                        }
+                        else
+                        {
+                            UpdateIfDifferent((TraitEntry)mappingItem, jItem["specification"]?.ToString(), nameof(TraitEntry.Specification));
+                        }
+                    }
+                    else if (mappingItem.Type == "skill")
+                    {
+                        new SkillReader().UpdateEntryFromBabele(jItem, (SkillEntry)mappingItem);
+                    }
+                    else if (mappingItem.Type == "talent")
+                    {
+                        new TalentReader().UpdateEntryFromBabele(jItem, (TalentEntry)mappingItem);
+                    }
+                    else if (mappingItem.Type == "weapon")
+                    {
+                        new WeaponReader().UpdateEntryFromBabele(jItem, (WeaponEntry)mappingItem);
+                    }
+                    else if (mappingItem.Type == "Referenced")
+                    {
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+            //mapping.Items = newMappingItems;
+
+            var effects = (JObject)babeleEntry["effects"];
+            var existinEffects = new List<EffectEntry>();
+            if (effects != null)
+            {
+                foreach (var effect in effects.Properties())
+                {
+                    var effectItem = (JObject)effect.Value;
+                    var newEffect = mapping.Effects.First(x => x.FoundryId == effect.Name);
+                    existinEffects.Add(newEffect);
+                    new EffectReader().UpdateEntryFromBabele(effectItem, newEffect);
+                }
+                mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
+            }
+            var initializationFolder = babeleEntry.Value<string>("initialization_folder");
+            if (!string.IsNullOrEmpty(initializationFolder))
+            {
+                mapping.InitializationFolder = initializationFolder;
+            }
         }
     }
 }

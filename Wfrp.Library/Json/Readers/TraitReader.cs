@@ -12,5 +12,11 @@ namespace WFRP4e.Translator.Packs
             UpdateItemEntry(pack, mapping);
             UpdateIfDifferent(mapping, pack["system"]?["specification"]?["value"]?.ToString(), nameof(mapping.Specification));
         }
+
+        public void UpdateEntryFromBabele(JObject pack, TraitEntry mapping)
+        {
+            UpdateItemEntryFromBabele(pack, mapping);
+            UpdateIfDifferent(mapping, pack["specification"]?.ToString(), nameof(mapping.Specification));
+        }
     }
 }

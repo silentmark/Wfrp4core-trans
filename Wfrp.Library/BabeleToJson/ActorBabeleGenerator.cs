@@ -21,8 +21,8 @@ namespace WFRP4e.Translator.Packs
             entry["description"] = mapping.Description ?? string.Empty;
             entry["sourceId"] = mapping.OriginFoundryId ?? string.Empty;
 
-            entry["gender"] = mapping.Gender ?? string.Empty;
-            entry["species"] = mapping.Species ?? string.Empty;
+            entry["gender"] = mapping.Species ?? string.Empty;
+            entry["species"] = mapping.Gender ?? string.Empty;
 
             if (mapping.Effects?.Count > 0)
             {

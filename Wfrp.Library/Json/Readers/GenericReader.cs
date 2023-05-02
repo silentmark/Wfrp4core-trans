@@ -43,6 +43,34 @@ namespace WFRP4e.Translator.Packs
             UpdateInitializationFolder(pack, mapping);
         }
 
+        protected void UpdateItemEntryFromBabele(JObject babeleEntry, ItemEntry mapping)
+        {
+            mapping.Name = babeleEntry.Value<string>("name");
+            UpdateIfDifferent(mapping, babeleEntry.Value<string>("description"), nameof(mapping.Description));
+
+            var effects = (JObject) babeleEntry["effects"];
+            var existinEffects = mapping.Effects;
+            if (effects != null)
+            {
+                foreach (var effect in effects.Properties())
+                {
+                    var effectItem = (JObject)effect.Value;
+                    var newEffect = existinEffects.FirstOrDefault(x => x.FoundryId == effect.Name);
+                    if (newEffect != null)
+                    {
+                        new EffectReader().UpdateEntryFromBabele(effectItem, newEffect);
+                    }
+                }
+
+                mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
+            }
+            var initializationFolder = babeleEntry.Value<string>("initialization_folder");
+            if (!string.IsNullOrEmpty(initializationFolder))
+            {
+                mapping.InitializationFolder = initializationFolder;
+            }
+        }
+
         public static void UpdateInitializationFolder(JObject pack, BaseEntry mapping)
         {
             foreach (JProperty property in pack["flags"])

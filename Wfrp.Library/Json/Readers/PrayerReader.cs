@@ -15,5 +15,13 @@ namespace WFRP4e.Translator.Packs
             UpdateIfDifferent(mapping, pack["system"]?["target"]?["value"]?.ToString(), nameof(mapping.Target));
             UpdateIfDifferent(mapping, pack["system"]?["range"]?["value"]?.ToString(), nameof(mapping.Range));
         }
+
+        public void UpdateEntryFromBabele(JObject pack, PrayerEntry mapping)
+        {
+            UpdateItemEntryFromBabele(pack, mapping);
+            UpdateIfDifferent(mapping, pack["duration"]?.ToString(), nameof(mapping.Duration));
+            UpdateIfDifferent(mapping, pack["range"]?.ToString(), nameof(mapping.Range));
+            UpdateIfDifferent(mapping, pack["target"]?.ToString(), nameof(mapping.Target));
+        }
     }
 }

@@ -13,5 +13,12 @@ namespace WFRP4e.Translator.Packs
             UpdateIfDifferent(mapping, pack["system"]?["wounds"]?["value"]?.ToString(), nameof(mapping.Wounds));
             UpdateIfDifferent(mapping, pack["system"]?["location"]?["value"]?.ToString(), nameof(mapping.Location));
         }
+
+        public void UpdateEntryFromBabele(JObject pack, CriticalEntry mapping)
+        {
+            UpdateItemEntryFromBabele(pack, mapping);
+            UpdateIfDifferent(mapping, pack["wounds"]?.ToString(), nameof(mapping.Wounds));
+            UpdateIfDifferent(mapping, pack["location"]?.ToString(), nameof(mapping.Location));
+        }
     }
 }

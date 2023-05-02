@@ -15,5 +15,11 @@ namespace WFRP4e.Translator.Packs
             GenericReader.UpdateIfDifferent(newEffect, effect["flags"]?["wfrp4e"]?["script"]?.ToString(), nameof(newEffect.Script));
             GenericReader.UpdateIfDifferent(newEffect, effect["flags"]?["wfrp4e"]?["secondaryEffect"]?["script"]?.ToString(), nameof(newEffect.SecondaryScript));
         }
+
+        internal void UpdateEntryFromBabele(JObject babeleEffect, EffectEntry newEffect)
+        {
+            newEffect.Name = babeleEffect.Value<string>("label");
+            newEffect.Script = babeleEffect.Value<string>("script");
+        }
     }
 }
