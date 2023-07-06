@@ -15,11 +15,13 @@ namespace WFRP4e.Translator.Packs
         public void UpdateEntry(JObject pack, MutationEntry mapping)
         {
             UpdateItemEntry(pack, mapping);
+            UpdateIfDifferent(mapping, pack["system"]?["modifier"]?["value"]?.ToString(), nameof(mapping.Modifier));
         }
 
         public void UpdateEntryFromBabele(JObject pack, MutationEntry mapping)
         {
             UpdateItemEntryFromBabele(pack, mapping);
+            UpdateIfDifferent(mapping, pack["modifier"]?.ToString(), nameof(mapping.Modifier));
         }
     }
 }

@@ -29,14 +29,6 @@ namespace WFRP4e.Translator.Packs
             {
                 pack["system"]["range"]["value"] = mapping.Range;
             }
-            if (pack["system"]?["lore"]?["value"] != null)
-            {
-                pack["system"]["lore"]["value"] = mapping.Lore;
-            }
-            if (pack["system"]?["wind"]?["value"] != null)
-            {
-                pack["system"]["wind"]["value"] = mapping.Wind;
-            }
         }
     }
 }

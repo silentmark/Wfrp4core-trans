@@ -12,7 +12,6 @@ namespace WFRP4e.Translator.Packs
 {
     [FoundryType("skill")]
     [FoundryType("money")]
-    [FoundryType("mutation")]
     [FoundryType("psychology")]
     [FoundryType("trapping")]
     [FoundryType("vehicleMod")]
@@ -42,6 +41,14 @@ namespace WFRP4e.Translator.Packs
                         if (!string.IsNullOrEmpty(effect.Script))
                         {
                             jEffect[effect.FoundryId]["script"] = effect.Script;
+                        }
+                        if (!string.IsNullOrEmpty(effect.SecondaryScript))
+                        {
+                            jEffect[effect.FoundryId]["secondaryScript"] = effect.SecondaryScript;
+                        }
+                        if (!string.IsNullOrEmpty(effect.Description))
+                        {
+                            jEffect[effect.FoundryId]["description"] = effect.Description;
                         }
                     }
                     entry["effects"] = jEffect;

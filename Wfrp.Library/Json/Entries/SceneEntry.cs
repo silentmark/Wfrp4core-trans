@@ -10,6 +10,8 @@
 
         public string SceneNote { get; set; }
 
+        public string Units { get; set; }
+
         public List<NoteEntry> Notes { get; set; } = new List<NoteEntry>();
     }
 

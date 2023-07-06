@@ -11,18 +11,17 @@ namespace WFRP4e.Translator.Effects
 {
     public class EffectsExtractor
     {
-
         public static void ExtractEffects(string packName)
         {
-            var scriptPath = Config.TranslationsPath + "\\" + packName.Replace(".db", "");
-            var packElements = File.ReadAllLines(Path.Combine(Config.TranslationsPath, packName));
+            var scriptPath = Config.PacksPath + "\\" + packName.Replace(".db", "");
+            var packElements = File.ReadAllLines(Path.Combine(Config.PacksPath, packName));
             var jsons = packElements.Select(pack => JObject.Parse(pack)).ToList();
             Console.WriteLine($"Processing {packName} with {jsons.Count} elements");
             foreach (var json in jsons)
             {
                 var name = json["name"].Value<string>();
                 var effects = json["effects"].ToArray();
-                foreach(var effect in effects)
+                foreach (var effect in effects)
                 {
                     Console.WriteLine($"Found {effect["label"].Value<string>()} - {effect["_id"].Value<string>()}");
 

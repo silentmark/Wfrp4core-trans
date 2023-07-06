@@ -26,13 +26,10 @@ namespace WFRP4e.Translator.Packs
             var jRes = new JObject();
             foreach (var result in mapping.TableResults)
             {
-                if (string.IsNullOrEmpty(result.DocumentId))
+                var packItem = ((JArray)originalDbEntity["results"]).FirstOrDefault(x => x["_id"].ToString() == result.FoundryId);
+                if (packItem != null)
                 {
-                    var packItem = ((JArray)originalDbEntity["results"]).FirstOrDefault(x => x["_id"].ToString() == result.FoundryId);
-                    if (packItem != null)
-                    {
-                        jRes[packItem["range"][0].ToString() + "-" + packItem["range"][1].ToString()] = result.Name;
-                    }
+                    jRes[packItem["range"][0].ToString() + "-" + packItem["range"][1].ToString()] = result.Name;
                 }
             }
             entity["results"] = jRes;

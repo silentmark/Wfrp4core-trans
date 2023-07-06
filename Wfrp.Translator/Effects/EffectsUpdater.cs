@@ -20,7 +20,7 @@ namespace WFRP4e.Translator.Effects
             Effects.Clear();
             EffectsWithName.Clear();
 
-            var scriptPaths = new string[] { Config.TranslationsPath + "\\wfrp4e-core\\packs", Config.TranslationsPath + "\\wfrp4e-eis\\packs" };
+            var scriptPaths = new string[] { Config.PacksPath + "\\wfrp4e-core\\packs", Config.PacksPath + "\\wfrp4e-eis\\packs" };
             foreach (var scriptPath in scriptPaths)
             {
                 var scriptDirectoriees = Directory.GetDirectories(scriptPath);
@@ -55,8 +55,8 @@ namespace WFRP4e.Translator.Effects
 
         public static void EffectsUpdate(string packName, bool actors = false)
         {
-            var scriptPath = Config.TranslationsPath + "\\" + packName.Replace(".db", "");
-            var packElements = File.ReadAllLines(Path.Combine(Config.TranslationsPath, packName));
+            var scriptPath = Config.PacksPath + "\\" + packName.Replace(".db", "");
+            var packElements = File.ReadAllLines(Path.Combine(Config.PacksPath, packName));
             var jsons = packElements.Select(pack => JObject.Parse(pack)).ToList();
             Console.WriteLine($"Processing {packName} with {jsons.Count} elements");
             foreach (var json in jsons)
@@ -136,7 +136,6 @@ namespace WFRP4e.Translator.Effects
                         Console.WriteLine($"NIE UDAŁO SIĘ NAPRAWIĆ SKRYPTÓ DLA: {objectName} W AKTORZE: {name}");
                     }
                 }
-
             }
         }
 

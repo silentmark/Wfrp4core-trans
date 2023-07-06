@@ -34,6 +34,10 @@ namespace WFRP4e.Translator.Packs
                 entity["notes"] = jNote;
             }
 
+            if (!string.IsNullOrEmpty(mapping.Units))
+            {
+                entity["units"] = mapping.Units;
+            }
             if (!string.IsNullOrEmpty(mapping.SceneNote))
             {
                 entity["scene_note"] = mapping.SceneNote;

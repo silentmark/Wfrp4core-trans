@@ -28,14 +28,6 @@ namespace WFRP4e.Translator.Packs
             {
                 entity["range"] = mapping.Range;
             }
-            if (!string.IsNullOrEmpty(mapping.Lore))
-            {
-                entity["lore"] = mapping.Lore;
-            }
-            if (!string.IsNullOrEmpty(mapping.Wind))
-            {
-                entity["wind"] = mapping.Wind;
-            }
         }
     }
 }

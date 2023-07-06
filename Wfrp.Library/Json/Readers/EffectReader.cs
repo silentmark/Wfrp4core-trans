@@ -20,6 +20,8 @@ namespace WFRP4e.Translator.Packs
         {
             newEffect.Name = babeleEffect.Value<string>("label");
             newEffect.Script = babeleEffect.Value<string>("script");
+            newEffect.SecondaryScript = babeleEffect.Value<string>("secondaryScript");
+            newEffect.Description = babeleEffect.Value<string>("description");
         }
     }
 }

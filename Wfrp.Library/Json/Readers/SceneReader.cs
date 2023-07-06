@@ -31,6 +31,10 @@ namespace WFRP4e.Translator.Packs
                     mapping.Notes.Add(noteEntry);
                 }
             }
+            if (pack["grid"] != null)
+            {
+                UpdateIfDifferent(mapping, pack["grid"]["units"].ToString(), nameof(mapping.Units));
+            }
 
             UpdateInitializationFolder(pack, mapping);
         }

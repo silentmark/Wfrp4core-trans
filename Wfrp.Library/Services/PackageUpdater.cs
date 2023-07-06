@@ -275,6 +275,12 @@ namespace Wfrp.Library.Services
                 var module = Path.GetFileName(Path.GetDirectoryName(Path.GetDirectoryName(pack)));
                 compendiumToEntriesDictionary[module + "." + packName] = new Dictionary<string, JObject>();
                 OnProgressUpdated($"Przetwarzam {Path.GetFileName(pack)} z modułu {module}");
+                var babeleFile = babeleTargetLocation + "\\" + module + "." + packName + ".json";
+                JObject originalBabele = null;
+                if (File.Exists(babeleFile))
+                {
+                    originalBabele = JObject.Parse(File.ReadAllText(babeleFile));
+                }
 
                 var originalPacks = File.ReadAllLines(pack);
                 foreach (var originalPack in originalPacks)
@@ -290,8 +296,10 @@ namespace Wfrp.Library.Services
                         if (dic.ContainsKey(originalSourceId))
                         {
                             var newBabeleEntry = new JObject();
-                            //var newBabeleEntry = (JObject)originalBabele["entries"][originalObj["name"].ToString()];
-
+                            if (originalBabele != null)
+                            {
+                                newBabeleEntry = (JObject)originalBabele["entries"][originalObj["name"].ToString()];
+                            }
                             var entry = dic[originalSourceId];
                             var readerType = GenericReader.GetEntryType(type, typeof(GenericItemBabeleGenerator));
                             if (readerType != null)
@@ -304,27 +312,37 @@ namespace Wfrp.Library.Services
                     }
                 }
                 var babeleTranslationPath = babeleTargetLocation + "\\" + module + "." + packName + ".json";
-                var babeleTranslationObj = JObject.Parse(File.ReadAllText(babeleTranslationPath));
-
-                var entries = compendiumToEntriesDictionary[module + "." + packName].Values.ToArray();
-                var entriesjArr = new JObject();
-                foreach (var entry in entries)
+                if (File.Exists(babeleTranslationPath))
                 {
-                    var key = entry["originalName"].ToString();
-                    entry.Remove("originalName");
-                    entriesjArr[key] = entry;
+                    var babeleTranslationObj = JObject.Parse(File.ReadAllText(babeleTranslationPath));
+
+                    var entries = compendiumToEntriesDictionary[module + "." + packName].Values.ToArray();
+                    var entriesjArr = new JObject();
+                    foreach (var entry in entries)
+                    {
+                        var key = entry["originalName"]?.ToString();
+                        if (!string.IsNullOrEmpty(key))
+                        {
+                            entry.Remove("originalName");
+                            entriesjArr[key] = entry;
+                        }
+                        else
+                        {
+                            entriesjArr[entry["name"].ToString()] = entry;
+                        }
+                    }
+                    babeleTranslationObj["entries"] = entriesjArr;
+
+                    using FileStream fs = File.Open(babeleTranslationPath, FileMode.Create);
+                    using StreamWriter sw = new StreamWriter(fs);
+                    using JsonTextWriter jw = new JsonTextWriter(sw);
+
+                    jw.Formatting = Formatting.Indented;
+                    jw.IndentChar = ' ';
+                    jw.Indentation = 4;
+
+                    babeleTranslationObj.WriteTo(jw);
                 }
-                babeleTranslationObj["entries"] = entriesjArr;
-
-                using FileStream fs = File.Open(babeleTranslationPath, FileMode.Create);
-                using StreamWriter sw = new StreamWriter(fs);
-                using JsonTextWriter jw = new JsonTextWriter(sw);
-
-                jw.Formatting = Formatting.Indented;
-                jw.IndentChar = ' ';
-                jw.Indentation = 4;
-
-                babeleTranslationObj.WriteTo(jw);
             }
         }
 

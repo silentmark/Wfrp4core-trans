@@ -14,8 +14,6 @@ namespace WFRP4e.Translator.Packs
             UpdateIfDifferent(mapping, pack["system"]?["duration"]?["value"]?.ToString(), nameof(mapping.Duration));
             UpdateIfDifferent(mapping, pack["system"]?["target"]?["value"]?.ToString(), nameof(mapping.Target));
             UpdateIfDifferent(mapping, pack["system"]?["range"]?["value"]?.ToString(), nameof(mapping.Range));
-            UpdateIfDifferent(mapping, pack["system"]?["lore"]?["value"]?.ToString(), nameof(mapping.Lore));
-            UpdateIfDifferent(mapping, pack["system"]?["wind"]?["value"]?.ToString(), nameof(mapping.Wind));
         }
 
         public void UpdateEntryFromBabele(JObject pack, SpellEntry mapping)

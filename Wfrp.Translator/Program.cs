@@ -15,6 +15,7 @@ using WFRP4e.Translator.Json.Entries;
 using System.Text;
 using Wfrp.Library.Services;
 using Config = WFRP4e.Translator.Utilities.Config;
+using HtmlAgilityPack;
 
 namespace WFRP4e.Translator
 {
@@ -40,8 +41,39 @@ namespace WFRP4e.Translator
 
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", Config.GoogleSigninKeyPath);
 
+            //var journals = JObject.Parse(File.ReadAllText("C:\\source-code\\WFRP\\wfrp4e-core-pl-source\\locales\\pl\\wfrp4e-core.journal-entries.json"));
+            //var entries = (JObject)journals["entries"];
+            //foreach (JProperty entryProp in entries.Properties())
+            //{
+            //    var entry = (JObject)entries[entryProp.Name]["pages"];
+            //    foreach (JProperty page in entry.Properties())
+            //    {
+            //        var html = entry[page.Name].Value<string>("text");
+            //        var htmlDoc = new HtmlDocument
+            //        {
+            //            OptionFixNestedTags = true,
+            //            OptionCheckSyntax = true,
+            //            OptionOutputAsXml = true,
+            //            OptionAutoCloseOnEnd = true
+            //        };
+            //        htmlDoc.LoadHtml(html);
+            //        html = htmlDoc.DocumentNode.OuterHtml;
+            //        entry[page.Name]["text"] = html;
+            //    }
+            //}
+
+            //using FileStream fs = File.Open("C:\\source-code\\WFRP\\wfrp4e-core-pl-source\\locales\\pl\\wfrp4e-core.journal-entries.json", FileMode.Create);
+            //using StreamWriter sw = new StreamWriter(fs);
+            //using JsonTextWriter jw = new JsonTextWriter(sw);
+
+            //jw.Formatting = Formatting.Indented;
+            //jw.IndentChar = ' ';
+            //jw.Indentation = 4;
+
+            //journals.WriteTo(jw);
+
             Console.WriteLine(
-                        $"Konfiguracja:\nŚcieżka do plików .db: {Config.PacksPath}\nŚcieżka do plików wyjściowych: {Config.TranslationsPath}");
+                        $"Konfiguracja:\nŚcieżka do plików .db: {Config.PacksPath}\n");
             Console.WriteLine($"Ogarniam mapowanie");
             PackageUpdater.ProgressUpdated += (sender, message) => Console.WriteLine(message.EventData);
             PackageUpdater.InitAllMappings(Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary);
@@ -55,43 +87,31 @@ namespace WFRP4e.Translator
             {
                 Console.WriteLine($"Generuję json dla oryginałów");
                 PackageUpdater.ExtractJsonsToFilesAndCorrectIds(Config.PacksPath);
-                Console.WriteLine($"Generuję json dla tłumaczeń");
-                PackageUpdater.ExtractJsonsToFilesAndCorrectIds(Config.TranslationsPath);
 
                 Console.WriteLine(
                     @"
-                  Wciśnij 1. aby zmodyfikować pliki .db na podstawie plików json.
-                  Wciśnij 2. aby wygenerować pliki .json do tłumaczenia babele.
-                  Wciśnij 3. aby zwalidować i zaktualizować pliki źródłowe EN.
-                  Wciśnij 4. aby zwalidować i zaktualizować mapowania PL.
-                  Wciśnij 5. aby zwalidować i zaktualizować pliki źródłowe EN na podstawie babele.
-                  Wciśnij 6. aby zwalidować i zaktualizować mapowania PL na podstawie babele.
+                  Wciśnij 1. wygeneruj pośredni JSONMAPPING z db EN.
+                  Wciśnij 2. wygeneruj Babele EN i PL z JSONMAPPING.
+                  Wciśnij 3. zaktualizuj JSONMAPPING EN na podstawie Babele.
+                  Wciśnij 4. zaktualizuj JSONMAPPING PL na podstawie Babele.
                   "
     );
                 input = Console.ReadKey();
                 Console.WriteLine();
+
                 if (input.KeyChar == '1')
                 {
-                    PackageUpdater.TransformPackagesBasedOnTranslationFile(Config.PacksPath, Config.TranslationsPath);
+                    UpdateJsonMappingFiles(Config.PacksPath, Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary);
                 }
                 else if (input.KeyChar == '2')
                 {
-                    PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.SourceJsonsPl, Config.BabeleLocationPl, Mappings.TranslatedTypeToMappingDictonary);
                     PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.SourceJsonsEn, Config.BabeleLocationEn, Mappings.OriginalTypeToMappingDictonary);
                 }
                 else if (input.KeyChar == '3')
                 {
-                    UpdateJsonMappingFiles(Config.PacksPath, Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary);
-                }
-                else if (input.KeyChar == '4')
-                {
-                    UpdateJsonMappingFiles(Config.TranslationsPath, Config.SourceJsonsPl, Mappings.TranslatedTypeToMappingDictonary);
-                }
-                else if (input.KeyChar == '5')
-                {
                     PackageUpdater.GenerateJsonFilesFromBabele(Config.SourceJsonsEn, Config.BabeleLocationEn, Mappings.OriginalTypeToMappingDictonary);
                 }
-                else if (input.KeyChar == '6')
+                else if (input.KeyChar == '4')
                 {
                     PackageUpdater.GenerateJsonFilesFromBabele(Config.SourceJsonsPl, Config.BabeleLocationPl, Mappings.TranslatedTypeToMappingDictonary);
                 }
@@ -350,19 +370,10 @@ namespace WFRP4e.Translator
 
         private static void ExportAllEffects()
         {
-            var packs = Directory.EnumerateFiles(Config.TranslationsPath, "*.db", SearchOption.AllDirectories).ToList();
             var packsOriginal = Directory.EnumerateFiles(Config.PacksPath, "*.db", SearchOption.AllDirectories).ToList();
             var effectsObjects = new List<BaseEntry>();
-            foreach (var pack in packsOriginal)
-            {
-                var fileName = Path.GetFileName(pack);
-                if (packs.Select(x => Path.GetFileName(x)).All(x => x != fileName))
-                {
-                    packs.Add(pack);
-                }
-            }
 
-            foreach (var pack in packs)
+            foreach (var pack in packsOriginal)
             {
                 var lines = File.ReadAllLines(pack);
                 foreach (var line in lines)
@@ -400,7 +411,7 @@ namespace WFRP4e.Translator
                     }
                 }
             }
-            File.WriteAllText(Config.TranslationsPath + "\\wfrp4e-jsons\\effects.json", JsonConvert.SerializeObject(effectsObjects, Formatting.Indented));
+            File.WriteAllText(Config.PacksPath + "\\wfrp4e-jsons\\effects.json", JsonConvert.SerializeObject(effectsObjects, Formatting.Indented));
         }
 
         private static void ValidatingCareerTranslatiosn()

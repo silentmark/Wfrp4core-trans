@@ -12,7 +12,6 @@ namespace WFRP4e.Translator.Packs
 {
     [FoundryType("skill")]
     [FoundryType("money")]
-    [FoundryType("mutation")]
     [FoundryType("psychology")]
     [FoundryType("trapping")]
     [FoundryType("vehicleMod")]

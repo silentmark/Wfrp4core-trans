@@ -3,6 +3,6 @@
     [FoundryType("mutation")]
     public class MutationEntry : ItemEntry
     {
-
+        public string Modifier { get; set; }
     }
 }
