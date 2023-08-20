@@ -44,15 +44,6 @@ namespace Wfrp.Service.Controllers
                 await SendText(webSocket, $"Ogarniam mapowanie");
                 PackageUpdater.InitAllMappings(Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary);
                 PackageUpdater.InitAllMappings(Config.SourceJsonsPl, Mappings.TranslatedTypeToMappingDictonary);
-
-                await SendText(webSocket, $"Generuję json dla oryginałów");
-                PackageUpdater.ExtractJsonsToFilesAndCorrectIds(Config.PacksPath);
-                await SendText(webSocket, $"Generuję json dla tłumaczeń");
-                PackageUpdater.ExtractJsonsToFilesAndCorrectIds(Config.TranslationsPath);
-                await SendText(webSocket, $"Aktualizuję pliki .db");
-                PackageUpdater.TransformPackagesBasedOnTranslationFile(Config.PacksPath, Config.TranslationsPath);
-                await SendText(webSocket, $"Przygotowuję paczkę .zip");
-                await SendText(webSocket, $"Gotowe");
             }
             catch (Exception ex)
             {

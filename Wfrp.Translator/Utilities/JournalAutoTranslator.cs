@@ -42,8 +42,7 @@ namespace WFRP4e.Translator.Utilities
                             }
                             else
                             {
-                                var translation = OpenAiTranslator.Translate(node.OuterHtml);
-
+                                var translation = string.Empty;
                                 Console.WriteLine($"Zawartość:");
                                 Console.WriteLine(node.OuterHtml.PadRight(10));
                                 Console.WriteLine("Tłumaczenie:");

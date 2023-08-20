@@ -21,7 +21,7 @@ namespace Wfrp.Service
     {
         public static void Main(string[] args)
         {
-            Config.Configuration = new ConfigurationBuilder()
+            var config = new ConfigurationBuilder()
                  .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
                  .AddJsonFile("appsettings.json", false)
                  .Build();

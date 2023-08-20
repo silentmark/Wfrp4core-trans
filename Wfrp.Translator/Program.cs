@@ -15,7 +15,6 @@ using WFRP4e.Translator.Json.Entries;
 using System.Text;
 using Wfrp.Library.Services;
 using Config = WFRP4e.Translator.Utilities.Config;
-using HtmlAgilityPack;
 
 namespace WFRP4e.Translator
 {
