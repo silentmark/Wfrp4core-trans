@@ -80,6 +80,7 @@ namespace WFRP4e.Translator
 
             Wfrp.Library.Services.Config.SourceJsonsEn = Config.SourceJsonsEn;
             Wfrp.Library.Services.Config.SourceJsonsPl = Config.SourceJsonsPl;
+            Wfrp.Library.Services.Config.PacksPath = Config.PacksPath;
 
             ConsoleKeyInfo input;
             do
@@ -89,7 +90,7 @@ namespace WFRP4e.Translator
 
                 Console.WriteLine(
                     @"
-                  Wciśnij 1. wygeneruj pośredni JSONMAPPING z db EN.
+                  Wciśnij 1. wygeneruj pośredni JSONMAPPING z leveldb EN.
                   Wciśnij 2. wygeneruj Babele EN i PL z JSONMAPPING.
                   Wciśnij 3. zaktualizuj JSONMAPPING EN na podstawie Babele.
                   Wciśnij 4. zaktualizuj JSONMAPPING PL na podstawie Babele.
@@ -163,22 +164,33 @@ namespace WFRP4e.Translator
 
         private static void UpdateJsonMappingFiles(string dbPath, string jsonPath, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDirectory)
         {
-            var packs = Directory.EnumerateFiles(dbPath, "*.db", SearchOption.AllDirectories).ToList();
+            var packs = Directory.EnumerateDirectories(dbPath, "_source", SearchOption.AllDirectories).ToList();
 
             var newTypeToJsonListDic = new Dictionary<string, List<BaseEntry>>();
 
             foreach (var pack in packs)
             {
-                var jsons = File.ReadAllLines(pack).Select(x => JObject.Parse(x)).Where(x =>
-                            x["type"] == null || (
-                            x["type"].ToString() != "npc" &&
-                            x["type"].ToString() != "creature" &&
-                            x["type"].ToString() != "character" &&
-                            x["type"].ToString() != "vehicle"))
-                    .ToList();
-
-                foreach (var itemJson in jsons)
+                var jsonsPaths = Directory.EnumerateFiles(pack, "*.json").ToList();
+                foreach (var dbJsonPath in jsonsPaths)
                 {
+                    var itemJson = JObject.Parse(File.ReadAllText(dbJsonPath));
+                    if (!(itemJson["type"] == null ||
+                                itemJson["type"].ToString() != "npc" &&
+                                itemJson["type"].ToString() != "creature" &&
+                                itemJson["type"].ToString() != "character" &&
+                                itemJson["type"].ToString() != "vehicle"))
+                    {
+                        continue;
+                    }
+                    if (itemJson["_key"].ToString().Contains("."))
+                    {
+                        continue;
+                    }
+                    if (itemJson["type"]?.ToString() == "Item" ||
+                        itemJson["type"]?.ToString() == "RollTable")
+                    {
+                        continue;
+                    }
                     var id = itemJson.GetValue("_id").Value<string>();
                     var type = GenericReader.GetTypeFromJson(itemJson);
                     var targtetType = GenericReader.GetEntryType(type, typeof(BaseEntry));
@@ -186,13 +198,15 @@ namespace WFRP4e.Translator
                     var name = itemJson.GetValue("name").Value<string>();
 
                     var sourceCompendium = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[0];
-                    var packName = Path.GetFileNameWithoutExtension(pack);
-                    var originalSourceId = itemJson["flags"]["core"]["sourceId"].ToString();
+                    var packName = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[2];
+                    var originalSourceId = itemJson["flags"]?["core"]?["sourceId"]?.ToString();
                     var correctSourceId = $"Compendium.{sourceCompendium}.{packName}.{id}";
                     if (originalSourceId != correctSourceId)
                     {
+                        itemJson["flags"] = itemJson["flags"] ?? new JObject();
+                        itemJson["flags"]["core"] = itemJson["flags"]["core"] ?? new JObject();
+                        itemJson["flags"]["core"]["sourceId"] = correctSourceId;
                         Console.WriteLine($"SOMETHING IS WRONG: {originalSourceId} VS: {correctSourceId}");
-                        continue;
                     }
 
                     if (!typeToMappingDirectory.ContainsKey(type))
@@ -242,16 +256,18 @@ namespace WFRP4e.Translator
 
             foreach (var pack in packs)
             {
-                var jsons = File.ReadAllLines(pack).Select(x => JObject.Parse(x)).Where(x =>
-                            x["type"] != null && (
-                            x["type"].ToString() == "npc" ||
-                            x["type"].ToString() == "creature" ||
-                            x["type"].ToString() == "character" ||
-                            x["type"].ToString() == "vehicle"))
-                    .ToList();
-
-                foreach (var actorJson in jsons)
+                var jsonsPaths = Directory.EnumerateFiles(pack, "*.json").ToList();
+                foreach (var dbJsonPath in jsonsPaths)
                 {
+                    var actorJson = JObject.Parse(File.ReadAllText(dbJsonPath));
+                    if (actorJson["type"] == null ||
+                                actorJson["type"].ToString() != "npc" &&
+                                actorJson["type"].ToString() != "creature" &&
+                                actorJson["type"].ToString() != "character" &&
+                                actorJson["type"].ToString() != "vehicle")
+                    {
+                        continue;
+                    }
                     var id = actorJson.GetValue("_id").Value<string>();
                     var type = GenericReader.GetTypeFromJson(actorJson);
                     var targtetType = GenericReader.GetEntryType(type, typeof(BaseEntry));
@@ -259,13 +275,15 @@ namespace WFRP4e.Translator
                     var name = actorJson.GetValue("name").Value<string>();
 
                     var sourceCompendium = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[0];
-                    var packName = Path.GetFileNameWithoutExtension(pack);
+                    var packName = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[2];
                     var originalSourceId = actorJson["flags"]["core"]["sourceId"].ToString();
                     var correctSourceId = $"Compendium.{sourceCompendium}.{packName}.{id}";
                     if (originalSourceId != correctSourceId)
                     {
+                        actorJson["flags"] = actorJson["flags"] ?? new JObject();
+                        actorJson["flags"]["core"] = actorJson["flags"]["core"] ?? new JObject();
+                        actorJson["flags"]["core"]["sourceId"] = correctSourceId;
                         Console.WriteLine($"SOMETHING IS WRONG: {originalSourceId} VS: {correctSourceId}");
-                        continue;
                     }
 
                     if (!typeToMappingDirectory.ContainsKey(type))

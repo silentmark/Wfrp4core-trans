@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using Wfrp.Library.Services;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;
 
@@ -32,11 +33,12 @@ namespace WFRP4e.Translator.Packs
             var effects = pack["effects"].ToArray();
             var existinEffects = new List<EffectEntry>();
 
-            foreach (JObject effect in effects)
+            foreach (JValue effectId in effects)
             {
                 var newEffect = new EffectEntry();
                 existinEffects.Add(newEffect);
-                new EffectReader().UpdateEntry(effect, newEffect);
+                var effectObject = GetSubEntryFromId(effectId.Value.ToString(), pack["_id"].ToString());
+                new EffectReader().UpdateEntry(effectObject, newEffect);
             }
             mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
 
@@ -48,7 +50,7 @@ namespace WFRP4e.Translator.Packs
             mapping.Name = babeleEntry.Value<string>("name");
             UpdateIfDifferent(mapping, babeleEntry.Value<string>("description"), nameof(mapping.Description));
 
-            var effects = (JObject) babeleEntry["effects"];
+            var effects = (JObject)babeleEntry["effects"];
             var existinEffects = mapping.Effects;
             if (effects != null)
             {
@@ -123,6 +125,26 @@ namespace WFRP4e.Translator.Packs
             var types = typeof(BaseEntry).Assembly.GetTypes().Where(x => x.CustomAttributes.Any(x => x.AttributeType == typeof(FoundryTypeAttribute)) && x.IsAssignableTo(baseType)).ToList();
             var type = types.FirstOrDefault(x => x.GetCustomAttributes<FoundryTypeAttribute>(false).FirstOrDefault(y => y.Type == foundryType) != null);
             return type;
+        }
+
+        public static JObject GetSubEntryFromId(string id, string parentId)
+        {
+            var jsonsPaths = Directory.EnumerateFiles(Config.PacksPath, $"*{id}.json", SearchOption.AllDirectories).ToList();
+            if (jsonsPaths.Count == 1)
+            {
+                var jObject = JObject.Parse(File.ReadAllText(jsonsPaths.First()));
+                return jObject;
+            }
+            else
+            {
+                var jObject = jsonsPaths.Select(x => JObject.Parse(File.ReadAllText(x))).Where(x => x["_key"].ToString().Contains(parentId)).FirstOrDefault();
+                if(jObject == null)
+                {
+                    jObject = jsonsPaths.Select(x => JObject.Parse(File.ReadAllText(x))).First();
+                }
+                
+                return jObject;
+            }
         }
     }
 }

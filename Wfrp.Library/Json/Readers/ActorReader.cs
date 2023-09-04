@@ -34,8 +34,9 @@ namespace WFRP4e.Translator.Packs
             var items = pack["items"].ToArray();
             var newMappingItems = new List<Entry>();
 
-            foreach (JObject item in items)
+            foreach (JValue subItemId in items)
             {
+                var item = GetSubEntryFromId(subItemId.Value.ToString(), pack["_id"].ToString());
                 var type = GetTypeFromJson(item);
                 var readerType = GetEntryType(type, typeof(GenericReader));
                 var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
@@ -119,10 +120,11 @@ namespace WFRP4e.Translator.Packs
             var effects = pack["effects"].ToArray();
             var existinEffects = new List<EffectEntry>();
 
-            foreach (JObject effect in effects)
+            foreach (JValue effectId in effects)
             {
                 var newEffect = new EffectEntry();
                 existinEffects.Add(newEffect);
+                var effect = GetSubEntryFromId(effectId.Value.ToString(), pack["_id"].ToString());
                 new EffectReader().UpdateEntry(effect, newEffect);
             }
             mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
@@ -175,7 +177,6 @@ namespace WFRP4e.Translator.Packs
                     }
                     else
                     {
-
                     }
                 }
             }

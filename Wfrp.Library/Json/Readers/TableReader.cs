@@ -23,10 +23,11 @@ namespace WFRP4e.Translator.Packs
             var subItems = pack["results"].ToArray();
             var existingSubItems = new List<TableResultEntry>();
 
-            foreach (JObject subItem in subItems)
+            foreach (JValue subItemId in subItems)
             {
                 var newSubEntry = new TableResultEntry();
                 existingSubItems.Add(newSubEntry);
+                var subItem = GetSubEntryFromId(subItemId.Value.ToString(), pack["_id"].ToString());
                 new TableResultReader().UpdateEntry(subItem, newSubEntry);
             }
             mapping.TableResults = existingSubItems;

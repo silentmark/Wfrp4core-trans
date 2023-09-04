@@ -7,10 +7,11 @@ namespace WFRP4e.Translator.Packs
     {
         public void UpdateEntry(JObject effect, EffectEntry newEffect)
         {
-            newEffect.Name = effect.Value<string>("label");
+            newEffect.Name = effect.Value<string>("name");
             newEffect.Type = "effect";
 
             GenericReader.UpdateIfDifferent(newEffect, effect["_id"].ToString(), nameof(newEffect.FoundryId));
+            GenericReader.UpdateIfDifferent(newEffect, effect["description"].ToString(), nameof(newEffect.Description));
             GenericReader.UpdateIfDifferent(newEffect, effect["flags"]?["wfrp4e"]?["effectData"]?["description"]?.ToString(), nameof(newEffect.Description));
             GenericReader.UpdateIfDifferent(newEffect, effect["flags"]?["wfrp4e"]?["script"]?.ToString(), nameof(newEffect.Script));
             GenericReader.UpdateIfDifferent(newEffect, effect["flags"]?["wfrp4e"]?["secondaryEffect"]?["script"]?.ToString(), nameof(newEffect.SecondaryScript));

@@ -115,12 +115,11 @@ namespace Wfrp.Library.Services
         public static void ExtractJsonsToFilesAndCorrectIds(string packsPath)
         {
             var dic = new Dictionary<string, Dictionary<string, JObject>>();
-            var packs = Directory.EnumerateFiles(packsPath, "*.db", SearchOption.AllDirectories).ToList();
+            var packs = Directory.EnumerateDirectories(packsPath, "_source", SearchOption.AllDirectories).ToList();
 
             CleanupJsonAndUpdateSourceId(packsPath, dic, packs);
             UpdateChildItemSourceIds(dic);
             GenertingEntryJsonFiles(packsPath, dic);
-            RegenerateCleanDBFile(packsPath, dic);
         }
 
         private static void RegenerateCleanDBFile(string packsPath, Dictionary<string, Dictionary<string, JObject>> dic)
@@ -152,15 +151,11 @@ namespace Wfrp.Library.Services
                 foreach (var entry in dictionaries.Value)
                 {
                     var obj = entry.Value;
-                    var id = obj.GetValue("_id").Value<string>();
-                    obj.Remove("_stats");
-                    var parts = dictionaries.Key.Split(".");
-                    if (!Directory.Exists(packsPath + "\\" + parts[1] + "\\packs\\jsons\\" + parts[2]))
-                    {
-                        Directory.CreateDirectory(packsPath + "\\" + parts[1] + "\\packs\\jsons\\" + parts[2]);
-                    }
-                    var targetPath = packsPath + "\\" + parts[1] + "\\packs\\jsons\\" + parts[2] + "\\" + id + ".json";
-                    File.WriteAllText(targetPath, JsonConvert.SerializeObject(obj, Formatting.Indented));
+                    var fileName = obj["fileName"].ToString();
+                    obj.Remove("fileName");
+
+                    var content = JsonConvert.SerializeObject(obj, Formatting.Indented);
+                    File.WriteAllText(fileName, content);
                 }
             }
         }
@@ -176,53 +171,52 @@ namespace Wfrp.Library.Services
                 {
                     var items = entry.Value.Value<JArray>("items");
                     var entryId = entry.Value["flags"]["core"]["sourceId"].Value<string>();
-                    foreach (var item in items)
+                    foreach (JValue itemId in items)
                     {
+                        var item = dictionaries.Value[itemId.Value.ToString()];
                         var type = item.Value<string>("type");
                         var name = item.Value<string>("name");
                         var sourceId = item["flags"]?["core"]?["sourceId"]?.Value<string>();
                         var newSourceId = string.Empty;
-                        if (string.IsNullOrEmpty(sourceId) || sourceId.Split(".").Length != 4)
+
+                        var success = false;
+                        var matchingItems = dic.Values.SelectMany(x => x.Values).ToList().Where(x => x.Value<string>("type") == type && x.Value<string>("name") == name && !x.Value<string>("_key").ToString().Contains(".")).ToList();
+                        if (matchingItems.Count == 1)
                         {
-                            var success = false;
-                            var matchingItems = dic.Values.SelectMany(x => x.Values).ToList().Where(x => x.Value<string>("type") == type && x.Value<string>("name") == name).ToList();
-                            if (matchingItems.Count == 1)
+                            success = true;
+                            newSourceId = matchingItems[0]["flags"]["core"]["sourceId"].ToString();
+                        }
+                        if (matchingItems.Count > 1 && matchingItems.All(x => x["flags"]["core"]["sourceId"].ToString() != newSourceId))
+                        {
+                            OnProgressUpdated($"{entryId} - Nie można dopasować sourceId, pasujace elementy: {matchingItems.Count}");
+                        }
+                        if (success && newSourceId != sourceId)
+                        {
+                            OnProgressUpdated($"{entryId} - Aktualizuję sourceId dla elementu: {item.Value<string>("_id")} na {newSourceId}");
+                            item["flags"]["core"] = new JObject();
+                            item["flags"]["core"]["sourceId"] = newSourceId;
+                        }
+
+                        /*
+                        var existingSourceId = item["flags"]["core"]["sourceId"].Value<string>();
+                        var dicKey = string.Join(".", existingSourceId.Split(".").Take(3));
+                        if (dic.ContainsKey(dicKey))
+                        {
+                            var itemDictionary = dic[dicKey];
+                            var existingItemId = existingSourceId.Split(".")[3];
+                            var sourceItem = itemDictionary.Values.FirstOrDefault(x => x.Value<string>("type") == type && x.Value<string>("_id") == existingItemId);
+                            if (sourceItem == null)
                             {
-                                success = true;
-                                newSourceId = matchingItems[0]["flags"]["core"]["sourceId"].ToString();
-                            }
-                            if (matchingItems.Count > 1 && matchingItems.All(x => x["flags"]["core"]["sourceId"].ToString() != newSourceId))
-                            {
-                                OnProgressUpdated($"{entryId} - Nie można dopasować sourceId, pasujace elementy: {matchingItems.Count}");
-                            }
-                            if (success && newSourceId != sourceId)
-                            {
-                                OnProgressUpdated($"{entryId} - Aktualizuję sourceId dla elementu: {item.Value<string>("_id")} na {newSourceId}");
-                                item["flags"]["core"] = new JObject();
-                                item["flags"]["core"]["sourceId"] = newSourceId;
+                                OnProgressUpdated("Nie odnaleziono elementu źródłowego dla: " + item.Value<string>("name") + " o sourceId: " + existingSourceId);
+                                ((JObject)(item["flags"]["core"])).Remove("sourceid");
                             }
                         }
                         else
                         {
-                            var existingSourceId = item["flags"]["core"]["sourceId"].Value<string>();
-                            var dicKey = string.Join(".", existingSourceId.Split(".").Take(3));
-                            if (dic.ContainsKey(dicKey))
-                            {
-                                var itemDictionary = dic[dicKey];
-                                var existingItemId = existingSourceId.Split(".")[3];
-                                var sourceItem = itemDictionary.Values.FirstOrDefault(x => x.Value<string>("type") == type && x.Value<string>("_id") == existingItemId);
-                                if (sourceItem == null)
-                                {
-                                    OnProgressUpdated("Nie odnaleziono elementu źródłowego dla: " + item.Value<string>("name") + " o sourceId: " + existingSourceId);
-                                    ((JObject)(item["flags"]["core"])).Remove("sourceid");
-                                }
-                            }
-                            else
-                            {
-                                OnProgressUpdated("Source Id dla elementu: " + item.Value<string>("name") + " nie może być odnalezione " + existingSourceId);
-                                ((JObject)(item["flags"]["core"])).Remove("sourceid");
-                            }
+                            OnProgressUpdated("Source Id dla elementu: " + item.Value<string>("name") + " nie może być odnalezione " + existingSourceId);
+                            ((JObject)(item["flags"]["core"])).Remove("sourceid");
                         }
+                        */
                     }
                 }
             }
@@ -232,20 +226,23 @@ namespace Wfrp.Library.Services
         {
             foreach (var pack in packs)
             {
-                var module = pack.Replace(packsPath, "").Split("\\", StringSplitOptions.RemoveEmptyEntries)[0];
-                var packName = Path.GetFileNameWithoutExtension(pack);
-                var compendiumPrefix = "Compendium." + module + "." + packName;
-                if (!dic.ContainsKey(compendiumPrefix))
+                var files = Directory.EnumerateFiles(pack, "*.json");
+                foreach (var file in files)
                 {
-                    dic[compendiumPrefix] = new Dictionary<string, JObject>();
-                }
-                var jsons = File.ReadAllLines(pack);
-                foreach (var jsonString in jsons)
-                {
-                    var obj = JObject.Parse(jsonString);
+
+                    var module = pack.Replace(packsPath, "").Split("\\", StringSplitOptions.RemoveEmptyEntries)[0];
+                    var packName = pack.Replace(packsPath, "").Split("\\", StringSplitOptions.RemoveEmptyEntries)[2];
+                    var compendiumPrefix = "Compendium." + module + "." + packName;
+
+                    var obj = JObject.Parse(File.ReadAllText(file));
                     var id = obj.GetValue("_id").Value<string>();
                     obj.Remove("_stats");
                     obj.Remove("ownership");
+
+                    if (!dic.ContainsKey(compendiumPrefix))
+                    {
+                        dic[compendiumPrefix] = new Dictionary<string, JObject>();
+                    }
                     dic[compendiumPrefix][id] = obj;
                     if (obj["flags"] == null)
                     {
@@ -256,6 +253,7 @@ namespace Wfrp.Library.Services
                         obj["flags"]["core"] = new JObject();
                     }
                     obj["flags"]["core"]["sourceId"] = compendiumPrefix + "." + id;
+                    obj["fileName"] = file;
                 }
             }
         }
@@ -263,7 +261,7 @@ namespace Wfrp.Library.Services
         public static void GenerateBabeleJsonFiles(string packsPath, string sourceJsons, string babeleTargetLocation, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDictionary)
         {
             var compendiumToEntriesDictionary = new Dictionary<string, Dictionary<string, JObject>>();
-            var packs = Directory.EnumerateFiles(packsPath, "*.db", SearchOption.AllDirectories).ToList();
+            var packs = Directory.EnumerateDirectories(packsPath, "_source", SearchOption.AllDirectories).ToList();
 
             //var packs = Directory.EnumerateFiles(packsPath, "bestiary.db", SearchOption.AllDirectories).ToList();
 
@@ -271,25 +269,48 @@ namespace Wfrp.Library.Services
             //var originalBabele = JObject.Parse(File.ReadAllText(pathToBabele));
             foreach (var pack in packs)
             {
-                var packName = Path.GetFileNameWithoutExtension(pack);
-                var module = Path.GetFileName(Path.GetDirectoryName(Path.GetDirectoryName(pack)));
-                compendiumToEntriesDictionary[module + "." + packName] = new Dictionary<string, JObject>();
-                OnProgressUpdated($"Przetwarzam {Path.GetFileName(pack)} z modułu {module}");
-                var babeleFile = babeleTargetLocation + "\\" + module + "." + packName + ".json";
-                JObject originalBabele = null;
-                if (File.Exists(babeleFile))
-                {
-                    originalBabele = JObject.Parse(File.ReadAllText(babeleFile));
-                }
+                var packName = pack.Replace(Config.PacksPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[2];
+                var module = Path.GetFileName(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(pack))));
 
-                var originalPacks = File.ReadAllLines(pack);
-                foreach (var originalPack in originalPacks)
+                var sources = Directory.EnumerateFiles(pack, "*.json");
+                foreach (var originalPack in sources)
                 {
-                    var originalObj = JObject.Parse(originalPack);
+                    var babeleFileName = module + "." + packName;
+
+                    var originalObj = JObject.Parse(File.ReadAllText(originalPack));
+                    if (originalObj["_key"].ToString().Contains("."))
+                    {
+                        continue;
+                    }
+                    if (originalObj["type"]?.ToString() == "Item" ||
+                        originalObj["type"]?.ToString() == "RollTable")
+                    {
+                        continue;
+                    }
+
+                    if (originalObj["type"] != null &&
+                        originalObj["type"].ToString() != "npc" &&
+                        originalObj["type"].ToString() != "creature" &&
+                        originalObj["type"].ToString() != "character" &&
+                        originalObj["type"].ToString() != "vehicle")
+                    {
+                        babeleFileName = $"{module}.{originalObj["type"]}.{module}.{packName}";
+                    }
+
+                    if (!compendiumToEntriesDictionary.ContainsKey(babeleFileName))
+                    {
+                        compendiumToEntriesDictionary[babeleFileName] = new Dictionary<string, JObject>();
+                    }
+                    var babeleFile = babeleTargetLocation + "\\" + babeleFileName + ".json";
+
+                    JObject originalBabele = null;
+                    if (File.Exists(babeleFile))
+                    {
+                        originalBabele = JObject.Parse(File.ReadAllText(babeleFile));
+                    }
                     var id = originalObj.GetValue("_id").Value<string>();
                     var originalSourceId = originalObj["flags"]["core"]["sourceId"].ToString();
                     var type = GenericReader.GetTypeFromJson(originalObj);
-
                     if (typeToMappingDictionary.ContainsKey(type))
                     {
                         var dic = typeToMappingDictionary[type];
@@ -306,17 +327,20 @@ namespace Wfrp.Library.Services
                             {
                                 var reader = (GenericItemBabeleGenerator)readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
                                 reader.Parse(newBabeleEntry, originalObj, entry);
-                                compendiumToEntriesDictionary[module + "." + packName][entry.FoundryId] = newBabeleEntry;
+                                compendiumToEntriesDictionary[babeleFileName][entry.FoundryId] = newBabeleEntry;
                             }
                         }
                     }
                 }
-                var babeleTranslationPath = babeleTargetLocation + "\\" + module + "." + packName + ".json";
+            }
+            foreach (var babeleFile in compendiumToEntriesDictionary)
+            {
+                var babeleTranslationPath = babeleTargetLocation + "\\" + babeleFile.Key + ".json";
                 if (File.Exists(babeleTranslationPath))
                 {
                     var babeleTranslationObj = JObject.Parse(File.ReadAllText(babeleTranslationPath));
 
-                    var entries = compendiumToEntriesDictionary[module + "." + packName].Values.ToArray();
+                    var entries = babeleFile.Value.Values.ToArray();
                     var entriesjArr = new JObject();
                     foreach (var entry in entries)
                     {

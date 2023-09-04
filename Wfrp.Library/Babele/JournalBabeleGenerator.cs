@@ -27,7 +27,7 @@ namespace WFRP4e.Translator.Packs
                 var jP = new JObject();
                 foreach (var p in mapping.Pages)
                 {
-                    var jPage = (JObject)((JArray)originalDbEntity["pages"]).First(x => x["_id"].ToString() == p.FoundryId);
+                    var jPage = GenericReader.GetSubEntryFromId(p.FoundryId, mapping.FoundryId);
                     jP[jPage["name"].ToString()] = new JObject()
                     {
                         ["name"] = p.Name,

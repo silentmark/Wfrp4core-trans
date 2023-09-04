@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Linq;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;
 
@@ -122,7 +120,7 @@ namespace WFRP4e.Translator.Packs
                 if (!(item is ReferenceEntry))
                 {
                     var babeleType = GenericReader.GetEntryType(item.Type, typeof(GenericItemBabeleGenerator));
-                    var jPackItem = ((JArray)originalDbEntity["items"]).FirstOrDefault(x => x["_id"].Value<string>() == item.FoundryId) as JObject;
+                    var jPackItem = GenericReader.GetSubEntryFromId(item.FoundryId, entity.FoundryId);//  ((JArray)originalDbEntity["items"]).FirstOrDefault(x => x["_id"].Value<string>() == item.FoundryId) as JObject;
 
                     var key = jPackItem["_id"].ToString();
                     var backup = jItem[jPackItem["name"].ToString()] as JObject;
@@ -210,7 +208,9 @@ namespace WFRP4e.Translator.Packs
                 }
                 else
                 {
-                    var jPackItem = (JObject)((JArray)originalDbEntity["items"]).FirstOrDefault(x => x["_id"].Value<string>() == item.FoundryId);
+                    var jPackItem = GenericReader.GetSubEntryFromId(item.FoundryId, entity.FoundryId);
+
+                    //     var jPackItem = (JObject)((JArray)originalDbEntity["items"]).FirstOrDefault(x => x["_id"].Value<string>() == item.FoundryId);
                     if (jPackItem != null)
                     {
                         var key = jPackItem["_id"].ToString();
