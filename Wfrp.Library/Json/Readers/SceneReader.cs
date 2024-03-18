@@ -36,8 +36,6 @@ namespace WFRP4e.Translator.Packs
             {
                 UpdateIfDifferent(mapping, pack["grid"]["units"].ToString(), nameof(mapping.Units));
             }
-
-            UpdateInitializationFolder(pack, mapping);
         }
     }
 }

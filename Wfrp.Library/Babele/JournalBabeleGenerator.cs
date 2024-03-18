@@ -14,11 +14,6 @@ namespace WFRP4e.Translator.Packs
         {
             var mapping = (JournalEntry)entry;
 
-            if (!string.IsNullOrEmpty(mapping.InitializationFolder))
-            {
-                entity["initialization_folder"] = mapping.InitializationFolder;
-            }
-
             entity["id"] = mapping.FoundryId;
             entity["originalName"] = originalDbEntity["name"].ToString();
             entity["name"] = mapping.Name;

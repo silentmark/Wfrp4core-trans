@@ -82,23 +82,24 @@ namespace WFRP4e.Translator.Packs
                 var mappingEffect = mapping.Effects.FirstOrDefault(x => x.FoundryId == effect.Value<string>("_id"));
                 if (mappingEffect == null)
                 {
-                    Console.WriteLine($"Nie odnaleziono tłumaczenia dla efektu: {effect.Value<string>("label")} o id: {effect.Value<string>("_id")} - Posiadane mapowanie: {mapping}");
+                    Console.WriteLine($"Nie odnaleziono tłumaczenia dla efektu: {effect.Value<string>("name")} o id: {effect.Value<string>("_id")} - Posiadane mapowanie: {mapping}");
                 }
                 else
                 {
-                    effect["label"] = mappingEffect.Name;
+                    effect["name"] = mappingEffect.Name;
                     if (effect["flags"]?["wfrp4e"]?["effectData"]?["description"] != null)
                     {
                         effect["flags"]["wfrp4e"]["effectData"]["description"] = mappingEffect.Description;
                     }
-                    if (effect["flags"]?["wfrp4e"]?["script"] != null)
-                    {
-                        effect["flags"]["wfrp4e"]["script"] = mappingEffect.Script;
-                    }
-                    if (effect["flags"]?["wfrp4e"]?["secondaryEffect"]?["script"] != null)
-                    {
-                        effect["flags"]["wfrp4e"]["secondaryEffect"]["script"] = mappingEffect.SecondaryScript;
-                    }
+                    //TODO:
+                    //if (effect["flags"]?["wfrp4e"]?["script"] != null)
+                    //{
+                    //    effect["flags"]["wfrp4e"]["script"] = mappingEffect.Script;
+                    //}
+                    //if (effect["flags"]?["wfrp4e"]?["secondaryEffect"]?["script"] != null)
+                    //{
+                    //    effect["flags"]["wfrp4e"]["secondaryEffect"]["script"] = mappingEffect.SecondaryScript;
+                    //}
                 }
             }
         }

@@ -37,9 +37,6 @@ namespace WFRP4e.Translator
                  .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
                  .AddJsonFile("appsettings.json", false)
                  .Build();
-
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", Config.GoogleSigninKeyPath);
-
             //var journals = JObject.Parse(File.ReadAllText("C:\\source-code\\WFRP\\wfrp4e-core-pl-source\\locales\\pl\\wfrp4e-core.journal-entries.json"));
             //var entries = (JObject)journals["entries"];
             //foreach (JProperty entryProp in entries.Properties())
@@ -80,6 +77,8 @@ namespace WFRP4e.Translator
 
             Wfrp.Library.Services.Config.SourceJsonsEn = Config.SourceJsonsEn;
             Wfrp.Library.Services.Config.SourceJsonsPl = Config.SourceJsonsPl;
+            Wfrp.Library.Services.Config.BabeleLocationEn = Config.BabeleLocationEn;
+            Wfrp.Library.Services.Config.BabeleLocationPl = Config.BabeleLocationPl;
             Wfrp.Library.Services.Config.PacksPath = Config.PacksPath;
 
             ConsoleKeyInfo input;
@@ -106,6 +105,7 @@ namespace WFRP4e.Translator
                 else if (input.KeyChar == '2')
                 {
                     PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.SourceJsonsEn, Config.BabeleLocationEn, Mappings.OriginalTypeToMappingDictonary);
+                    PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.SourceJsonsPl, Config.BabeleLocationPl, Mappings.TranslatedTypeToMappingDictonary);
                 }
                 else if (input.KeyChar == '3')
                 {
@@ -118,6 +118,65 @@ namespace WFRP4e.Translator
             }
             while (input.KeyChar != 'x');
             Console.WriteLine("Zakończono");
+        }
+
+        private static void somerandomstufftofixeffects()
+        {
+            try
+            {
+                var files = Directory.EnumerateFiles(Wfrp.Library.Services.Config.BabeleLocationPl, "*.json", SearchOption.AllDirectories).ToList();
+                files = files.Where(x => !x.Contains("forien")).ToList();
+                files = files.Where(x => !x.Contains("actor")).ToList();
+                foreach (var file in files)
+                {
+                    var originalBabele = JObject.Parse(File.ReadAllText(file));
+                    foreach (var entry in originalBabele["entries"])
+                    {
+                        JObject jEntry = null;
+                        if (entry is JObject)
+                        {
+                            jEntry = entry as JObject;
+                        }
+                        if (entry is JProperty)
+                        {
+                            jEntry = originalBabele["entries"][(entry as JProperty).Name] as JObject;
+                        }
+                        if (jEntry != null && jEntry["effects"] != null)
+                        {
+                            foreach (var effect in jEntry["effects"].ToList())
+                            {
+                                if (effect is JProperty)
+                                {
+                                    var jEffect = effect as JProperty;
+                                    if (jEntry["effects"][jEffect.Name][jEffect.Name] != null)
+                                    {
+                                        var dupadupa = jEntry["effects"][jEffect.Name][jEffect.Name].ToList();
+                                        foreach (var dupaProperty in dupadupa.OfType<JProperty>())
+                                        {
+                                            jEntry["effects"][jEffect.Name][dupaProperty.Name] = jEntry["effects"][jEffect.Name][jEffect.Name][dupaProperty.Name].ToString();
+                                        }
+
+                                        (jEntry["effects"][jEffect.Name] as JObject).Remove(jEffect.Name);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    using FileStream fs = File.Open(file, FileMode.Create);
+                    using StreamWriter sw = new StreamWriter(fs);
+                    using JsonTextWriter jw = new JsonTextWriter(sw);
+
+                    jw.Formatting = Formatting.Indented;
+                    jw.IndentChar = ' ';
+                    jw.Indentation = 4;
+
+                    originalBabele.WriteTo(jw);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("somerandomstuff" + ex);
+            }
         }
 
         private static void RemoveDuplicateItemsFromActors()
@@ -165,6 +224,8 @@ namespace WFRP4e.Translator
         private static void UpdateJsonMappingFiles(string dbPath, string jsonPath, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDirectory)
         {
             var packs = Directory.EnumerateDirectories(dbPath, "_source", SearchOption.AllDirectories).ToList();
+            //packs = packs.Where(x => !x.Contains("armoury")).ToList();
+            //packs = packs.Where(x => !x.Contains("actor")).ToList();
 
             var newTypeToJsonListDic = new Dictionary<string, List<BaseEntry>>();
 
@@ -187,7 +248,8 @@ namespace WFRP4e.Translator
                         continue;
                     }
                     if (itemJson["type"]?.ToString() == "Item" ||
-                        itemJson["type"]?.ToString() == "RollTable")
+                        itemJson["type"]?.ToString() == "RollTable" ||
+                        itemJson["type"]?.ToString() == "Macro")
                     {
                         continue;
                     }
@@ -201,12 +263,13 @@ namespace WFRP4e.Translator
                     var packName = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[2];
                     var originalSourceId = itemJson["flags"]?["core"]?["sourceId"]?.ToString();
                     var correctSourceId = $"Compendium.{sourceCompendium}.{packName}.{id}";
-                    if (originalSourceId != correctSourceId)
+                    if (originalSourceId != correctSourceId) //&& !originalSourceId.Contains(".items.Item."))
                     {
                         itemJson["flags"] = itemJson["flags"] ?? new JObject();
                         itemJson["flags"]["core"] = itemJson["flags"]["core"] ?? new JObject();
                         itemJson["flags"]["core"]["sourceId"] = correctSourceId;
                         Console.WriteLine($"SOMETHING IS WRONG: {originalSourceId} VS: {correctSourceId}");
+                        originalSourceId = correctSourceId;
                     }
 
                     if (!typeToMappingDirectory.ContainsKey(type))
@@ -214,10 +277,10 @@ namespace WFRP4e.Translator
                         typeToMappingDirectory[type] = new Dictionary<string, BaseEntry>();
                     }
                     var dic = typeToMappingDirectory[type];
-                    if (!dic.ContainsKey(correctSourceId))
+                    if (!dic.ContainsKey(originalSourceId))
                     {
                         //TRY CREATE EMPTY:
-                        Console.WriteLine($"Nie odnalazłem wpisu dla: {correctSourceId} - {type} - {name}");
+                        Console.WriteLine($"Nie odnalazłem wpisu dla: {originalSourceId} - {type} - {name}");
                         var entry = targtetType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as BaseEntry;
                         var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
                         if (readerType != null)
@@ -237,7 +300,7 @@ namespace WFRP4e.Translator
                     else
                     {
                         //GET AND UPDATE IF NEEDED;
-                        var entry = dic[correctSourceId];
+                        var entry = dic[originalSourceId];
                         var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
                         if (readerType != null)
                         {
@@ -278,12 +341,13 @@ namespace WFRP4e.Translator
                     var packName = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[2];
                     var originalSourceId = actorJson["flags"]["core"]["sourceId"].ToString();
                     var correctSourceId = $"Compendium.{sourceCompendium}.{packName}.{id}";
-                    if (originalSourceId != correctSourceId)
+                    if (originalSourceId != correctSourceId) // && !originalSourceId.Contains(".items.Item."))
                     {
                         actorJson["flags"] = actorJson["flags"] ?? new JObject();
                         actorJson["flags"]["core"] = actorJson["flags"]["core"] ?? new JObject();
                         actorJson["flags"]["core"]["sourceId"] = correctSourceId;
                         Console.WriteLine($"SOMETHING IS WRONG: {originalSourceId} VS: {correctSourceId}");
+                        originalSourceId = correctSourceId;
                     }
 
                     if (!typeToMappingDirectory.ContainsKey(type))
@@ -291,10 +355,10 @@ namespace WFRP4e.Translator
                         typeToMappingDirectory[type] = new Dictionary<string, BaseEntry>();
                     }
                     var dic = typeToMappingDirectory[type];
-                    if (!dic.ContainsKey(correctSourceId))
+                    if (!dic.ContainsKey(originalSourceId))
                     {
                         //TRY CREATE EMPTY:
-                        Console.WriteLine($"Nie odnalazłem wpisu dla: {correctSourceId} - {type} - {name}");
+                        Console.WriteLine($"Nie odnalazłem wpisu dla: {originalSourceId} - {type} - {name}");
                         var entry = targtetType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as ActorEntry;
                         var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
                         if (readerType != null)
@@ -314,7 +378,7 @@ namespace WFRP4e.Translator
                     else
                     {
                         //GET AND UPDATE IF NEEDED;
-                        var entry = dic[correctSourceId];
+                        var entry = dic[originalSourceId];
                         var readerType = GenericReader.GetEntryType(type, typeof(GenericReader));
                         if (readerType != null)
                         {
@@ -406,7 +470,7 @@ namespace WFRP4e.Translator
                         {
                             foreach (var effect in effects)
                             {
-                                var label = effect["label"].Value<string>();
+                                var label = effect["name"].Value<string>();
                                 Console.WriteLine($"Found {label} - {effect["_id"].Value<string>()}");
                                 if (!string.IsNullOrEmpty(effect["flags"]?["wfrp4e"]?["script"]?.ToString()))
                                 {

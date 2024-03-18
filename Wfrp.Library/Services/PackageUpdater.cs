@@ -45,6 +45,11 @@ namespace Wfrp.Library.Services
                     foreach (var json in listOfJsons)
                     {
                         var element = JsonConvert.DeserializeObject(File.ReadAllText(json), targtetType) as BaseEntry;
+                        //TODO: hack after compendium split?
+                        //if (!element.OriginFoundryId.Contains("items.Item"))
+                        //{
+                        //    element.OriginFoundryId = element.OriginFoundryId.Replace(".items.", ".items.Item.");
+                        //}
                         dictionary.Add(element.OriginFoundryId, element);
                     }
                 }
@@ -229,7 +234,6 @@ namespace Wfrp.Library.Services
                 var files = Directory.EnumerateFiles(pack, "*.json");
                 foreach (var file in files)
                 {
-
                     var module = pack.Replace(packsPath, "").Split("\\", StringSplitOptions.RemoveEmptyEntries)[0];
                     var packName = pack.Replace(packsPath, "").Split("\\", StringSplitOptions.RemoveEmptyEntries)[2];
                     var compendiumPrefix = "Compendium." + module + "." + packName;
@@ -252,7 +256,24 @@ namespace Wfrp.Library.Services
                     {
                         obj["flags"]["core"] = new JObject();
                     }
-                    obj["flags"]["core"]["sourceId"] = compendiumPrefix + "." + id;
+                    // TODO: zmienic - inny format source id jest teraz...
+                    if (obj["flags"]["core"]["sourceId"] == null)
+                    {
+                        obj["flags"]["core"]["sourceId"] = compendiumPrefix + "." + id;
+                    }
+
+                    /*
+                    {
+                        if (obj["flags"]["core"]["sourceId"] == null || !obj["_key"].ToString().Contains("!"))
+                        {
+                            obj["flags"]["core"]["sourceId"] = compendiumPrefix + "." + id;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Skipping item {obj["_key"]} with {obj["flags"]["core"]["sourceId"]} - proposed sourceId: {compendiumPrefix + "." + id}");
+                        }
+                    }
+                    */
                     obj["fileName"] = file;
                 }
             }
@@ -263,6 +284,8 @@ namespace Wfrp.Library.Services
             var compendiumToEntriesDictionary = new Dictionary<string, Dictionary<string, JObject>>();
             var packs = Directory.EnumerateDirectories(packsPath, "_source", SearchOption.AllDirectories).ToList();
 
+            //packs = packs.Where(x => !x.Contains("armoury")).ToList();
+            //packs = packs.Where(x => !x.Contains("actor")).ToList();
             //var packs = Directory.EnumerateFiles(packsPath, "bestiary.db", SearchOption.AllDirectories).ToList();
 
             //var pathToBabele = "C:\\source-code\\WFRP\\wfrp4e-core-pl-source\\locales\\pl\\wfrp4e-core.bestiary.json";
@@ -283,6 +306,7 @@ namespace Wfrp.Library.Services
                         continue;
                     }
                     if (originalObj["type"]?.ToString() == "Item" ||
+                        originalObj["type"]?.ToString() == "Macro" ||
                         originalObj["type"]?.ToString() == "RollTable")
                     {
                         continue;
@@ -292,9 +316,21 @@ namespace Wfrp.Library.Services
                         originalObj["type"].ToString() != "npc" &&
                         originalObj["type"].ToString() != "creature" &&
                         originalObj["type"].ToString() != "character" &&
+                        originalObj["type"].ToString() != "script" &&
                         originalObj["type"].ToString() != "vehicle")
                     {
-                        babeleFileName = $"{module}.{originalObj["type"]}.{module}.{packName}";
+                        if (originalObj["type"].ToString() == "ammunition" ||
+                            originalObj["type"].ToString() == "armour" ||
+                            originalObj["type"].ToString() == "weapon" ||
+                            originalObj["type"].ToString() == "container" ||
+                            originalObj["type"].ToString() == "money")
+                        {
+                            babeleFileName = $"{module}.trapping.{module}.{packName}";
+                        }
+                        else
+                        {
+                            babeleFileName = $"{module}.{originalObj["type"]}.{module}.{packName}";
+                        }
                     }
 
                     if (!compendiumToEntriesDictionary.ContainsKey(babeleFileName))
@@ -319,7 +355,9 @@ namespace Wfrp.Library.Services
                             var newBabeleEntry = new JObject();
                             if (originalBabele != null)
                             {
-                                newBabeleEntry = (JObject)originalBabele["entries"][originalObj["name"].ToString()];
+                                newBabeleEntry = (JObject)originalBabele["entries"][originalObj["name"].ToString()]
+                                    ?? (JObject)originalBabele["entries"][originalObj["_id"].ToString()]
+                                    ?? new JObject();
                             }
                             var entry = dic[originalSourceId];
                             var readerType = GenericReader.GetEntryType(type, typeof(GenericItemBabeleGenerator));
@@ -341,21 +379,30 @@ namespace Wfrp.Library.Services
                     var babeleTranslationObj = JObject.Parse(File.ReadAllText(babeleTranslationPath));
 
                     var entries = babeleFile.Value.Values.ToArray();
-                    var entriesjArr = new JObject();
+                    var entriesjArr = babeleTranslationObj["entries"];
                     foreach (var entry in entries)
                     {
                         var key = entry["originalName"]?.ToString();
                         if (!string.IsNullOrEmpty(key))
                         {
                             entry.Remove("originalName");
-                            entriesjArr[key] = entry;
+                        }
+                        if (entriesjArr[entry["id"].ToString()] != null)
+                        {
+                            entriesjArr[entry["id"].ToString()] = entry;
                         }
                         else
                         {
-                            entriesjArr[entry["name"].ToString()] = entry;
+                            if (!string.IsNullOrEmpty(key))
+                            {
+                                entriesjArr[key] = entry;
+                            }
+                            else
+                            {
+                                entriesjArr[entry["name"].ToString()] = entry;
+                            }
                         }
                     }
-                    babeleTranslationObj["entries"] = entriesjArr;
 
                     using FileStream fs = File.Open(babeleTranslationPath, FileMode.Create);
                     using StreamWriter sw = new StreamWriter(fs);

@@ -44,14 +44,6 @@ namespace WFRP4e.Translator.Packs
                 }
             }
             pack["flags"]["wfrp4e-core"]["scene-note"] = mapping.SceneNote;
-            foreach (JProperty property in pack["flags"])
-            {
-                if (property.Value["initialization-folder"] != null)
-                {
-                    property.Value["initialization-folder"] = mapping.InitializationFolder;
-                    break;
-                }
-            }
         }
     }
 }

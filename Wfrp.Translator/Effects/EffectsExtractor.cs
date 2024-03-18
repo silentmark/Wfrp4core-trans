@@ -23,7 +23,7 @@ namespace WFRP4e.Translator.Effects
                 var effects = json["effects"].ToArray();
                 foreach (var effect in effects)
                 {
-                    Console.WriteLine($"Found {effect["label"].Value<string>()} - {effect["_id"].Value<string>()}");
+                    Console.WriteLine($"Found {effect["name"].Value<string>()} - {effect["_id"].Value<string>()}");
 
                     if (!string.IsNullOrEmpty(effect["flags"]?["wfrp4e"]?["script"]?.ToString()))
                     {

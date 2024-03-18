@@ -30,33 +30,54 @@ namespace WFRP4e.Translator.Packs
                 var item = (ItemEntry)mapping;
                 if (item.Effects?.Count > 0)
                 {
-                    var jEffect = new JObject();
+                    var jEffects = new JObject();
+                    entry["effects"] = jEffects;
                     foreach (var effect in item.Effects)
                     {
-                        jEffect[effect.FoundryId] = new JObject()
+                        jEffects[effect.FoundryId] = new JObject()
                         {
                             ["id"] = effect.FoundryId,
-                            ["label"] = effect.Name,
+                            ["name"] = effect.Name,
                         };
-                        if (!string.IsNullOrEmpty(effect.Script))
-                        {
-                            jEffect[effect.FoundryId]["script"] = effect.Script;
-                        }
-                        if (!string.IsNullOrEmpty(effect.SecondaryScript))
-                        {
-                            jEffect[effect.FoundryId]["secondaryScript"] = effect.SecondaryScript;
-                        }
                         if (!string.IsNullOrEmpty(effect.Description))
                         {
-                            jEffect[effect.FoundryId]["description"] = effect.Description;
+                            jEffects[effect.FoundryId]["description"] = effect.Description;
+                        }
+
+                        if (!string.IsNullOrEmpty(effect.Filter))
+                        {
+                            jEffects[effect.FoundryId]["filter"] = effect.Filter;
+                        }
+                        if (effect.ScriptData != null)
+                        {
+                            var jArrScripts = new JArray();
+                            jEffects[effect.FoundryId]["scriptData"] = jArrScripts;
+                            foreach (var script in effect.ScriptData)
+                            {
+                                var jScript = new JObject();
+                                jScript["id"] = effect.FoundryId;
+                                jScript["name"] = effect.Name;
+                                jArrScripts.Add(jScript);
+                                if (!string.IsNullOrEmpty(script.Script))
+                                {
+                                    jScript["script"] = script.Script;
+                                }
+                                if (!string.IsNullOrEmpty(script.ActivationScript))
+                                {
+                                    jScript["activationScript"] = script.ActivationScript;
+                                }
+                                if (!string.IsNullOrEmpty(script.HideScript))
+                                {
+                                    jScript["hideScript"] = script.HideScript;
+                                }
+                                if (!string.IsNullOrEmpty(script.SubmissionScript))
+                                {
+                                    jScript["submissionScript"] = script.SubmissionScript;
+                                }
+                            }
                         }
                     }
-                    entry["effects"] = jEffect;
                 }
-            }
-            if (!string.IsNullOrEmpty(mapping.InitializationFolder))
-            {
-                entry["initialization_folder"] = mapping.InitializationFolder;
             }
         }
     }

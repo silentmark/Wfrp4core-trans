@@ -93,7 +93,7 @@ namespace WFRP4e.Translator.Effects
                     var effects = item["effects"].ToArray();
                     foreach (var effect in effects)
                     {
-                        var label = effect["label"].Value<string>();
+                        var label = effect["name"].Value<string>();
                         var id = effect["_id"].Value<string>();
                         if (!string.IsNullOrEmpty(effect["flags"]?["wfrp4e"]?["script"]?.ToString()))
                         {
@@ -118,7 +118,7 @@ namespace WFRP4e.Translator.Effects
                                 else
                                 {
                                     requiresFix = true;
-                                    Console.WriteLine($"NIE ODNALEZIONO SKRYPTU (LICZBA EFEKTÓW: {effectKeys.Count}) DLA: {effect["_id"]} - {effect["label"]}");
+                                    Console.WriteLine($"NIE ODNALEZIONO SKRYPTU (LICZBA EFEKTÓW: {effectKeys.Count}) DLA: {effect["_id"]} - {effect["name"]}");
                                 }
                             }
                         }
@@ -150,7 +150,7 @@ namespace WFRP4e.Translator.Effects
                 var effects = json["effects"].ToArray();
                 foreach (var effect in effects)
                 {
-                    var label = effect["label"].Value<string>();
+                    var label = effect["name"].Value<string>();
                     var id = effect["_id"].Value<string>();
                     if (!string.IsNullOrEmpty(effect["flags"]?["wfrp4e"]?["script"]?.ToString()))
                     {
@@ -174,7 +174,7 @@ namespace WFRP4e.Translator.Effects
                             }
                             else
                             {
-                                Console.WriteLine($"NIE ODNALEZIONO SKRYPTU (LICZBA EFEKTÓW: {effectKeys.Count}) DLA: {effect["_id"]} - {effect["label"]}");
+                                Console.WriteLine($"NIE ODNALEZIONO SKRYPTU (LICZBA EFEKTÓW: {effectKeys.Count}) DLA: {effect["_id"]} - {effect["name"]}");
                             }
                         }
                     }

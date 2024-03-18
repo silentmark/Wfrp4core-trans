@@ -23,11 +23,10 @@ namespace WFRP4e.Translator.Packs
             {
                 var newPage = new JournalEntryPage();
                 existingPages.Add(newPage);
-                var page = GetSubEntryFromId(pageId.Value.ToString(), pack["_id"].ToString()); 
+                var page = GetSubEntryFromId(pageId.Value.ToString(), pack["_id"].ToString());
                 new JournalPageReader().UpdateEntry(page, newPage);
             }
             mapping.Pages = existingPages;
-            UpdateInitializationFolder(pack, mapping);
         }
     }
 }

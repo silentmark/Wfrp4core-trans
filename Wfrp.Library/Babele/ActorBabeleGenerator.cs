@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Wfrp.Library.Services;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;
 
@@ -30,12 +31,13 @@ namespace WFRP4e.Translator.Packs
                     jEffect[effect.FoundryId] = new JObject()
                     {
                         ["id"] = effect.FoundryId,
-                        ["label"] = effect.Name
+                        ["name"] = effect.Name
                     };
-                    if (!string.IsNullOrEmpty(effect.Script))
-                    {
-                        jEffect[effect.FoundryId]["script"] = effect.Script;
-                    }
+                    //TODO:
+                    //if (!string.IsNullOrEmpty(effect.Script))
+                    //{
+                    //    jEffect[effect.FoundryId]["script"] = effect.Script;
+                    //}
                 }
                 entry["effects"] = jEffect;
             }
@@ -77,10 +79,6 @@ namespace WFRP4e.Translator.Packs
                     }
                 }
             }
-            if (!string.IsNullOrEmpty(mapping.InitializationFolder))
-            {
-                entry["initialization_folder"] = mapping.InitializationFolder;
-            }
         }
 
         public override void Parse(JObject entry, JObject originalDbEntity, BaseEntry entity)
@@ -104,23 +102,65 @@ namespace WFRP4e.Translator.Packs
                     jEffect[effect.FoundryId] = new JObject()
                     {
                         ["id"] = effect.FoundryId,
-                        ["label"] = effect.Name
+                        ["name"] = effect.Name
                     };
-                    if (!string.IsNullOrEmpty(effect.Script))
-                    {
-                        jEffect[effect.FoundryId]["script"] = effect.Script;
-                    }
+                    //TODO:
+                   // if (!string.IsNullOrEmpty(effect.Script))
+                   //{
+                   //     jEffect[effect.FoundryId]["script"] = effect.Script;
+                   // }
                 }
                 entry["effects"] = jEffect;
             }
             var jItem = entry["items"] as JObject ?? new JObject();
-            entry["items"] = jItem;
             foreach (var item in mapping.Items)
             {
+                var jPackItem = GenericReader.GetSubEntryFromId(item.FoundryId, entity.FoundryId);
+                var type = jPackItem["type"].ToString();
+                var itemBabeleFileName = "";
+
+                if (type == "ammunition" || type == "armour" || type == "weapon" || type == "container" || type == "money")
+                {
+                    itemBabeleFileName = "wfrp4e-core.trapping.wfrp4e-core.items.json";
+                }
+                else
+                {
+                    itemBabeleFileName = $"wfrp4e-core.{type}.wfrp4e-core.items.json";
+                }
+                var compendiumItem = Mappings.OriginalTypeToMappingDictonary[type].Values.FirstOrDefault(x => x.Name == jPackItem["name"].ToString());
+                var compendiumItemPl = Mappings.TranslatedTypeToMappingDictonary[type].Values.FirstOrDefault(x => x.Name == jPackItem["name"].ToString());
+
+                JObject babeleTranslationObj = null;
+                if (compendiumItem != null) // en
+                {
+                    babeleTranslationObj = JObject.Parse(File.ReadAllText(Config.BabeleLocationEn + "\\" + itemBabeleFileName));
+                    if (babeleTranslationObj["entries"][compendiumItem.FoundryId] != null)
+                    {
+                        var key = jPackItem["_id"].ToString();
+                        var babeleType = GenericReader.GetEntryType(type, typeof(GenericItemBabeleGenerator));
+                        var parser = (GenericItemBabeleGenerator)babeleType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                        jItem[key] = new JObject();
+                        parser.Parse((JObject)jItem[key], jPackItem, (BaseEntry)compendiumItem);
+                        continue;
+                        //Do all
+                    }
+                }
+                else if (compendiumItemPl != null) //pl
+                {
+                    babeleTranslationObj = JObject.Parse(File.ReadAllText(Config.BabeleLocationPl + "\\" + itemBabeleFileName));
+                    if (babeleTranslationObj["entries"][compendiumItemPl.FoundryId] != null)
+                    {
+                        var key = jPackItem["_id"].ToString();
+                        var babeleType = GenericReader.GetEntryType(type, typeof(GenericItemBabeleGenerator));
+                        var parser = (GenericItemBabeleGenerator)babeleType.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                        parser.Parse((JObject)jItem[key], jPackItem, (BaseEntry)compendiumItemPl);
+                        continue;
+                    }
+                }
+
                 if (!(item is ReferenceEntry))
                 {
                     var babeleType = GenericReader.GetEntryType(item.Type, typeof(GenericItemBabeleGenerator));
-                    var jPackItem = GenericReader.GetSubEntryFromId(item.FoundryId, entity.FoundryId);//  ((JArray)originalDbEntity["items"]).FirstOrDefault(x => x["_id"].Value<string>() == item.FoundryId) as JObject;
 
                     var key = jPackItem["_id"].ToString();
                     var backup = jItem[jPackItem["name"].ToString()] as JObject;
@@ -129,7 +169,7 @@ namespace WFRP4e.Translator.Packs
                     {
                         jItem[jPackItem["name"].ToString()]?.Parent.Remove();
                     }
-                    var compendiumItem = Mappings.OriginalTypeToMappingDictonary[item.Type].Values.FirstOrDefault(x => x.Name == jPackItem["name"].ToString());
+                    compendiumItem = Mappings.OriginalTypeToMappingDictonary[item.Type].Values.FirstOrDefault(x => x.Name == jPackItem["name"].ToString());
                     if (compendiumItem != null)
                     {
                         if (item is TraitEntry trait)
@@ -208,8 +248,6 @@ namespace WFRP4e.Translator.Packs
                 }
                 else
                 {
-                    var jPackItem = GenericReader.GetSubEntryFromId(item.FoundryId, entity.FoundryId);
-
                     //     var jPackItem = (JObject)((JArray)originalDbEntity["items"]).FirstOrDefault(x => x["_id"].Value<string>() == item.FoundryId);
                     if (jPackItem != null)
                     {
@@ -232,10 +270,7 @@ namespace WFRP4e.Translator.Packs
                     }
                 }
             }
-            if (!string.IsNullOrEmpty(mapping.InitializationFolder))
-            {
-                entry["initialization_folder"] = mapping.InitializationFolder;
-            }
+            entry["items"] = jItem;
         }
     }
 }

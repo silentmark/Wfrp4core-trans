@@ -31,8 +31,6 @@ namespace WFRP4e.Translator.Packs
                 new TableResultReader().UpdateEntry(subItem, newSubEntry);
             }
             mapping.TableResults = existingSubItems;
-
-            UpdateInitializationFolder(pack, mapping);
         }
     }
 }

@@ -34,14 +34,6 @@ namespace WFRP4e.Translator.Packs
                 var resultMapping = mapping.TableResults.First(x => x.FoundryId == resultId);
                 jObj["text"] = resultMapping.Name;
             }
-            foreach (JProperty property in pack["flags"])
-            {
-                if (property.Value["initialization-folder"] != null)
-                {
-                    property.Value["initialization-folder"] = mapping.InitializationFolder;
-                    break;
-                }
-            }
         }
     }
 }

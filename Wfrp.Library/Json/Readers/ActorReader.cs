@@ -128,8 +128,6 @@ namespace WFRP4e.Translator.Packs
                 new EffectReader().UpdateEntry(effect, newEffect);
             }
             mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
-
-            UpdateInitializationFolder(pack, mapping);
         }
 
         protected void UpdateActorEntryFromBabele(JObject babeleEntry, ActorEntry mapping)
@@ -194,11 +192,6 @@ namespace WFRP4e.Translator.Packs
                     new EffectReader().UpdateEntryFromBabele(effectItem, newEffect);
                 }
                 mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
-            }
-            var initializationFolder = babeleEntry.Value<string>("initialization_folder");
-            if (!string.IsNullOrEmpty(initializationFolder))
-            {
-                mapping.InitializationFolder = initializationFolder;
             }
         }
     }

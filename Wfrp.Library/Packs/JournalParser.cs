@@ -31,14 +31,6 @@ namespace WFRP4e.Translator.Packs
                 jObj["text"]["content"] = resultMapping.Content;
                 jObj["name"] = resultMapping.Name;
             }
-            foreach (JProperty property in pack["flags"])
-            {
-                if (property.Value["initialization-folder"] != null)
-                {
-                    property.Value["initialization-folder"] = mapping.InitializationFolder;
-                    break;
-                }
-            }
         }
     }
 }

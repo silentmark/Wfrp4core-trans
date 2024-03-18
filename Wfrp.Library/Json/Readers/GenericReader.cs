@@ -41,8 +41,6 @@ namespace WFRP4e.Translator.Packs
                 new EffectReader().UpdateEntry(effectObject, newEffect);
             }
             mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
-
-            UpdateInitializationFolder(pack, mapping);
         }
 
         protected void UpdateItemEntryFromBabele(JObject babeleEntry, ItemEntry mapping)
@@ -65,26 +63,6 @@ namespace WFRP4e.Translator.Packs
                 }
 
                 mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
-            }
-            var initializationFolder = babeleEntry.Value<string>("initialization_folder");
-            if (!string.IsNullOrEmpty(initializationFolder))
-            {
-                mapping.InitializationFolder = initializationFolder;
-            }
-        }
-
-        public static void UpdateInitializationFolder(JObject pack, BaseEntry mapping)
-        {
-            foreach (JProperty property in pack["flags"])
-            {
-                if (property.Value is JObject)
-                {
-                    if (property.Value["initialization-folder"] != null)
-                    {
-                        mapping.InitializationFolder = property.Value["initialization-folder"].Value<string>();
-                        UpdateIfDifferent(mapping, property.Value["initialization-folder"].Value<string>(), nameof(mapping.InitializationFolder));
-                    }
-                }
             }
         }
 
@@ -138,11 +116,11 @@ namespace WFRP4e.Translator.Packs
             else
             {
                 var jObject = jsonsPaths.Select(x => JObject.Parse(File.ReadAllText(x))).Where(x => x["_key"].ToString().Contains(parentId)).FirstOrDefault();
-                if(jObject == null)
+                if (jObject == null)
                 {
                     jObject = jsonsPaths.Select(x => JObject.Parse(File.ReadAllText(x))).First();
                 }
-                
+
                 return jObject;
             }
         }
