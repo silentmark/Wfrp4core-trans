@@ -21,9 +21,6 @@
 	  <Content Include="appsettings.Development.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
-	  <Content Include="appsettings.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
 	  <Content Include="asset-manifest.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
@@ -33,5 +30,10 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Wfrp.Library\Wfrp.Library.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

@@ -35,7 +35,7 @@ namespace WFRP4e.Translator
 
             Config.Configuration = new ConfigurationBuilder()
                  .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
-                 .AddJsonFile("appsettings.json", false)
+                 .AddJsonFile("appsettings-wfrp4e.json", false)
                  .Build();
             //var journals = JObject.Parse(File.ReadAllText("C:\\source-code\\WFRP\\wfrp4e-core-pl-source\\locales\\pl\\wfrp4e-core.journal-entries.json"));
             //var entries = (JObject)journals["entries"];
@@ -105,7 +105,7 @@ namespace WFRP4e.Translator
                 else if (input.KeyChar == '2')
                 {
                     PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.SourceJsonsEn, Config.BabeleLocationEn, Mappings.OriginalTypeToMappingDictonary);
-                    PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.SourceJsonsPl, Config.BabeleLocationPl, Mappings.TranslatedTypeToMappingDictonary);
+          //          PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.SourceJsonsPl, Config.BabeleLocationPl, Mappings.TranslatedTypeToMappingDictonary);
                 }
                 else if (input.KeyChar == '3')
                 {

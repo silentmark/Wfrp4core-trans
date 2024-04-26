@@ -97,6 +97,7 @@ namespace WFRP4e.Translator.Packs
             if (mapping.Effects?.Count > 0)
             {
                 var jEffect = new JObject();
+                // THIS SHOULD NOW ALWAYS BE EMPTY!s
                 foreach (var effect in mapping.Effects)
                 {
                     jEffect[effect.FoundryId] = new JObject()
@@ -115,7 +116,7 @@ namespace WFRP4e.Translator.Packs
             var jItem = entry["items"] as JObject ?? new JObject();
             foreach (var item in mapping.Items)
             {
-                var jPackItem = GenericReader.GetSubEntryFromId(item.FoundryId, entity.FoundryId);
+                var jPackItem = originalDbEntity["items"].ToList().FirstOrDefault(x => x["_id"].Value<string>() == item.FoundryId) as JObject;
                 var type = jPackItem["type"].ToString();
                 var itemBabeleFileName = "";
 
@@ -253,8 +254,24 @@ namespace WFRP4e.Translator.Packs
                     {
                         var key = jPackItem["_id"].ToString();
                         var itemType = GenericReader.GetTypeFromJson(jPackItem);
-                        var translatedItem = Mappings.TranslatedTypeToMappingDictonary[itemType][item.OriginFoundryId];
-                        var originalMapping = Mappings.OriginalTypeToMappingDictonary[itemType][item.OriginFoundryId];
+                        BaseEntry translatedItem;
+                        if (Mappings.TranslatedTypeToMappingDictonary[itemType].ContainsKey(item.OriginFoundryId))
+                        {
+                            translatedItem = Mappings.TranslatedTypeToMappingDictonary[itemType][item.OriginFoundryId];
+                        }
+                        else
+                        {
+                            translatedItem = Mappings.TranslatedTypeToMappingDictonary[itemType][item.OriginFoundryId.Replace(".items.", ".items.Item.")];
+                        }
+                        BaseEntry originalMapping;
+                        if (Mappings.OriginalTypeToMappingDictonary[itemType].ContainsKey(item.OriginFoundryId)) 
+                        {
+                            originalMapping = Mappings.OriginalTypeToMappingDictonary[itemType][item.OriginFoundryId];
+                        }
+                        else
+                        {
+                            originalMapping = Mappings.OriginalTypeToMappingDictonary[itemType][item.OriginFoundryId.Replace(".items.", ".items.Item.")];
+                        }
                         if (originalMapping.Name != jPackItem["name"].ToString())
                         {
                             jItem[key] = new JObject();

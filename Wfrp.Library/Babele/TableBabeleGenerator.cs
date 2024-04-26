@@ -21,7 +21,7 @@ namespace WFRP4e.Translator.Packs
             var jRes = new JObject();
             foreach (var result in mapping.TableResults)
             {
-                var packItem = GenericReader.GetSubEntryFromId(result.FoundryId, mapping.FoundryId);
+                var packItem = originalDbEntity["results"].ToList().FirstOrDefault(x => x?["_id"].Value<string>() == result.FoundryId) as JObject;
                 if (packItem != null)
                 {
                     jRes[packItem["range"][0].ToString() + "-" + packItem["range"][1].ToString()] = result.Name;

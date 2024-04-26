@@ -23,10 +23,9 @@ namespace WFRP4e.Translator.Packs
             {
                 var arr = (JArray)pack["notes"];
                 mapping.Notes = new List<NoteEntry>();
-                foreach (JValue noteId in arr)
+                foreach (JObject note in arr)
                 {
                     var noteEntry = new NoteEntry();
-                    var note = GetSubEntryFromId(noteId.Value.ToString(), pack["_id"].ToString());
                     noteEntry.Text = note["text"].ToString();
                     noteEntry.FoundryId = note["_id"].ToString();
                     mapping.Notes.Add(noteEntry);

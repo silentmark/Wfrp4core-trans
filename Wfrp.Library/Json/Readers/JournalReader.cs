@@ -19,11 +19,10 @@ namespace WFRP4e.Translator.Packs
             var pages = pack["pages"].ToArray();
             var existingPages = new List<JournalEntryPage>();
 
-            foreach (JValue pageId in pages)
+            foreach (JObject page in pages)
             {
                 var newPage = new JournalEntryPage();
                 existingPages.Add(newPage);
-                var page = GetSubEntryFromId(pageId.Value.ToString(), pack["_id"].ToString());
                 new JournalPageReader().UpdateEntry(page, newPage);
             }
             mapping.Pages = existingPages;

@@ -33,11 +33,10 @@ namespace WFRP4e.Translator.Packs
             var effects = pack["effects"].ToArray();
             var existinEffects = new List<EffectEntry>();
 
-            foreach (JValue effectId in effects)
+            foreach (JObject effectObject in effects)
             {
                 var newEffect = new EffectEntry();
                 existinEffects.Add(newEffect);
-                var effectObject = GetSubEntryFromId(effectId.Value.ToString(), pack["_id"].ToString());
                 new EffectReader().UpdateEntry(effectObject, newEffect);
             }
             mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();

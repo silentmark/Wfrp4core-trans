@@ -34,9 +34,8 @@ namespace WFRP4e.Translator.Packs
             var items = pack["items"].ToArray();
             var newMappingItems = new List<Entry>();
 
-            foreach (JValue subItemId in items)
+            foreach (JObject item in items)
             {
-                var item = GetSubEntryFromId(subItemId.Value.ToString(), pack["_id"].ToString());
                 var type = GetTypeFromJson(item);
                 var readerType = GetEntryType(type, typeof(GenericReader));
                 var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });

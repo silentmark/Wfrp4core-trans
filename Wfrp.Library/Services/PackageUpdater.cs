@@ -176,9 +176,9 @@ namespace Wfrp.Library.Services
                 {
                     var items = entry.Value.Value<JArray>("items");
                     var entryId = entry.Value["flags"]["core"]["sourceId"].Value<string>();
-                    foreach (JValue itemId in items)
+                    foreach (JObject item in items)
                     {
-                        var item = dictionaries.Value[itemId.Value.ToString()];
+                        //var item = dictionaries.Value[itemId.Value.ToString()];
                         var type = item.Value<string>("type");
                         var name = item.Value<string>("name");
                         var sourceId = item["flags"]?["core"]?["sourceId"]?.Value<string>();
@@ -242,7 +242,24 @@ namespace Wfrp.Library.Services
                     var id = obj.GetValue("_id").Value<string>();
                     obj.Remove("_stats");
                     obj.Remove("ownership");
-
+                    if (obj.ContainsKey("items"))
+                    {
+                        var items = obj["items"];
+                        foreach (JObject item in items)
+                        {
+                            item.Remove("_stats");
+                            item.Remove("ownership");
+                        }
+                    }
+                    if (obj.ContainsKey("pages"))
+                    {
+                        var items = obj["pages"];
+                        foreach (JObject item in items)
+                        {
+                            item.Remove("_stats");
+                            item.Remove("ownership");
+                        }
+                    }
                     if (!dic.ContainsKey(compendiumPrefix))
                     {
                         dic[compendiumPrefix] = new Dictionary<string, JObject>();
