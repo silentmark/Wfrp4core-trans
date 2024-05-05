@@ -7,9 +7,9 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("trapping")]
     public class TrappingReader : GenericReader
     {
-        public void UpdateEntry(JObject pack, TrappingEntry mapping)
+        public void UpdateEntry(JObject pack, TrappingEntry mapping, bool onlyNulls = false)
         {
-            UpdateItemEntry(pack, mapping);
+            UpdateItemEntry(pack, mapping, onlyNulls);
         }
 
         public void UpdateEntryFromBabele(JObject pack, TrappingEntry mapping)

@@ -11,10 +11,10 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("creature")]
     public class ActorReader : GenericReader
     {
-        public void UpdateEntry(JObject pack, ActorEntry mapping)
+        public void UpdateEntry(JObject pack, ActorEntry mapping, bool onlyNulls = false)
         {
             mapping.Type = mapping.GetType() == typeof(CharacterEntry) ? "character" : (mapping.GetType() == typeof(NpcEntry) ? "npc" : "creature");
-            UpdateActorEntry(pack, mapping);
+            UpdateActorEntry(pack, mapping, onlyNulls);
         }
 
         public void UpdateEntryFromBabele(JObject pack, ActorEntry mapping)
@@ -22,14 +22,14 @@ namespace WFRP4e.Translator.Packs
             UpdateActorEntryFromBabele(pack, mapping);
         }
 
-        protected void UpdateActorEntry(JObject pack, ActorEntry mapping)
+        protected void UpdateActorEntry(JObject pack, ActorEntry mapping, bool onlyNulls)
         {
-            mapping.Name = pack.Value<string>("name");
-            UpdateIfDifferent(mapping, pack["_id"].ToString(), nameof(mapping.FoundryId));
-            UpdateIfDifferent(mapping, pack["flags"]["core"]["sourceId"].ToString(), nameof(mapping.OriginFoundryId));
-            UpdateIfDifferent(mapping, pack["system"]["details"]["biography"]["value"]?.ToString(), nameof(mapping.Description));
-            UpdateIfDifferent(mapping, pack["system"]["details"]["species"]["value"]?.ToString(), nameof(mapping.Species));
-            UpdateIfDifferent(mapping, pack["system"]["details"]["gender"]["value"]?.ToString(), nameof(mapping.Gender));
+            mapping.Name = onlyNulls ? mapping.Name ?? pack.Value<string>("name") : pack.Value<string>("name");
+            UpdateIfDifferent(mapping, pack["_id"].ToString(), nameof(mapping.FoundryId), onlyNulls);
+            UpdateIfDifferent(mapping, pack["flags"]["core"]["sourceId"].ToString(), nameof(mapping.OriginFoundryId), onlyNulls);
+            UpdateIfDifferent(mapping, pack["system"]["details"]["biography"]["value"]?.ToString(), nameof(mapping.Description), onlyNulls);
+            UpdateIfDifferent(mapping, pack["system"]["details"]["species"]["value"]?.ToString(), nameof(mapping.Species), onlyNulls);
+            UpdateIfDifferent(mapping, pack["system"]["details"]["gender"]["value"]?.ToString(), nameof(mapping.Gender), onlyNulls);
 
             var items = pack["items"].ToArray();
             var newMappingItems = new List<Entry>();
@@ -68,7 +68,7 @@ namespace WFRP4e.Translator.Packs
                 }
                 else
                 {
-                    value = Mappings.TranslatedTypeToMappingDictonary[type].Where(x => x.Value.Name == item.Value<string>("name")).ToList();
+                    value = Mappings.OriginalTypeToMappingDictonary[type].Where(x => x.Value.Name == item.Value<string>("name")).ToList();
                     matchingValue = value.FirstOrDefault(x => x.Value.OriginFoundryId.Replace("Compendium.", "").Split(".")[0] == mapping.OriginFoundryId.Replace("Compendium.", "").Split(".")[0]);
                     if (matchingValue.Key == null)
                     {
@@ -107,10 +107,20 @@ namespace WFRP4e.Translator.Packs
                     }
                     else
                     {
-                        var newSubEntry = (ItemEntry)GetEntryType(type, typeof(ItemEntry)).GetConstructor(new Type[] { }).Invoke(new object[] { });
-                        newSubEntry.Type = type;
-                        newMappingItems.Add(newSubEntry);
-                        method.Invoke(reader, new object[] { item, newSubEntry });
+                        if (!onlyNulls)
+                        {
+                            var newSubEntry = (ItemEntry)GetEntryType(type, typeof(ItemEntry)).GetConstructor(new Type[] { }).Invoke(new object[] { });
+                            newSubEntry.Type = type;
+                            newMappingItems.Add(newSubEntry);
+                            method.Invoke(reader, new object[] { item, newSubEntry, onlyNulls });
+                        }
+                        else
+                        {
+                            var newSubEntry = mapping.Items.FirstOrDefault(x=>x.FoundryId == itemId) ?? (ItemEntry)GetEntryType(type, typeof(ItemEntry)).GetConstructor(new Type[] { }).Invoke(new object[] { });
+                            newSubEntry.Type = type;
+                            newMappingItems.Add(newSubEntry);
+                            method.Invoke(reader, new object[] { item, newSubEntry, onlyNulls });
+                        }
                     }
                 }
             }
@@ -119,12 +129,11 @@ namespace WFRP4e.Translator.Packs
             var effects = pack["effects"].ToArray();
             var existinEffects = new List<EffectEntry>();
 
-            foreach (JValue effectId in effects)
+            foreach (JObject effectObject in effects)
             {
                 var newEffect = new EffectEntry();
                 existinEffects.Add(newEffect);
-                var effect = GetSubEntryFromId(effectId.Value.ToString(), pack["_id"].ToString());
-                new EffectReader().UpdateEntry(effect, newEffect);
+                new EffectReader().UpdateEntry(effectObject, newEffect, onlyNulls);
             }
             mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
         }
@@ -132,9 +141,9 @@ namespace WFRP4e.Translator.Packs
         protected void UpdateActorEntryFromBabele(JObject babeleEntry, ActorEntry mapping)
         {
             mapping.Name = babeleEntry.Value<string>("name");
-            UpdateIfDifferent(mapping, babeleEntry["description"].ToString(), nameof(mapping.Description));
-            UpdateIfDifferent(mapping, babeleEntry["species"]?.ToString(), nameof(mapping.Species));
-            UpdateIfDifferent(mapping, babeleEntry["gender"]?.ToString(), nameof(mapping.Gender));
+            UpdateIfDifferent(mapping, babeleEntry["description"].ToString(), nameof(mapping.Description), false);
+            UpdateIfDifferent(mapping, babeleEntry["species"]?.ToString(), nameof(mapping.Species), false);
+            UpdateIfDifferent(mapping, babeleEntry["gender"]?.ToString(), nameof(mapping.Gender), false);
 
             var items = (JObject)babeleEntry["items"];
             //var newMappingItems = new List<Entry>();
@@ -144,6 +153,11 @@ namespace WFRP4e.Translator.Packs
                 var foundryId = item.Name;
                 var jItem = (JObject)item.Value;
                 var mappingItem = mapping.Items.FirstOrDefault(x => x.FoundryId == foundryId);
+                if (mappingItem == null)
+                {
+                    Console.WriteLine("Nie znaleziono przedmiotu dla mapowania: " + foundryId + " u aktora: " + mapping.FoundryId);
+                }
+
                 if (mappingItem != null)
                 {
                     if (mappingItem.Type == "trait")
@@ -154,7 +168,7 @@ namespace WFRP4e.Translator.Packs
                         }
                         else
                         {
-                            UpdateIfDifferent((TraitEntry)mappingItem, jItem["specification"]?.ToString(), nameof(TraitEntry.Specification));
+                            UpdateIfDifferent((TraitEntry)mappingItem, jItem["specification"]?.ToString(), nameof(TraitEntry.Specification), false);
                         }
                     }
                     else if (mappingItem.Type == "skill")
@@ -186,9 +200,12 @@ namespace WFRP4e.Translator.Packs
                 foreach (var effect in effects.Properties())
                 {
                     var effectItem = (JObject)effect.Value;
-                    var newEffect = mapping.Effects.First(x => x.FoundryId == effect.Name);
-                    existinEffects.Add(newEffect);
-                    new EffectReader().UpdateEntryFromBabele(effectItem, newEffect);
+                    var newEffect = mapping.Effects.FirstOrDefault(x => x.FoundryId == effect.Name);
+                    if (newEffect != null)
+                    {
+                        existinEffects.Add(newEffect);
+                        new EffectReader().UpdateEntryFromBabele(effectItem, newEffect);
+                    }
                 }
                 mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
             }

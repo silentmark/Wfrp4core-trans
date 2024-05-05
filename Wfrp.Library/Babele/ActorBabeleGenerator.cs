@@ -17,10 +17,10 @@ namespace WFRP4e.Translator.Packs
             entry["id"] = mapping.FoundryId;
             entry["name"] = mapping.Name;
             entry["originalName"] = originalDbEntity["name"].ToString();
-            entry["description"] = mapping.Description ?? string.Empty;
-            entry["sourceId"] = mapping.OriginFoundryId ?? string.Empty;
+            entry["description"] = mapping.Description ?? " ";
+            entry["sourceId"] = mapping.OriginFoundryId ?? " ";
 
-            entry["gender"] = mapping.Gender ?? string.Empty;
+            entry["gender"] = mapping.Gender ?? " ";
             entry["species"] = mapping.Species ?? string.Empty;
 
             if (mapping.Effects?.Count > 0)
@@ -88,15 +88,15 @@ namespace WFRP4e.Translator.Packs
             entry["id"] = mapping.FoundryId;
             entry["name"] = mapping.Name;
             entry["originalName"] = originalDbEntity["name"].ToString();
-            entry["description"] = mapping.Description ?? string.Empty;
-            entry["sourceId"] = mapping.OriginFoundryId ?? string.Empty;
+            entry["description"] = mapping.Description ?? " ";
+            entry["sourceId"] = mapping.OriginFoundryId ?? " ";
 
-            entry["species"] = mapping.Species ?? string.Empty;
-            entry["gender"] = mapping.Gender ?? string.Empty;
+            entry["species"] = mapping.Species ?? " ";
+            entry["gender"] = mapping.Gender ?? " ";
 
+            var jEffect = new JObject();
             if (mapping.Effects?.Count > 0)
             {
-                var jEffect = new JObject();
                 // THIS SHOULD NOW ALWAYS BE EMPTY!s
                 foreach (var effect in mapping.Effects)
                 {
@@ -111,8 +111,8 @@ namespace WFRP4e.Translator.Packs
                    //     jEffect[effect.FoundryId]["script"] = effect.Script;
                    // }
                 }
-                entry["effects"] = jEffect;
             }
+            entry["effects"] = jEffect;
             var jItem = entry["items"] as JObject ?? new JObject();
             foreach (var item in mapping.Items)
             {

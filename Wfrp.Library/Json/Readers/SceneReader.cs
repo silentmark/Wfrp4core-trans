@@ -9,15 +9,15 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("scene")]
     public class SceneReader : GenericReader
     {
-        public void UpdateEntry(JObject pack, SceneEntry mapping)
+        public void UpdateEntry(JObject pack, SceneEntry mapping, bool onlyNulls = false)
         {
             mapping.Name = pack.Value<string>("name");
             mapping.Type = "scene";
-            UpdateIfDifferent(mapping, pack["_id"].ToString(), nameof(mapping.FoundryId));
-            UpdateIfDifferent(mapping, pack["flags"]["core"]["sourceId"].ToString(), nameof(mapping.OriginFoundryId));
+            UpdateIfDifferent(mapping, pack["_id"].ToString(), nameof(mapping.FoundryId), onlyNulls);
+            UpdateIfDifferent(mapping, pack["flags"]["core"]["sourceId"].ToString(), nameof(mapping.OriginFoundryId), onlyNulls);
             if (pack["flags"]["wfrp4e-core"]?["scene-note"] != null)
             {
-                UpdateIfDifferent(mapping, pack["flags"]["wfrp4e-core"]["scene-note"].ToString(), nameof(mapping.SceneNote));
+                UpdateIfDifferent(mapping, pack["flags"]["wfrp4e-core"]["scene-note"].ToString(), nameof(mapping.SceneNote), onlyNulls);
             }
             if (pack["notes"] != null)
             {
@@ -33,7 +33,7 @@ namespace WFRP4e.Translator.Packs
             }
             if (pack["grid"] != null)
             {
-                UpdateIfDifferent(mapping, pack["grid"]["units"].ToString(), nameof(mapping.Units));
+                UpdateIfDifferent(mapping, pack["grid"]["units"].ToString(), nameof(mapping.Units), onlyNulls);
             }
         }
     }

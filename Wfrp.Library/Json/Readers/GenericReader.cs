@@ -10,13 +10,20 @@ namespace WFRP4e.Translator.Packs
 {
     public class GenericReader
     {
-        protected void UpdateItemEntry(JObject pack, ItemEntry mapping)
+        protected void UpdateItemEntry(JObject pack, ItemEntry mapping, bool onlyNulls)
         {
-            mapping.Name = pack.Value<string>("name");
+            if (onlyNulls)
+            {
+                mapping.Name = mapping.Name ?? pack.Value<string>("name");
+            }
+            else
+            {
+                mapping.Name = pack.Value<string>("name");
+            }
             mapping.Type = pack.Value<string>("type");
 
-            UpdateIfDifferent(mapping, pack["_id"].ToString(), nameof(mapping.FoundryId));
-            UpdateIfDifferent(mapping, pack["system"]["description"]["value"]?.ToString(), nameof(mapping.Description));
+            UpdateIfDifferent(mapping, pack["_id"].ToString(), nameof(mapping.FoundryId), onlyNulls);
+            UpdateIfDifferent(mapping, pack["system"]["description"]["value"]?.ToString(), nameof(mapping.Description), onlyNulls);
 
             if (pack["flags"]?["core"]?["sourceId"]?.ToString() == null)
             {
@@ -27,17 +34,30 @@ namespace WFRP4e.Translator.Packs
             }
             else
             {
-                UpdateIfDifferent(mapping, pack["flags"]["core"]["sourceId"].ToString(), nameof(mapping.OriginFoundryId));
+                UpdateIfDifferent(mapping, pack["flags"]["core"]["sourceId"].ToString(), nameof(mapping.OriginFoundryId), onlyNulls);
             }
 
             var effects = pack["effects"].ToArray();
-            var existinEffects = new List<EffectEntry>();
+            var existinEffects = mapping.Effects.ToList();
+            var effectsToRemove = mapping.Effects.ToList();
 
             foreach (JObject effectObject in effects)
             {
-                var newEffect = new EffectEntry();
-                existinEffects.Add(newEffect);
-                new EffectReader().UpdateEntry(effectObject, newEffect);
+                var newEffect = existinEffects.FirstOrDefault(x => x.FoundryId == effectObject["_id"].ToString());
+                if (newEffect == null)
+                {
+                    newEffect = new EffectEntry();
+                    existinEffects.Add(newEffect);
+                }
+                else
+                {
+                    effectsToRemove.Remove(newEffect);
+                }
+                new EffectReader().UpdateEntry(effectObject, newEffect, onlyNulls);
+            }
+            foreach(var effect in effectsToRemove)
+            {
+                existinEffects.Remove(effect);
             }
             mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
         }
@@ -45,7 +65,7 @@ namespace WFRP4e.Translator.Packs
         protected void UpdateItemEntryFromBabele(JObject babeleEntry, ItemEntry mapping)
         {
             mapping.Name = babeleEntry.Value<string>("name");
-            UpdateIfDifferent(mapping, babeleEntry.Value<string>("description"), nameof(mapping.Description));
+            UpdateIfDifferent(mapping, babeleEntry.Value<string>("description"), nameof(mapping.Description), false);
 
             var effects = (JObject)babeleEntry["effects"];
             var existinEffects = mapping.Effects;
@@ -65,12 +85,16 @@ namespace WFRP4e.Translator.Packs
             }
         }
 
-        public static void UpdateIfDifferent(BaseEntry mapping, string value, string property)
+        public static void UpdateIfDifferent(BaseEntry mapping, string value, string property, bool onlyNulls)
         {
             var prop = mapping.GetType().GetProperty(property);
             var existingValue = prop.GetValue(mapping)?.ToString();
             if (existingValue != value && !(string.IsNullOrWhiteSpace(existingValue) && string.IsNullOrWhiteSpace(value)))
             {
+                if (onlyNulls && existingValue != null)
+                {
+                    return;
+                }
                 prop.SetValue(mapping, value);
             }
         }
@@ -102,26 +126,6 @@ namespace WFRP4e.Translator.Packs
             var types = typeof(BaseEntry).Assembly.GetTypes().Where(x => x.CustomAttributes.Any(x => x.AttributeType == typeof(FoundryTypeAttribute)) && x.IsAssignableTo(baseType)).ToList();
             var type = types.FirstOrDefault(x => x.GetCustomAttributes<FoundryTypeAttribute>(false).FirstOrDefault(y => y.Type == foundryType) != null);
             return type;
-        }
-
-        public static JObject GetSubEntryFromId(string id, string parentId)
-        {
-            var jsonsPaths = Directory.EnumerateFiles(Config.PacksPath, $"*{id}.json", SearchOption.AllDirectories).ToList();
-            if (jsonsPaths.Count == 1)
-            {
-                var jObject = JObject.Parse(File.ReadAllText(jsonsPaths.First()));
-                return jObject;
-            }
-            else
-            {
-                var jObject = jsonsPaths.Select(x => JObject.Parse(File.ReadAllText(x))).Where(x => x["_key"].ToString().Contains(parentId)).FirstOrDefault();
-                if (jObject == null)
-                {
-                    jObject = jsonsPaths.Select(x => JObject.Parse(File.ReadAllText(x))).First();
-                }
-
-                return jObject;
-            }
         }
     }
 }

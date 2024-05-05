@@ -12,16 +12,16 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("mutation")]
     public class MutationReader : GenericReader
     {
-        public void UpdateEntry(JObject pack, MutationEntry mapping)
+        public void UpdateEntry(JObject pack, MutationEntry mapping, bool onlyNulls = false)
         {
-            UpdateItemEntry(pack, mapping);
-            UpdateIfDifferent(mapping, pack["system"]?["modifier"]?["value"]?.ToString(), nameof(mapping.Modifier));
+            UpdateItemEntry(pack, mapping, onlyNulls);
+            UpdateIfDifferent(mapping, pack["system"]?["modifier"]?["value"]?.ToString(), nameof(mapping.Modifier), onlyNulls);
         }
 
         public void UpdateEntryFromBabele(JObject pack, MutationEntry mapping)
         {
             UpdateItemEntryFromBabele(pack, mapping);
-            UpdateIfDifferent(mapping, pack["modifier"]?.ToString(), nameof(mapping.Modifier));
+            UpdateIfDifferent(mapping, pack["modifier"]?.ToString(), nameof(mapping.Modifier), false);
         }
     }
 }

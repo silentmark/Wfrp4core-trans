@@ -90,7 +90,7 @@ namespace WFRP4e.Translator
                 Console.WriteLine(
                     @"
                   Wciśnij 1. wygeneruj pośredni JSONMAPPING z leveldb EN.
-                  Wciśnij 2. wygeneruj Babele EN i PL z JSONMAPPING.
+                  Wciśnij 2. wygeneruj Babele EN z LevelDB EN.
                   Wciśnij 3. zaktualizuj JSONMAPPING EN na podstawie Babele.
                   Wciśnij 4. zaktualizuj JSONMAPPING PL na podstawie Babele.
                   "
@@ -100,12 +100,12 @@ namespace WFRP4e.Translator
 
                 if (input.KeyChar == '1')
                 {
-                    UpdateJsonMappingFiles(Config.PacksPath, Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary);
+                    UpdateJsonMappingFiles(Config.PacksPath, Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary, Config.SourceJsonsPl, Mappings.TranslatedTypeToMappingDictonary);
                 }
                 else if (input.KeyChar == '2')
                 {
-                    PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.SourceJsonsEn, Config.BabeleLocationEn, Mappings.OriginalTypeToMappingDictonary);
-          //          PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.SourceJsonsPl, Config.BabeleLocationPl, Mappings.TranslatedTypeToMappingDictonary);
+                    PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.BabeleLocationEn, Mappings.OriginalTypeToMappingDictonary);
+                    PackageUpdater.CompareBabeleJsonFiles(Config.BabeleLocationEn, Config.BabeleLocationPl);
                 }
                 else if (input.KeyChar == '3')
                 {
@@ -221,13 +221,14 @@ namespace WFRP4e.Translator
             }
         }
 
-        private static void UpdateJsonMappingFiles(string dbPath, string jsonPath, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDirectory)
+        private static void UpdateJsonMappingFiles(string dbPath, string sourceJsonPath, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDirectory, string sourceJsonsPl, Dictionary<string, Dictionary<string, BaseEntry>> translatedTypeToMappingDictonary)
         {
             var packs = Directory.EnumerateDirectories(dbPath, "_source", SearchOption.AllDirectories).ToList();
             //packs = packs.Where(x => !x.Contains("armoury")).ToList();
             //packs = packs.Where(x => !x.Contains("actor")).ToList();
 
             var newTypeToJsonListDic = new Dictionary<string, List<BaseEntry>>();
+            var newTypeToJsonListDicPL = new Dictionary<string, List<BaseEntry>>();
 
             foreach (var pack in packs)
             {
@@ -262,8 +263,8 @@ namespace WFRP4e.Translator
                     var sourceCompendium = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[0];
                     var packName = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[2];
                     var originalSourceId = itemJson["flags"]?["core"]?["sourceId"]?.ToString();
-                    var correctSourceId = $"Compendium.{sourceCompendium}.{packName}.{id}";
-                    if (originalSourceId != correctSourceId) //&& !originalSourceId.Contains(".items.Item."))
+                    var correctSourceId = originalSourceId.Contains(".items.Item.") ? $"Compendium.{sourceCompendium}.{packName}.Item.{id}" : $"Compendium.{sourceCompendium}.{packName}.{id}";
+                    if (originalSourceId != correctSourceId)
                     {
                         itemJson["flags"] = itemJson["flags"] ?? new JObject();
                         itemJson["flags"]["core"] = itemJson["flags"]["core"] ?? new JObject();
@@ -276,7 +277,20 @@ namespace WFRP4e.Translator
                     {
                         typeToMappingDirectory[type] = new Dictionary<string, BaseEntry>();
                     }
+                    if (!translatedTypeToMappingDictonary.ContainsKey(type))
+                    {
+                        translatedTypeToMappingDictonary[type] = new Dictionary<string, BaseEntry>();
+                    }
+
                     var dic = typeToMappingDirectory[type];
+                    var dicPL = translatedTypeToMappingDictonary[type];
+
+                    if (!dic.ContainsKey(originalSourceId) && originalSourceId.Contains(".items.Item."))
+                    {
+                        //temporary fix for item id replacement.
+                        originalSourceId = originalSourceId.Replace(".items.Item.", ".items.");
+                    }
+
                     if (!dic.ContainsKey(originalSourceId))
                     {
                         //TRY CREATE EMPTY:
@@ -287,7 +301,7 @@ namespace WFRP4e.Translator
                         {
                             var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
                             var method = readerType.GetMethod("UpdateEntry");
-                            method.Invoke(reader, new object[] { itemJson, entry });
+                            method.Invoke(reader, new object[] { itemJson, entry, false });
 
                             dic.Add(entry.OriginFoundryId, entry);
                             if (!newTypeToJsonListDic.ContainsKey(type))
@@ -295,6 +309,12 @@ namespace WFRP4e.Translator
                                 newTypeToJsonListDic[type] = new List<BaseEntry>();
                             }
                             newTypeToJsonListDic[type].Add(entry);
+
+                            if (!newTypeToJsonListDicPL.ContainsKey(type))
+                            {
+                                newTypeToJsonListDicPL[type] = new List<BaseEntry>();
+                            }
+                            newTypeToJsonListDicPL[type].Add(entry);
                         }
                     }
                     else
@@ -306,12 +326,36 @@ namespace WFRP4e.Translator
                         {
                             var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
                             var method = readerType.GetMethod("UpdateEntry");
-                            method.Invoke(reader, new object[] { itemJson, entry });
+                            method.Invoke(reader, new object[] { itemJson, entry, false });
                             if (!newTypeToJsonListDic.ContainsKey(type))
                             {
                                 newTypeToJsonListDic[type] = new List<BaseEntry>();
                             }
                             newTypeToJsonListDic[type].Add(entry);
+
+                            if (!newTypeToJsonListDicPL.ContainsKey(type))
+                            {
+                                newTypeToJsonListDicPL[type] = new List<BaseEntry>();
+                            }
+
+
+                            if (!dicPL.ContainsKey(originalSourceId) && originalSourceId.Contains(".items.Item."))
+                            {
+                                //temporary fix for item id replacement.
+                                originalSourceId = originalSourceId.Replace(".items.Item.", ".items.");
+                            }
+
+                            if (dicPL.ContainsKey(originalSourceId))
+                            {
+                                var entryPL = dicPL[originalSourceId];
+                                method.Invoke(reader, new object[] { itemJson, entryPL, true });
+                                entryPL.OriginFoundryId = entry.OriginFoundryId;
+                                newTypeToJsonListDicPL[type].Add(entryPL);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Nie odnalazłem POLSKIEGO wpisu dla: {originalSourceId} - {type} - {name}");
+                            }
                         }
                     }
                 }
@@ -354,7 +398,13 @@ namespace WFRP4e.Translator
                     {
                         typeToMappingDirectory[type] = new Dictionary<string, BaseEntry>();
                     }
+                    if (!translatedTypeToMappingDictonary.ContainsKey(type))
+                    {
+                        translatedTypeToMappingDictonary[type] = new Dictionary<string, BaseEntry>();
+                    }
+
                     var dic = typeToMappingDirectory[type];
+                    var dicPL = translatedTypeToMappingDictonary[type];
                     if (!dic.ContainsKey(originalSourceId))
                     {
                         //TRY CREATE EMPTY:
@@ -373,6 +423,11 @@ namespace WFRP4e.Translator
                                 newTypeToJsonListDic[type] = new List<BaseEntry>();
                             }
                             newTypeToJsonListDic[type].Add(entry);
+                            if (!newTypeToJsonListDicPL.ContainsKey(type))
+                            {
+                                newTypeToJsonListDicPL[type] = new List<BaseEntry>();
+                            }
+                            newTypeToJsonListDicPL[type].Add(entry);
                         }
                     }
                     else
@@ -384,12 +439,27 @@ namespace WFRP4e.Translator
                         {
                             var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
                             var method = readerType.GetMethod("UpdateEntry");
-                            method.Invoke(reader, new object[] { actorJson, entry });
+                            method.Invoke(reader, new object[] { actorJson, entry, false});
                             if (!newTypeToJsonListDic.ContainsKey(type))
                             {
                                 newTypeToJsonListDic[type] = new List<BaseEntry>();
                             }
                             newTypeToJsonListDic[type].Add(entry);
+                            if (!newTypeToJsonListDicPL.ContainsKey(type))
+                            {
+                                newTypeToJsonListDicPL[type] = new List<BaseEntry>();
+                            }
+
+                            if (dicPL.ContainsKey(originalSourceId))
+                            {
+                                var entryPL = dicPL[originalSourceId];
+                                method.Invoke(reader, new object[] { actorJson, entryPL, true });
+                                newTypeToJsonListDicPL[type].Add(entryPL);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Nie odnalazłem POLSKIEGO wpisu dla: {originalSourceId} - {type} - {name}");
+                            }
                         }
                     }
                 }
@@ -400,13 +470,34 @@ namespace WFRP4e.Translator
                 foreach (var newItem in newTypeToJsonListDic[type])
                 {
                     var folder = newItem.OriginFoundryId.Split('.')[1];
-                    var dictionaryPath = Path.Combine(jsonPath, folder, type);
+                    var dictionaryPath = Path.Combine(sourceJsonPath, folder, type);
                     if (!Directory.Exists(dictionaryPath))
                     {
                         Directory.CreateDirectory(dictionaryPath);
                     }
 
-                    var path = jsonPath + "\\" + newItem.OriginFoundryId.Split(".")[1] + "\\" + type;
+                    var path = sourceJsonPath + "\\" + newItem.OriginFoundryId.Split(".")[1] + "\\" + type;
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+                    var fileName = string.Join("-", newItem.Name.Split(Path.GetInvalidFileNameChars()));
+                    var filePath = Path.Combine(path, $"{newItem.FoundryId}.json");
+                    File.WriteAllText(filePath, JsonConvert.SerializeObject(newItem, Formatting.Indented));
+                }
+            }
+            foreach (var type in newTypeToJsonListDicPL.Keys)
+            {
+                foreach (var newItem in newTypeToJsonListDicPL[type])
+                {
+                    var folder = newItem.OriginFoundryId.Split('.')[1];
+                    var dictionaryPath = Path.Combine(sourceJsonsPl, folder, type);
+                    if (!Directory.Exists(dictionaryPath))
+                    {
+                        Directory.CreateDirectory(dictionaryPath);
+                    }
+
+                    var path = sourceJsonsPl + "\\" + newItem.OriginFoundryId.Split(".")[1] + "\\" + type;
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);

@@ -296,7 +296,7 @@ namespace Wfrp.Library.Services
             }
         }
 
-        public static void GenerateBabeleJsonFiles(string packsPath, string sourceJsons, string babeleTargetLocation, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDictionary)
+        public static void GenerateBabeleJsonFiles(string packsPath, string babeleTargetLocation, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDictionary)
         {
             var compendiumToEntriesDictionary = new Dictionary<string, Dictionary<string, JObject>>();
             var packs = Directory.EnumerateDirectories(packsPath, "_source", SearchOption.AllDirectories).ToList();
@@ -504,6 +504,77 @@ namespace Wfrp.Library.Services
                     var filePath = Path.Combine(path, $"{newItem.Value.FoundryId}.json");
                     File.WriteAllText(filePath, JsonConvert.SerializeObject(newItem.Value, Formatting.Indented));
                 }
+            }
+        }
+
+        public static void CompareBabeleJsonFiles(string babeleLocationEn, string babeleLocationPl)
+        {
+            var babeleJsons = Directory.EnumerateFiles(babeleLocationEn, "*.json", SearchOption.AllDirectories).ToList();
+            var babeleJsonsPl = Directory.EnumerateFiles(babeleLocationPl, "*.json", SearchOption.AllDirectories).ToList();
+            babeleJsons.Reverse();
+            foreach (var babelePath in babeleJsons)
+            {
+                var babeleName = Path.GetFileNameWithoutExtension(babelePath);
+                var module = babeleName.Split('.')[0];
+                var packName = babeleName.Split('.')[1];
+                OnProgressUpdated($"Przetwarzam {Path.GetFileName(packName)} z modułu {module}");
+
+                var babele = JObject.Parse(File.ReadAllText(babelePath));
+                var entries = (JObject)babele["entries"];
+
+                var babelePl = JObject.Parse(File.ReadAllText(babeleJsonsPl.First(x => x.Contains(babeleName))));
+                var entriesPl = (JObject)babelePl["entries"];
+
+                foreach (var property in entries.Properties())
+                {
+                    var babeleEntry = (JObject)property.Value;
+
+                    var babeleEntryPl = ((JObject)entriesPl[property.Name]);
+                    foreach (var propertyPl in babeleEntryPl.Properties().ToList())
+                    {
+                        if (babeleEntry[propertyPl.Name] == null)
+                        {
+                            OnProgressUpdated($"Nie znaleziono tłumaczenia dla {property.Name}");
+                            babeleEntryPl.Remove(property.Name);
+                        }
+                        if ((babeleEntry[propertyPl.Name] as JObject) != null)
+                        {
+                            var subItems = babeleEntry[propertyPl.Name].Value<JObject>();
+                            var subItemsPl = babeleEntryPl[propertyPl.Name].Value<JObject>();
+                            foreach (var subPropertyPl in subItemsPl.Properties().ToList())
+                            {
+                                if (subItems[subPropertyPl.Name] == null)
+                                {
+                                    OnProgressUpdated($"Nie znaleziono tłumaczenia dla {subPropertyPl.Name}");
+                                    subItemsPl.Remove(subPropertyPl.Name);
+                                }
+
+                                if ((subItems[subPropertyPl.Name] as JObject) != null)
+                                {
+                                    var subSubItems = subItems[subPropertyPl.Name].Value<JObject>();
+                                    var subSubItemsPl = subItemsPl[subPropertyPl.Name].Value<JObject>();
+                                    foreach (var subSubPropertyPl in subSubItemsPl.Properties().ToList())
+                                    {
+                                        if (subSubItems[subSubPropertyPl.Name] == null)
+                                        {
+                                            OnProgressUpdated($"Nie znaleziono tłumaczenia dla {subSubPropertyPl.Name}");
+                                            subSubItemsPl.Remove(subSubPropertyPl.Name);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                using FileStream fs = File.Open(babeleLocationPl + "\\" + babeleName + ".json", FileMode.Create);
+                using StreamWriter sw = new StreamWriter(fs);
+                using JsonTextWriter jw = new JsonTextWriter(sw);
+
+                jw.Formatting = Formatting.Indented;
+                jw.IndentChar = ' ';
+                jw.Indentation = 4;
+
+                babelePl.WriteTo(jw);
             }
         }
     }

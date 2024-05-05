@@ -16,7 +16,7 @@ namespace WFRP4e.Translator.Packs
         {
             base.Parse(entity, originalDbEntity, entry);
             var mapping = (MutationEntry)entry;
-            entity["modifier"] = mapping.Modifier ?? string.Empty;
+            entity["modifier"] = mapping.Modifier ?? " ";
         }
     }
 }

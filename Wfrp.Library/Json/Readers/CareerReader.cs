@@ -8,37 +8,40 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("career")]
     public class CareerReader : GenericReader
     {
-        public void UpdateEntry(JObject pack, CareerEntry mapping)
+        public void UpdateEntry(JObject pack, CareerEntry mapping, bool onlyNulls = false)
         {
-            UpdateItemEntry(pack, mapping);
+            UpdateItemEntry(pack, mapping, onlyNulls);
 
-            UpdateIfDifferent(mapping, pack["system"]?["careergroup"]?["value"]?.ToString(), nameof(mapping.CareerGroup));
-            UpdateIfDifferent(mapping, pack["system"]?["class"]?["value"]?.ToString(), nameof(mapping.Class));
+            UpdateIfDifferent(mapping, pack["system"]?["careergroup"]?["value"]?.ToString(), nameof(mapping.CareerGroup), onlyNulls);
+            UpdateIfDifferent(mapping, pack["system"]?["class"]?["value"]?.ToString(), nameof(mapping.Class), onlyNulls);
 
-            var skills = ((JArray)pack["system"]["skills"]).Values<string>().ToArray();
-            if (!Enumerable.SequenceEqual(mapping.Skills ?? new string[] { }, skills))
+            if (!onlyNulls)
             {
-                mapping.Skills = skills;
-            }
+                var skills = ((JArray)pack["system"]["skills"]).Values<string>().ToArray();
+                if (!Enumerable.SequenceEqual(mapping.Skills ?? new string[] { }, skills))
+                {
+                    mapping.Skills = skills;
+                }
 
-            var talents = ((JArray)pack["system"]["talents"]).Values<string>().ToArray();
-            if (!Enumerable.SequenceEqual(mapping.Talents ?? new string[] { }, talents))
-            {
-                mapping.Talents = talents;
-            }
+                var talents = ((JArray)pack["system"]["talents"]).Values<string>().ToArray();
+                if (!Enumerable.SequenceEqual(mapping.Talents ?? new string[] { }, talents))
+                {
+                    mapping.Talents = talents;
+                }
 
-            var trappings = ((JArray)pack["system"]["trappings"]).Values<string>().ToArray();
-            if (!Enumerable.SequenceEqual(mapping.Trappings ?? new string[] { }, trappings))
-            {
-                mapping.Trappings = trappings;
+                var trappings = ((JArray)pack["system"]["trappings"]).Values<string>().ToArray();
+                if (!Enumerable.SequenceEqual(mapping.Trappings ?? new string[] { }, trappings))
+                {
+                    mapping.Trappings = trappings;
+                }
             }
         }
 
         public void UpdateEntryFromBabele(JObject pack, CareerEntry mapping)
         {
             UpdateItemEntryFromBabele(pack, mapping);
-            UpdateIfDifferent(mapping, pack["careergroup"]?.ToString(), nameof(mapping.CareerGroup));
-            UpdateIfDifferent(mapping, pack["class"]?.ToString(), nameof(mapping.Class));
+            UpdateIfDifferent(mapping, pack["careergroup"]?.ToString(), nameof(mapping.CareerGroup), false);
+            UpdateIfDifferent(mapping, pack["class"]?.ToString(), nameof(mapping.Class), false);
 
             var skills = ((JArray)pack["skills"]).Values<string>().ToArray();
             if (!Enumerable.SequenceEqual(mapping.Skills ?? new string[] { }, skills))

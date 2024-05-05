@@ -7,9 +7,9 @@ namespace WFRP4e.Translator.Packs
     [FoundryType("vehicleMod")]
     public class VehicleModReader : GenericReader
     {
-        public void UpdateEntry(JObject pack, VehicleModEntry mapping)
+        public void UpdateEntry(JObject pack, VehicleModEntry mapping, bool onlyNulls = false)
         {
-            UpdateItemEntry(pack, mapping);
+            UpdateItemEntry(pack, mapping, onlyNulls);
         }
 
         public void UpdateEntryFromBabele(JObject pack, VehicleModEntry mapping)

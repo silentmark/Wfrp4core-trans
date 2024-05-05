@@ -6,13 +6,13 @@ namespace WFRP4e.Translator.Packs
 {
     public class TableResultReader
     {
-        public void UpdateEntry(JObject jObj, TableResultEntry result)
+        public void UpdateEntry(JObject jObj, TableResultEntry result, bool onlyNulls)
         {
-            result.Name = jObj.Value<string>("text");
+            result.Name = onlyNulls ? (result.Name ?? jObj.Value<string>("text")) : jObj.Value<string>("text");
             result.Type = "tableResult";
-            GenericReader.UpdateIfDifferent(result, jObj["_id"].ToString(), nameof(result.FoundryId));
-            GenericReader.UpdateIfDifferent(result, jObj["documentCollection"]?.ToString(), nameof(result.DocumentCollection));
-            GenericReader.UpdateIfDifferent(result, jObj["documentId"]?.ToString(), nameof(result.DocumentId));
+            GenericReader.UpdateIfDifferent(result, jObj["_id"].ToString(), nameof(result.FoundryId), onlyNulls);
+            GenericReader.UpdateIfDifferent(result, jObj["documentCollection"]?.ToString(), nameof(result.DocumentCollection), onlyNulls);
+            GenericReader.UpdateIfDifferent(result, jObj["documentId"]?.ToString(), nameof(result.DocumentId), onlyNulls);
 
             if (!string.IsNullOrEmpty(result.DocumentId))
             {
@@ -22,7 +22,7 @@ namespace WFRP4e.Translator.Packs
                     if (dic.Value.ContainsKey(originalId))
                     {
                         var targetItem = dic.Value[originalId];
-                        GenericReader.UpdateIfDifferent(result, targetItem.Name, nameof(result.Name));
+                        GenericReader.UpdateIfDifferent(result, targetItem.Name, nameof(result.Name), onlyNulls);
                     }
                 }
             }
