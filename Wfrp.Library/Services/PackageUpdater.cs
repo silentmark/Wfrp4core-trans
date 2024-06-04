@@ -56,67 +56,6 @@ namespace Wfrp.Library.Services
             }
         }
 
-        public static void TransformPackagesBasedOnTranslationFile(string packsPath, string translationsPath)
-        {
-            var packs = Directory.EnumerateFiles(packsPath, "*.db", SearchOption.AllDirectories).ToList();
-            var translationsPaths = Directory.EnumerateFiles(translationsPath, "*.db", SearchOption.AllDirectories).ToList();
-            foreach (var pack in packs)
-            {
-                var module = Path.GetFileName(Path.GetDirectoryName(Path.GetDirectoryName(pack)));
-                OnProgressUpdated($"Przetwarzam {Path.GetFileName(pack)} z modułu {module}");
-                var translationPath = translationsPaths.FirstOrDefault(x => Path.GetFileName(Path.GetDirectoryName(Path.GetDirectoryName(x))) == module && Path.GetFileName(x) == Path.GetFileName(pack));
-                var existingTranslations = new List<JObject>();
-                var newTranslations = new List<JObject>();
-                if (translationPath != null)
-                {
-                    var translationJsons = File.ReadAllLines(translationPath);
-                    foreach (var json in translationJsons)
-                    {
-                        existingTranslations.Add(JObject.Parse(json));
-                    }
-                }
-                translationPath = pack.Replace(packsPath, translationsPath);
-
-                var originalPacks = File.ReadAllLines(pack);
-                foreach (var originalPack in originalPacks)
-                {
-                    var originalObj = JObject.Parse(originalPack);
-                    var id = originalObj.GetValue("_id").Value<string>();
-                    var originalSourceId = originalObj["flags"]["core"]["sourceId"].ToString();
-                    var translatedObj = existingTranslations.FirstOrDefault(x => x.GetValue("_id").Value<string>() == id);
-
-                    var type = GenericReader.GetTypeFromJson(originalObj);
-                    if (Mappings.TranslatedTypeToMappingDictonary.ContainsKey(type))
-                    {
-                        var dic = Mappings.TranslatedTypeToMappingDictonary[type];
-                        if (dic.ContainsKey(originalSourceId))
-                        {
-                            var entry = dic[originalSourceId];
-                            var readerType = GenericReader.GetEntryType(type, typeof(GenericItemParser));
-                            if (readerType != null)
-                            {
-                                var reader = (GenericItemParser)readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
-                                reader.Parse(originalObj, entry);
-                            }
-                        }
-                    }
-
-                    if (translatedObj != null)
-                    {
-                        //TODO: Do some comparison between original and translated obj?;
-                    }
-                    newTranslations.Add(originalObj);
-                }
-
-                var content = new StringBuilder();
-                foreach (var obj in newTranslations)
-                {
-                    content.AppendLine(JsonConvert.SerializeObject(obj, Formatting.None));
-                }
-                File.WriteAllText(translationPath, content.ToString());
-            }
-        }
-
         public static void ExtractJsonsToFilesAndCorrectIds(string packsPath)
         {
             var dic = new Dictionary<string, Dictionary<string, JObject>>();
@@ -299,6 +238,7 @@ namespace Wfrp.Library.Services
         public static void GenerateBabeleJsonFiles(string packsPath, string babeleTargetLocation, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDictionary)
         {
             var compendiumToEntriesDictionary = new Dictionary<string, Dictionary<string, JObject>>();
+
             var packs = Directory.EnumerateDirectories(packsPath, "_source", SearchOption.AllDirectories).ToList();
 
             //packs = packs.Where(x => !x.Contains("armoury")).ToList();
@@ -309,7 +249,7 @@ namespace Wfrp.Library.Services
             //var originalBabele = JObject.Parse(File.ReadAllText(pathToBabele));
             foreach (var pack in packs)
             {
-                var packName = pack.Replace(Config.PacksPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[2];
+                var packName = pack.Replace(packsPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[2];
                 var module = Path.GetFileName(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(pack))));
 
                 var sources = Directory.EnumerateFiles(pack, "*.json");

@@ -79,13 +79,15 @@ namespace WFRP4e.Translator
             Wfrp.Library.Services.Config.SourceJsonsPl = Config.SourceJsonsPl;
             Wfrp.Library.Services.Config.BabeleLocationEn = Config.BabeleLocationEn;
             Wfrp.Library.Services.Config.BabeleLocationPl = Config.BabeleLocationPl;
-            Wfrp.Library.Services.Config.PacksPath = Config.PacksPath;
 
             ConsoleKeyInfo input;
             do
             {
-                Console.WriteLine($"Generuję json dla oryginałów");
-                PackageUpdater.ExtractJsonsToFilesAndCorrectIds(Config.PacksPath);
+                foreach (var module in Config.PacksPath.Split(';'))
+                {
+                    Console.WriteLine($"Generuję json dla: {module}");
+                    PackageUpdater.ExtractJsonsToFilesAndCorrectIds(module);
+                }
 
                 Console.WriteLine(
                     @"
@@ -100,12 +102,18 @@ namespace WFRP4e.Translator
 
                 if (input.KeyChar == '1')
                 {
-                    UpdateJsonMappingFiles(Config.PacksPath, Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary, Config.SourceJsonsPl, Mappings.TranslatedTypeToMappingDictonary);
+                    foreach(var module in Config.PacksPath.Split(';'))
+                    {
+                        UpdateJsonMappingFiles(module, Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary, Config.SourceJsonsPl, Mappings.TranslatedTypeToMappingDictonary);
+                    }
                 }
                 else if (input.KeyChar == '2')
                 {
-                    PackageUpdater.GenerateBabeleJsonFiles(Config.PacksPath, Config.BabeleLocationEn, Mappings.OriginalTypeToMappingDictonary);
-                    PackageUpdater.CompareBabeleJsonFiles(Config.BabeleLocationEn, Config.BabeleLocationPl);
+                    foreach (var module in Config.PacksPath.Split(';'))
+                    {
+                        PackageUpdater.GenerateBabeleJsonFiles(module, Config.BabeleLocationEn, Mappings.OriginalTypeToMappingDictonary);
+                        PackageUpdater.CompareBabeleJsonFiles(Config.BabeleLocationEn, Config.BabeleLocationPl);
+                    }
                 }
                 else if (input.KeyChar == '3')
                 {
@@ -176,48 +184,6 @@ namespace WFRP4e.Translator
             catch (Exception ex)
             {
                 Console.WriteLine("somerandomstuff" + ex);
-            }
-        }
-
-        private static void RemoveDuplicateItemsFromActors()
-        {
-            var packs = Directory.EnumerateFiles(Config.PacksPath, "*.db", SearchOption.AllDirectories).ToList();
-            foreach (var pack in packs)
-            {
-                var originalPacks = File.ReadAllLines(pack);
-                var content = new StringBuilder();
-                foreach (var originalPack in originalPacks)
-                {
-                    var originalObj = JObject.Parse(originalPack);
-                    var id = originalObj.GetValue("_id").Value<string>();
-                    if (originalObj["type"] != null)
-                    {
-                        var type = originalObj.GetValue("type").Value<string>();
-                        var originalSourceId = originalObj["flags"]["core"]["sourceId"].ToString();
-                        if (type == "npc" || type == "character" || type == "creature")
-                        {
-                            var originalItems = ((JArray)originalObj["items"]);
-                            foreach (var item in ((JArray)originalObj["items"]).ToArray())
-                            {
-                                var duplicates = originalItems.Where(x => x.Value<string>("name") == item.Value<string>("name") && x != item).ToList();
-                                if (duplicates.Count > 1)
-                                {
-                                    foreach (var duplicate in duplicates)
-                                    {
-                                        if (duplicate["system"]?["specification"]?["value"]?.ToString() == null
-                                            || item["system"]?["specification"]?["value"]?.ToString() == null
-                                            || duplicate["system"]?["specification"]?["value"]?.ToString() == item["system"]?["specification"]?["value"]?.ToString())
-                                        {
-                                            originalItems.Remove(duplicate);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    content.AppendLine(JsonConvert.SerializeObject(originalObj, Formatting.None));
-                }
-                File.WriteAllText(pack, content.ToString());
             }
         }
 
@@ -538,52 +504,6 @@ namespace WFRP4e.Translator
                 translator.DeleteGlossaryAsync(glossary).Wait();
             }
             var glossaryEnToDe = translator.CreateGlossaryAsync("Wfrp Glossary", "EN", "PL", new GlossaryEntries(entriesDictionary)).Result;
-        }
-
-        private static void ExportAllEffects()
-        {
-            var packsOriginal = Directory.EnumerateFiles(Config.PacksPath, "*.db", SearchOption.AllDirectories).ToList();
-            var effectsObjects = new List<BaseEntry>();
-
-            foreach (var pack in packsOriginal)
-            {
-                var lines = File.ReadAllLines(pack);
-                foreach (var line in lines)
-                {
-                    try
-                    {
-                        var packObject = JObject.Parse(line);
-                        var type = GenericReader.GetTypeFromJson(packObject);
-                        var name = packObject["name"].Value<string>();
-                        var id = packObject["_id"].Value<string>();
-                        var effects = packObject["effects"]?.ToArray();
-                        if (effects != null)
-                        {
-                            foreach (var effect in effects)
-                            {
-                                var label = effect["name"].Value<string>();
-                                Console.WriteLine($"Found {label} - {effect["_id"].Value<string>()}");
-                                if (!string.IsNullOrEmpty(effect["flags"]?["wfrp4e"]?["script"]?.ToString()))
-                                {
-                                    var effectId = effect["_id"].Value<string>();
-                                    effectsObjects.Add(new BaseEntry
-                                    {
-                                        FoundryId = $"{id}.{type}.{effectId}",
-                                        Name = $"{name} - {label}",
-                                        Description = effect["flags"]?["wfrp4e"]?["script"]?.ToString()
-                                    });
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(line);
-                        Console.WriteLine(e);
-                    }
-                }
-            }
-            File.WriteAllText(Config.PacksPath + "\\wfrp4e-jsons\\effects.json", JsonConvert.SerializeObject(effectsObjects, Formatting.Indented));
         }
 
         private static void ValidatingCareerTranslatiosn()
