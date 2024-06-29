@@ -60,6 +60,7 @@ namespace WFRP4e.Translator.Json.Entries
                         ((SpellEntry)newSubEntry).Range = spell.Range;
                         ((SpellEntry)newSubEntry).Target = spell.Target;
                         ((SpellEntry)newSubEntry).Duration = spell.Duration;
+                        ((SpellEntry)newSubEntry).Damage = spell.Damage;
                         break;
                     }
                 case PrayerEntry prayer:

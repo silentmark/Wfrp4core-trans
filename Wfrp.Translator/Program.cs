@@ -381,7 +381,7 @@ namespace WFRP4e.Translator
                         {
                             var reader = readerType.GetConstructor(new Type[] { }).Invoke(new object[] { });
                             var method = readerType.GetMethod("UpdateEntry");
-                            method.Invoke(reader, new object[] { actorJson, entry });
+                            method.Invoke(reader, new object[] { actorJson, entry, false });
 
                             dic.Add(entry.OriginFoundryId, entry);
                             if (!newTypeToJsonListDic.ContainsKey(type))

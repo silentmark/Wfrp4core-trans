@@ -56,7 +56,7 @@ namespace WFRP4e.Translator.Packs
                             {
                                 var jScript = new JObject();
                                 jScript["id"] = effect.FoundryId;
-                                jScript["name"] = effect.Name;
+                                jScript["name"] = script.Name;
                                 jArrScripts.Add(jScript);
                                 if (!string.IsNullOrEmpty(script.Script))
                                 {

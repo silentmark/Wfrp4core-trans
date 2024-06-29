@@ -29,6 +29,10 @@ namespace WFRP4e.Translator.Packs
             {
                 pack["system"]["range"]["value"] = mapping.Range;
             }
+            if (pack["system"]?["damage"]?["value"] != null)
+            {
+                pack["system"]["damage"]["value"] = mapping.Damage;
+            }
         }
     }
 }
