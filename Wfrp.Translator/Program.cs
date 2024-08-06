@@ -79,6 +79,7 @@ namespace WFRP4e.Translator
             Wfrp.Library.Services.Config.SourceJsonsPl = Config.SourceJsonsPl;
             Wfrp.Library.Services.Config.BabeleLocationEn = Config.BabeleLocationEn;
             Wfrp.Library.Services.Config.BabeleLocationPl = Config.BabeleLocationPl;
+            Wfrp.Library.Services.Config.SystemLocation = Config.SystemLocation;
 
             ConsoleKeyInfo input;
             do
@@ -95,6 +96,7 @@ namespace WFRP4e.Translator
                   Wciśnij 2. wygeneruj Babele EN z LevelDB EN.
                   Wciśnij 3. zaktualizuj JSONMAPPING EN na podstawie Babele.
                   Wciśnij 4. zaktualizuj JSONMAPPING PL na podstawie Babele.
+                  Wciśnij 5. pobierz skrypty aktywne w tłumaczeniach.
                   "
     );
                 input = Console.ReadKey();
@@ -122,6 +124,10 @@ namespace WFRP4e.Translator
                 else if (input.KeyChar == '4')
                 {
                     PackageUpdater.GenerateJsonFilesFromBabele(Config.SourceJsonsPl, Config.BabeleLocationPl, Mappings.TranslatedTypeToMappingDictonary);
+                }
+                else if (input.KeyChar == '5')
+                {
+                    PackageUpdater.ExtractScripts(Config.SystemLocation, Mappings.TranslatedTypeToMappingDictonary);
                 }
             }
             while (input.KeyChar != 'x');
@@ -226,8 +232,8 @@ namespace WFRP4e.Translator
 
                     var name = itemJson.GetValue("name").Value<string>();
 
-                    var sourceCompendium = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[0];
-                    var packName = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[2];
+                    var sourceCompendium = dbPath.Split('\\', StringSplitOptions.RemoveEmptyEntries).Reverse().ToList()[0];
+                    var packName = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[1];
                     var originalSourceId = itemJson["flags"]?["core"]?["sourceId"]?.ToString();
                     var correctSourceId = originalSourceId.Contains(".items.Item.") ? $"Compendium.{sourceCompendium}.{packName}.Item.{id}" : $"Compendium.{sourceCompendium}.{packName}.{id}";
                     if (originalSourceId != correctSourceId)
@@ -347,9 +353,9 @@ namespace WFRP4e.Translator
 
                     var name = actorJson.GetValue("name").Value<string>();
 
-                    var sourceCompendium = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[0];
-                    var packName = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[2];
-                    var originalSourceId = actorJson["flags"]["core"]["sourceId"].ToString();
+                    var sourceCompendium = dbPath.Split('\\', StringSplitOptions.RemoveEmptyEntries).Reverse().ToList()[0];
+                    var packName = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[1];
+                    var originalSourceId = actorJson["flags"]?["core"]?["sourceId"]?.ToString();
                     var correctSourceId = $"Compendium.{sourceCompendium}.{packName}.{id}";
                     if (originalSourceId != correctSourceId) // && !originalSourceId.Contains(".items.Item."))
                     {

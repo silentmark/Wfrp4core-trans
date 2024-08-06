@@ -17,7 +17,7 @@ namespace WFRP4e.Translator.Packs
             UpdateIfDifferent(mapping, pack["flags"]["core"]["sourceId"].ToString(), nameof(mapping.OriginFoundryId), onlyNulls);
 
             var pages = pack["pages"].ToArray();
-            var existingPages = mapping.Pages.ToList();
+            var existingPages = mapping.Pages?.ToList() ?? new List<JournalEntryPage>();
 
             foreach (JObject page in pages)
             {

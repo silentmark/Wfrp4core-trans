@@ -20,6 +20,7 @@ namespace WFRP4e.Translator.Utilities
         public static string OpenAiKey { get => GetSection(); }
         public static string BabeleLocationPl { get => GetSection(); }
         public static string BabeleLocationEn { get => GetSection(); }
+        public static string SystemLocation { get => GetSection(); }
 
         private static string GetSection([CallerMemberName] string name = "")
         {

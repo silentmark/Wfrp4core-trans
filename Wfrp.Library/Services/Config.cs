@@ -9,5 +9,7 @@
         public static string BabeleLocationPl { get; set; }
 
         public static string BabeleLocationEn { get; set; }
+
+        public static string SystemLocation { get; set; }
     }
 }

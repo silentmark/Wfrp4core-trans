@@ -9,6 +9,7 @@ using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Packs;
 using Newtonsoft.Json.Linq;
 using System.Windows.Markup;
+using System.Numerics;
 
 namespace Wfrp.Library.Services
 {
@@ -103,7 +104,8 @@ namespace Wfrp.Library.Services
                 }
             }
         }
-
+        
+        //TODO: - move this to later phase, to process all modules and packs - right now we are scoped to single pack. 
         private static void UpdateChildItemSourceIds(Dictionary<string, Dictionary<string, JObject>> dic)
         {
             foreach (var dictionaries in dic)
@@ -170,11 +172,11 @@ namespace Wfrp.Library.Services
         {
             foreach (var pack in packs)
             {
-                var files = Directory.EnumerateFiles(pack, "*.json");
+                var files = Directory.EnumerateFiles(pack, "*.json").ToList();
                 foreach (var file in files)
                 {
-                    var module = pack.Replace(packsPath, "").Split("\\", StringSplitOptions.RemoveEmptyEntries)[0];
-                    var packName = pack.Replace(packsPath, "").Split("\\", StringSplitOptions.RemoveEmptyEntries)[2];
+                    var module = pack.Split("\\", StringSplitOptions.RemoveEmptyEntries).Reverse().ToList()[3];
+                    var packName = pack.Replace(packsPath, "").Split("\\", StringSplitOptions.RemoveEmptyEntries)[1];
                     var compendiumPrefix = "Compendium." + module + "." + packName;
 
                     var obj = JObject.Parse(File.ReadAllText(file));
@@ -188,6 +190,16 @@ namespace Wfrp.Library.Services
                         {
                             item.Remove("_stats");
                             item.Remove("ownership");
+
+                            if (item.ContainsKey("effects"))
+                            {
+                                var items2 = item["effects"];
+                                foreach (JObject item2 in items2)
+                                {
+                                    item2.Remove("_stats");
+                                    item2.Remove("ownership");
+                                }
+                            }
                         }
                     }
                     if (obj.ContainsKey("pages"))
@@ -197,6 +209,15 @@ namespace Wfrp.Library.Services
                         {
                             item.Remove("_stats");
                             item.Remove("ownership");
+                        }
+                    }
+                    if (obj.ContainsKey("effects"))
+                    {
+                        var items2 = obj["effects"];
+                        foreach (JObject item2 in items2)
+                        {
+                            item2.Remove("_stats");
+                            item2.Remove("ownership");
                         }
                     }
                     if (!dic.ContainsKey(compendiumPrefix))
@@ -213,10 +234,11 @@ namespace Wfrp.Library.Services
                         obj["flags"]["core"] = new JObject();
                     }
                     // TODO: zmienic - inny format source id jest teraz...
-                    if (obj["flags"]["core"]["sourceId"] == null)
+                    if (obj["flags"]["core"]["sourceId"] == null || !obj["flags"]["core"]["sourceId"].ToString().StartsWith(compendiumPrefix + "." + id)) 
                     {
                         obj["flags"]["core"]["sourceId"] = compendiumPrefix + "." + id;
                     }
+                    
 
                     /*
                     {
@@ -249,10 +271,10 @@ namespace Wfrp.Library.Services
             //var originalBabele = JObject.Parse(File.ReadAllText(pathToBabele));
             foreach (var pack in packs)
             {
-                var packName = pack.Replace(packsPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[2];
+                var packName = pack.Split('\\', StringSplitOptions.RemoveEmptyEntries).Reverse().ToList()[1];
                 var module = Path.GetFileName(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(pack))));
 
-                var sources = Directory.EnumerateFiles(pack, "*.json");
+                var sources = Directory.EnumerateFiles(pack, "*.json").ToList();
                 foreach (var originalPack in sources)
                 {
                     var babeleFileName = module + "." + packName;
@@ -470,6 +492,7 @@ namespace Wfrp.Library.Services
                     var babeleEntry = (JObject)property.Value;
 
                     var babeleEntryPl = ((JObject)entriesPl[property.Name]);
+                    if (babeleEntryPl != null) { 
                     foreach (var propertyPl in babeleEntryPl.Properties().ToList())
                     {
                         if (babeleEntry[propertyPl.Name] == null)
@@ -477,28 +500,29 @@ namespace Wfrp.Library.Services
                             OnProgressUpdated($"Nie znaleziono tłumaczenia dla {property.Name}");
                             babeleEntryPl.Remove(property.Name);
                         }
-                        if ((babeleEntry[propertyPl.Name] as JObject) != null)
-                        {
-                            var subItems = babeleEntry[propertyPl.Name].Value<JObject>();
-                            var subItemsPl = babeleEntryPl[propertyPl.Name].Value<JObject>();
-                            foreach (var subPropertyPl in subItemsPl.Properties().ToList())
+                            if ((babeleEntry[propertyPl.Name] as JObject) != null)
                             {
-                                if (subItems[subPropertyPl.Name] == null)
+                                var subItems = babeleEntry[propertyPl.Name].Value<JObject>();
+                                var subItemsPl = babeleEntryPl[propertyPl.Name].Value<JObject>();
+                                foreach (var subPropertyPl in subItemsPl.Properties().ToList())
                                 {
-                                    OnProgressUpdated($"Nie znaleziono tłumaczenia dla {subPropertyPl.Name}");
-                                    subItemsPl.Remove(subPropertyPl.Name);
-                                }
-
-                                if ((subItems[subPropertyPl.Name] as JObject) != null)
-                                {
-                                    var subSubItems = subItems[subPropertyPl.Name].Value<JObject>();
-                                    var subSubItemsPl = subItemsPl[subPropertyPl.Name].Value<JObject>();
-                                    foreach (var subSubPropertyPl in subSubItemsPl.Properties().ToList())
+                                    if (subItems[subPropertyPl.Name] == null)
                                     {
-                                        if (subSubItems[subSubPropertyPl.Name] == null)
+                                        OnProgressUpdated($"Nie znaleziono tłumaczenia dla {subPropertyPl.Name}");
+                                        subItemsPl.Remove(subPropertyPl.Name);
+                                    }
+
+                                    if ((subItems[subPropertyPl.Name] as JObject) != null)
+                                    {
+                                        var subSubItems = subItems[subPropertyPl.Name].Value<JObject>();
+                                        var subSubItemsPl = subItemsPl[subPropertyPl.Name].Value<JObject>();
+                                        foreach (var subSubPropertyPl in subSubItemsPl.Properties().ToList())
                                         {
-                                            OnProgressUpdated($"Nie znaleziono tłumaczenia dla {subSubPropertyPl.Name}");
-                                            subSubItemsPl.Remove(subSubPropertyPl.Name);
+                                            if (subSubItems[subSubPropertyPl.Name] == null)
+                                            {
+                                                OnProgressUpdated($"Nie znaleziono tłumaczenia dla {subSubPropertyPl.Name}");
+                                                subSubItemsPl.Remove(subSubPropertyPl.Name);
+                                            }
                                         }
                                     }
                                 }
@@ -515,6 +539,104 @@ namespace Wfrp.Library.Services
                 jw.Indentation = 4;
 
                 babelePl.WriteTo(jw);
+            }
+        }
+
+        public static void ExtractScripts(string systemLocation, Dictionary<string, Dictionary<string, BaseEntry>> translatedTypeToMappingDictonary)
+        {
+            if (string.IsNullOrEmpty(systemLocation)) systemLocation = "C:\\Source-Code\\WFRP\\WFRP4e-FoundryVTT";
+            var scripts = Directory.EnumerateFiles(systemLocation + "\\scripts", "*.js", SearchOption.AllDirectories).ToList();
+            foreach (var key in translatedTypeToMappingDictonary.Keys)
+            {
+                var dic = translatedTypeToMappingDictonary[key];
+                foreach (var entry in dic)
+                {
+                    var baseEntry = entry.Value;
+                    switch (baseEntry)
+                    {
+                        case ActorEntry actor:
+                            {
+                                foreach (var subItem in actor.Items.OfType<ItemEntry>())
+                                {
+                                    foreach (var effect in subItem.Effects.Where(x=>x.ScriptData != null))
+                                    {
+                                        foreach (var script in effect.ScriptData)
+                                        {
+                                            if (!string.IsNullOrEmpty(script.Script) && script.Script.StartsWith("[Script."))
+                                            {
+                                                SaveScript(systemLocation, scripts, actor, subItem, script.Script);
+                                            }
+                                            if (!string.IsNullOrEmpty(script.SubmissionScript) && script.SubmissionScript.StartsWith("[Script."))
+                                            {
+                                                SaveScript(systemLocation, scripts, actor, subItem, script.SubmissionScript);
+                                            }
+                                            if (!string.IsNullOrEmpty(script.HideScript) && script.HideScript.StartsWith("[Script."))
+                                            {
+                                                SaveScript(systemLocation, scripts, actor, subItem, script.HideScript);
+                                            }
+                                            if (!string.IsNullOrEmpty(script.ActivationScript) && script.ActivationScript.StartsWith("[Script."))
+                                            {
+                                                SaveScript(systemLocation, scripts, actor, subItem, script.ActivationScript);
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        case ItemEntry item:
+                            {
+                                if (item.Effects != null)
+                                {
+                                    foreach (var effect in item.Effects.Where(x=>x.ScriptData != null))
+                                    {
+                                        foreach (var script in effect.ScriptData)
+                                        {
+                                            if (!string.IsNullOrEmpty(script.Script) && script.Script.StartsWith("[Script."))
+                                            {
+                                                SaveScript(systemLocation, scripts, null, item, script.Script);
+                                            }
+                                            if (!string.IsNullOrEmpty(script.SubmissionScript) && script.SubmissionScript.StartsWith("[Script."))
+                                            {
+                                                SaveScript(systemLocation, scripts, null, item, script.SubmissionScript);
+                                            }
+                                            if (!string.IsNullOrEmpty(script.HideScript) && script.HideScript.StartsWith("[Script."))
+                                            {
+                                                SaveScript(systemLocation, scripts, null, item, script.HideScript);
+                                            }
+                                            if (!string.IsNullOrEmpty(script.ActivationScript) && script.ActivationScript.StartsWith("[Script."))
+                                            {
+                                                SaveScript(systemLocation, scripts, null, item, script.ActivationScript);
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        default:
+                            {
+                                break;
+                            }
+                    }
+                }
+               
+
+            }
+            
+        }
+
+        private static void SaveScript(string systemLocation, List<string> scripts, ActorEntry? actor, ItemEntry subItem, string script)
+        {
+            var scriptFile = scripts.FirstOrDefault(x => x.Contains(script.Replace("[Script.", "").Replace("]", "") + ".js"));
+            if (!string.IsNullOrEmpty(scriptFile))
+            {
+                var newFilePath = systemLocation + $"\\scripts-pl\\{scriptFile.Split("\\").Last()}";
+                File.Copy(scriptFile, newFilePath, true);
+                var fileContent = File.ReadAllText(newFilePath);
+                if (!fileContent.StartsWith("//*** "))
+                {
+                    fileContent = "//*** " + subItem.Name + (actor != null ? " - " + actor.Name : "") + Environment.NewLine + fileContent;
+                    File.WriteAllText(newFilePath, fileContent);
+                }
             }
         }
     }
