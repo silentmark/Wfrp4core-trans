@@ -10,7 +10,7 @@ namespace WFRP4e.Translator.Json.Entries
         internal static void CloneItem(ItemEntry compendiumObject, ItemEntry newSubEntry)
         {
             newSubEntry.Effects = compendiumObject.Effects;
-            newSubEntry.OriginFoundryId = compendiumObject.OriginFoundryId;
+            newSubEntry.OriginFoundryId = compendiumObject.OriginFoundryId?.Replace(".items.Item.", ".items.");
             if (!string.IsNullOrEmpty(compendiumObject.Name) && !compendiumObject.Name.Contains("("))
             {
                 newSubEntry.Name = compendiumObject.Name;
@@ -68,6 +68,7 @@ namespace WFRP4e.Translator.Json.Entries
                         ((PrayerEntry)newSubEntry).Range = prayer.Range;
                         ((PrayerEntry)newSubEntry).Target = prayer.Target;
                         ((PrayerEntry)newSubEntry).Duration = prayer.Duration;
+                        ((PrayerEntry)newSubEntry).God = prayer.God;
                         break;
                     }
             }

@@ -261,7 +261,7 @@ namespace WFRP4e.Translator.Packs
                         }
                         else
                         {
-                            translatedItem = Mappings.TranslatedTypeToMappingDictonary[itemType][item.OriginFoundryId.Replace(".items.", ".items.Item.")];
+                            translatedItem = Mappings.TranslatedTypeToMappingDictonary[itemType][item.OriginFoundryId.Replace(".items.Item.", ".items.")];
                         }
                         BaseEntry originalMapping;
                         if (Mappings.OriginalTypeToMappingDictonary[itemType].ContainsKey(item.OriginFoundryId)) 
@@ -270,7 +270,7 @@ namespace WFRP4e.Translator.Packs
                         }
                         else
                         {
-                            originalMapping = Mappings.OriginalTypeToMappingDictonary[itemType][item.OriginFoundryId.Replace(".items.", ".items.Item.")];
+                            originalMapping = Mappings.OriginalTypeToMappingDictonary[itemType][item.OriginFoundryId.Replace(".items.Item.", ".items.")];
                         }
                         if (originalMapping.Name != jPackItem["name"].ToString())
                         {

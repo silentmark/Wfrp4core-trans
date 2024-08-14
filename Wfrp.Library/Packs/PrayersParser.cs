@@ -29,6 +29,10 @@ namespace WFRP4e.Translator.Packs
             {
                 pack["system"]["range"]["value"] = mapping.Range;
             }
+            if (pack["system"]?["god"]?["value"] != null)
+            {
+                pack["system"]["god"]["value"] = mapping.God;
+            }
         }
     }
 }

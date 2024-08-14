@@ -63,7 +63,7 @@ namespace WFRP4e.Translator.Packs
                     newMappingItems.Add(new ReferenceEntry
                     {
                         FoundryId = itemId,
-                        OriginFoundryId = matchingValue.Value.OriginFoundryId
+                        OriginFoundryId = matchingValue.Value.OriginFoundryId?.Replace(".items.Item.", ".items.")
                     });
                 }
                 else
@@ -94,7 +94,7 @@ namespace WFRP4e.Translator.Packs
                             newMappingItems.Add(new ReferenceEntry
                             {
                                 FoundryId = itemId,
-                                OriginFoundryId = matchingValue.Value.OriginFoundryId
+                                OriginFoundryId = matchingValue.Value.OriginFoundryId?.Replace(".items.Item.", ".items.")
                             });
                         }
                         else

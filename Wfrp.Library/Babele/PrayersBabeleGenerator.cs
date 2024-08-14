@@ -28,6 +28,10 @@ namespace WFRP4e.Translator.Packs
             {
                 entity["range"] = mapping.Range;
             }
+            if (!string.IsNullOrEmpty(mapping.God))
+            {
+                entity["god"] = mapping.God;
+            }
         }
     }
 }

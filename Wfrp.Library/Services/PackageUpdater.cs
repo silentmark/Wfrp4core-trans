@@ -47,10 +47,10 @@ namespace Wfrp.Library.Services
                     {
                         var element = JsonConvert.DeserializeObject(File.ReadAllText(json), targtetType) as BaseEntry;
                         //TODO: hack after compendium split?
-                        //if (!element.OriginFoundryId.Contains("items.Item"))
-                        //{
-                        //    element.OriginFoundryId = element.OriginFoundryId.Replace(".items.", ".items.Item.");
-                        //}
+                        if (element.OriginFoundryId.Contains(".items.Item."))
+                        {
+                            element.OriginFoundryId = element.OriginFoundryId.Replace(".items.Item.", ".items.");
+                        }
                         dictionary.Add(element.OriginFoundryId, element);
                     }
                 }

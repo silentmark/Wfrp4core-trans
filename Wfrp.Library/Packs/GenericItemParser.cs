@@ -50,10 +50,10 @@ namespace WFRP4e.Translator.Packs
                 else
                 {
                     effect["name"] = mappingEffect.Name;
-                    if (effect["flags"]?["wfrp4e"]?["effectData"]?["description"] != null)
-                    {
-                        effect["flags"]["wfrp4e"]["effectData"]["description"] = mappingEffect.Description;
-                    }
+                    //if (effect["flags"]?["wfrp4e"]?["effectData"]?["description"] != null)
+                    //{
+                    //    effect["flags"]["wfrp4e"]["effectData"]["description"] = mappingEffect.Description;
+                    //}
                     if (effect["flags"]?["wfrp4e"]?["applicationData"]?["filter"] != null)
                     {
                         effect["flags"]["wfrp4e"]["applicationData"]["filter"] = mappingEffect.Filter;

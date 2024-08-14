@@ -235,7 +235,7 @@ namespace WFRP4e.Translator
                     var sourceCompendium = dbPath.Split('\\', StringSplitOptions.RemoveEmptyEntries).Reverse().ToList()[0];
                     var packName = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[1];
                     var originalSourceId = itemJson["flags"]?["core"]?["sourceId"]?.ToString();
-                    var correctSourceId = originalSourceId.Contains(".items.Item.") ? $"Compendium.{sourceCompendium}.{packName}.Item.{id}" : $"Compendium.{sourceCompendium}.{packName}.{id}";
+                    var correctSourceId = $"Compendium.{sourceCompendium}.{packName}.{id}";
                     if (originalSourceId != correctSourceId)
                     {
                         itemJson["flags"] = itemJson["flags"] ?? new JObject();
@@ -257,9 +257,8 @@ namespace WFRP4e.Translator
                     var dic = typeToMappingDirectory[type];
                     var dicPL = translatedTypeToMappingDictonary[type];
 
-                    if (!dic.ContainsKey(originalSourceId) && originalSourceId.Contains(".items.Item."))
+                    if (originalSourceId.Contains(".items.Item."))
                     {
-                        //temporary fix for item id replacement.
                         originalSourceId = originalSourceId.Replace(".items.Item.", ".items.");
                     }
 
@@ -310,18 +309,11 @@ namespace WFRP4e.Translator
                                 newTypeToJsonListDicPL[type] = new List<BaseEntry>();
                             }
 
-
-                            if (!dicPL.ContainsKey(originalSourceId) && originalSourceId.Contains(".items.Item."))
-                            {
-                                //temporary fix for item id replacement.
-                                originalSourceId = originalSourceId.Replace(".items.Item.", ".items.");
-                            }
-
                             if (dicPL.ContainsKey(originalSourceId))
                             {
                                 var entryPL = dicPL[originalSourceId];
                                 method.Invoke(reader, new object[] { itemJson, entryPL, true });
-                                entryPL.OriginFoundryId = entry.OriginFoundryId;
+                                entryPL.OriginFoundryId = entry.OriginFoundryId?.Replace(".items.Item.", ".items.");
                                 newTypeToJsonListDicPL[type].Add(entryPL);
                             }
                             else
@@ -357,7 +349,7 @@ namespace WFRP4e.Translator
                     var packName = pack.Replace(dbPath, "").Split('\\', StringSplitOptions.RemoveEmptyEntries)[1];
                     var originalSourceId = actorJson["flags"]?["core"]?["sourceId"]?.ToString();
                     var correctSourceId = $"Compendium.{sourceCompendium}.{packName}.{id}";
-                    if (originalSourceId != correctSourceId) // && !originalSourceId.Contains(".items.Item."))
+                    if (originalSourceId != correctSourceId)
                     {
                         actorJson["flags"] = actorJson["flags"] ?? new JObject();
                         actorJson["flags"]["core"] = actorJson["flags"]["core"] ?? new JObject();
@@ -476,7 +468,10 @@ namespace WFRP4e.Translator
                     }
                     var fileName = string.Join("-", newItem.Name.Split(Path.GetInvalidFileNameChars()));
                     var filePath = Path.Combine(path, $"{newItem.FoundryId}.json");
-                    File.WriteAllText(filePath, JsonConvert.SerializeObject(newItem, Formatting.Indented));
+                    if (!File.Exists(filePath))
+                    {
+                        File.WriteAllText(filePath, JsonConvert.SerializeObject(newItem, Formatting.Indented));
+                    }
                 }
             }
         }

@@ -53,13 +53,13 @@ namespace WFRP4e.Translator.Packs
                 newEffect.ScriptData = newEffect.ScriptData ?? new List<ScriptDataEntry>();
                 foreach (JObject jObj in jArr)
                 {
-                    var existingScript = newEffect.ScriptData.FirstOrDefault(x => x.FoundryId == jObj["id"]?.ToString()) ?? new ScriptDataEntry();
+                    var existingScript = newEffect.ScriptData.FirstOrDefault(x => x.Script == jObj["script"]?.ToString()) ?? new ScriptDataEntry();
 
                     existingScript.Name = jObj["name"]?.ToString();
-                    existingScript.Script = jObj["name"]?.ToString();
+                    existingScript.Script = jObj["script"]?.ToString();
                     existingScript.HideScript = jObj["hideScript"]?.ToString();
                     existingScript.SubmissionScript = jObj["submissionScript"]?.ToString();
-                    existingScript.ActivationScript = jObj["activateScript"]?.ToString();
+                    existingScript.ActivationScript = jObj["activationScript"]?.ToString();
                     if (string.IsNullOrEmpty(existingScript.FoundryId))
                     {
                         existingScript.FoundryId = jObj["id"]?.ToString();

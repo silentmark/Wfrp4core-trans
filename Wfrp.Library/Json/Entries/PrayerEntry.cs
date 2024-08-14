@@ -8,5 +8,7 @@
         public string Duration { get; set; }
 
         public string Target { get; set; }
+
+        public string God { get; set; }
     }
 }
