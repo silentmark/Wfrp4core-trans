@@ -12,8 +12,11 @@ namespace WFRP4e.Translator.Packs
 
             GenericReader.UpdateIfDifferent(newEffect, effect["_id"].ToString(), nameof(newEffect.FoundryId), onlyNulls);
             GenericReader.UpdateIfDifferent(newEffect, effect["description"].ToString(), nameof(newEffect.Description), onlyNulls);
-            GenericReader.UpdateIfDifferent(newEffect, effect["flags"]?["wfrp4e"]?["applicationData"]?["filter"]?.ToString(), nameof(newEffect.Filter), onlyNulls);
-            var scriptData = effect["flags"]?["wfrp4e"]?["scriptData"] as JArray;
+            GenericReader.UpdateIfDifferent(newEffect, effect["system"]["transferData"]?["filter"]?.ToString(), nameof(newEffect.Filter), onlyNulls);
+            GenericReader.UpdateIfDifferent(newEffect, effect["system"]["transferData"]?["avoidTest"]?["script"]?.ToString(), nameof(newEffect.AvoidTestScript), onlyNulls);
+            GenericReader.UpdateIfDifferent(newEffect, effect["system"]["transferData"]?["enableConditionScript"]?.ToString(), nameof(newEffect.EnableConditionScript), onlyNulls);
+            GenericReader.UpdateIfDifferent(newEffect, effect["system"]["transferData"]?["preApplyScript"]?.ToString(), nameof(newEffect.PreApplyScript), onlyNulls);
+            var scriptData = effect["system"]["scriptData"] as JArray;
             if (scriptData != null)
             {
                 var listToRemove = newEffect.ScriptData?.ToList() ?? new List<ScriptDataEntry>();
@@ -31,9 +34,9 @@ namespace WFRP4e.Translator.Packs
                     }
                     listToRemove.Remove(existingScript);
                     GenericReader.UpdateIfDifferent(existingScript, script["script"]?.ToString(), nameof(existingScript.Script), onlyNulls);
-                    GenericReader.UpdateIfDifferent(existingScript, script["options"]?["dialog"]?["hideScript"]?.ToString(), nameof(existingScript.HideScript), onlyNulls);
-                    GenericReader.UpdateIfDifferent(existingScript, script["options"]?["dialog"]?["activateScript"]?.ToString(), nameof(existingScript.ActivationScript), onlyNulls);
-                    GenericReader.UpdateIfDifferent(existingScript, script["options"]?["dialog"]?["submissionScript"]?.ToString(), nameof(existingScript.SubmissionScript), onlyNulls   );
+                    GenericReader.UpdateIfDifferent(existingScript, script["options"]?["hideScript"]?.ToString(), nameof(existingScript.HideScript), onlyNulls);
+                    GenericReader.UpdateIfDifferent(existingScript, script["options"]?["activateScript"]?.ToString(), nameof(existingScript.ActivationScript), onlyNulls);
+                    GenericReader.UpdateIfDifferent(existingScript, script["options"]?["submissionScript"]?.ToString(), nameof(existingScript.SubmissionScript), onlyNulls   );
                 }
                 foreach (var scriptDataEntry in listToRemove)
                 {
@@ -48,6 +51,9 @@ namespace WFRP4e.Translator.Packs
             newEffect.Description = babeleEffect.Value<string>("description");
 
             newEffect.Filter = babeleEffect.Value<string>("filter");
+            newEffect.EnableConditionScript = babeleEffect.Value<string>("enableConditionScript");
+            newEffect.PreApplyScript = babeleEffect.Value<string>("preApplyScript");
+            newEffect.AvoidTestScript = babeleEffect.Value<string>("avoidTestScript");
             if (babeleEffect["scriptData"] is JArray jArr && jArr.Count > 0)
             {
                 newEffect.ScriptData = newEffect.ScriptData ?? new List<ScriptDataEntry>();

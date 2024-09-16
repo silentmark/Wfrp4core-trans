@@ -43,10 +43,21 @@ namespace WFRP4e.Translator.Packs
                         {
                             jEffects[effect.FoundryId]["description"] = effect.Description;
                         }
-
                         if (!string.IsNullOrEmpty(effect.Filter))
                         {
                             jEffects[effect.FoundryId]["filter"] = effect.Filter;
+                        }
+                        if (!string.IsNullOrEmpty(effect.EnableConditionScript))
+                        {
+                            jEffects[effect.FoundryId]["enableConditionScript"] = effect.EnableConditionScript;
+                        }
+                        if (!string.IsNullOrEmpty(effect.PreApplyScript))
+                        {
+                            jEffects[effect.FoundryId]["preApplyScript"] = effect.PreApplyScript;
+                        }
+                        if (!string.IsNullOrEmpty(effect.AvoidTestScript))
+                        {
+                            jEffects[effect.FoundryId]["avoidTestScript"] = effect.AvoidTestScript;
                         }
                         if (effect.ScriptData != null)
                         {

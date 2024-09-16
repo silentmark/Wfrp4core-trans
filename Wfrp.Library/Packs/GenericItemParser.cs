@@ -50,17 +50,25 @@ namespace WFRP4e.Translator.Packs
                 else
                 {
                     effect["name"] = mappingEffect.Name;
-                    //if (effect["flags"]?["wfrp4e"]?["effectData"]?["description"] != null)
-                    //{
-                    //    effect["flags"]["wfrp4e"]["effectData"]["description"] = mappingEffect.Description;
-                    //}
-                    if (effect["flags"]?["wfrp4e"]?["applicationData"]?["filter"] != null)
+                    if (effect["transferData"]?["filter"] != null)
                     {
-                        effect["flags"]["wfrp4e"]["applicationData"]["filter"] = mappingEffect.Filter;
+                        effect["transferData"]["filter"] = mappingEffect.Filter;
                     }
-                    if (effect["flags"]?["wfrp4e"]?["scriptData"] as JArray != null)
+                    if (effect["transferData"]?["enableConditionScript"] != null)
                     {
-                        var jArr = effect["flags"]["wfrp4e"]["scriptData"] as JArray;
+                        effect["transferData"]["enableConditionScript"] = mappingEffect.EnableConditionScript;
+                    }
+                    if (effect["transferData"]?["preApplyScript"] != null)
+                    {
+                        effect["transferData"]["preApplyScript"] = mappingEffect.PreApplyScript;
+                    }
+                    if (effect["transferData"]?["avoidTest"]?["script"] != null)
+                    {
+                        effect["transferData"]["avoidTest"]["script"] = mappingEffect.AvoidTestScript;
+                    }
+                    if (effect["scriptData"] as JArray != null)
+                    {
+                        var jArr = effect["scriptData"] as JArray;
                         foreach (var script in mappingEffect.ScriptData)
                         {
                             JObject jObj = jArr.OfType<JObject>().FirstOrDefault(x => x["id"].ToString() == script.FoundryId);
@@ -68,17 +76,17 @@ namespace WFRP4e.Translator.Packs
                             {
                                 jObj["script"] = script.Script;
                                 jObj["label"] = script.Name;
-                                if (jObj["options"]?["dialog"]?["hideScript"] != null)
+                                if (jObj["options"]?["hideScript"] != null)
                                 {
-                                    jObj["options"]["dialog"]["hideScript"] = script.HideScript;
+                                    jObj["options"]["hideScript"] = script.HideScript;
                                 }
-                                if (jObj["options"]?["dialog"]?["activateScript"] != null)
+                                if (jObj["options"]?["activateScript"] != null)
                                 {
-                                    jObj["options"]["dialog"]["activateScript"] = script.ActivationScript;
+                                    jObj["options"]["activateScript"] = script.ActivationScript;
                                 }
-                                if (jObj["options"]?["dialog"]?["submissionScript"] != null)
+                                if (jObj["options"]?["submissionScript"] != null)
                                 {
-                                    jObj["options"]["dialog"]["submissionScript"] = script.SubmissionScript;
+                                    jObj["options"]["submissionScript"] = script.SubmissionScript;
                                 }
                             }
                         }

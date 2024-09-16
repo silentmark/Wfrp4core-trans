@@ -10,3 +10,5 @@
 /Wfrp.Library/obj
 /Wfrp.Repository/bin/Debug/net7.0
 /Wfrp.Repository/obj
+/Wfrp.Library/bin/Debug/net8.0
+/Wfrp.Repository/bin/Debug/net8.0
