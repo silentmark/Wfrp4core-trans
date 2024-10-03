@@ -212,6 +212,7 @@ namespace WFRP4e.Translator
                                 itemJson["type"].ToString() != "npc" &&
                                 itemJson["type"].ToString() != "creature" &&
                                 itemJson["type"].ToString() != "character" &&
+                                itemJson["type"].ToString() != "Actor" &&
                                 itemJson["type"].ToString() != "vehicle"))
                     {
                         continue;
@@ -339,8 +340,10 @@ namespace WFRP4e.Translator
                     {
                         continue;
                     }
-                    var id = actorJson.GetValue("_id").Value<string>();
+
                     var type = GenericReader.GetTypeFromJson(actorJson);
+                    if (type == "Actor") continue;
+                    var id = actorJson.GetValue("_id").Value<string>();
                     var targtetType = GenericReader.GetEntryType(type, typeof(BaseEntry));
 
                     var name = actorJson.GetValue("name").Value<string>();

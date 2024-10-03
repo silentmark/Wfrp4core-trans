@@ -23,24 +23,6 @@ namespace WFRP4e.Translator.Packs
             entry["gender"] = mapping.Gender ?? " ";
             entry["species"] = mapping.Species ?? string.Empty;
 
-            if (mapping.Effects?.Count > 0)
-            {
-                var jEffect = new JObject();
-                foreach (var effect in mapping.Effects)
-                {
-                    jEffect[effect.FoundryId] = new JObject()
-                    {
-                        ["id"] = effect.FoundryId,
-                        ["name"] = effect.Name
-                    };
-                    //TODO:
-                    //if (!string.IsNullOrEmpty(effect.Script))
-                    //{
-                    //    jEffect[effect.FoundryId]["script"] = effect.Script;
-                    //}
-                }
-                entry["effects"] = jEffect;
-            }
             var jItem = new JObject();
             entry["items"] = jItem;
             foreach (var item in mapping.Items)
@@ -94,25 +76,6 @@ namespace WFRP4e.Translator.Packs
             entry["species"] = mapping.Species ?? " ";
             entry["gender"] = mapping.Gender ?? " ";
 
-            var jEffect = new JObject();
-            if (mapping.Effects?.Count > 0)
-            {
-                // THIS SHOULD NOW ALWAYS BE EMPTY!s
-                foreach (var effect in mapping.Effects)
-                {
-                    jEffect[effect.FoundryId] = new JObject()
-                    {
-                        ["id"] = effect.FoundryId,
-                        ["name"] = effect.Name
-                    };
-                    //TODO:
-                   // if (!string.IsNullOrEmpty(effect.Script))
-                   //{
-                   //     jEffect[effect.FoundryId]["script"] = effect.Script;
-                   // }
-                }
-            }
-            entry["effects"] = jEffect;
             var jItem = entry["items"] as JObject ?? new JObject();
             foreach (var item in mapping.Items)
             {

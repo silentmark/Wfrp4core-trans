@@ -125,17 +125,6 @@ namespace WFRP4e.Translator.Packs
                 }
             }
             mapping.Items = newMappingItems;
-
-            var effects = pack["effects"].ToArray();
-            var existinEffects = new List<EffectEntry>();
-
-            foreach (JObject effectObject in effects)
-            {
-                var newEffect = new EffectEntry();
-                existinEffects.Add(newEffect);
-                new EffectReader().UpdateEntry(effectObject, newEffect, onlyNulls);
-            }
-            mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
         }
 
         protected void UpdateActorEntryFromBabele(JObject babeleEntry, ActorEntry mapping)
@@ -190,24 +179,6 @@ namespace WFRP4e.Translator.Packs
                     {
                     }
                 }
-            }
-            //mapping.Items = newMappingItems;
-
-            var effects = (JObject)babeleEntry["effects"];
-            var existinEffects = new List<EffectEntry>();
-            if (effects != null)
-            {
-                foreach (var effect in effects.Properties())
-                {
-                    var effectItem = (JObject)effect.Value;
-                    var newEffect = mapping.Effects.FirstOrDefault(x => x.FoundryId == effect.Name);
-                    if (newEffect != null)
-                    {
-                        existinEffects.Add(newEffect);
-                        new EffectReader().UpdateEntryFromBabele(effectItem, newEffect);
-                    }
-                }
-                mapping.Effects = existinEffects.OrderBy(x => x.FoundryId).ToList();
             }
         }
     }
