@@ -28,6 +28,7 @@ namespace WFRP4e.Translator.Packs
             UpdateIfDifferent(mapping, pack["_id"].ToString(), nameof(mapping.FoundryId), onlyNulls);
             UpdateIfDifferent(mapping, pack["flags"]["core"]["sourceId"].ToString(), nameof(mapping.OriginFoundryId), onlyNulls);
             UpdateIfDifferent(mapping, pack["system"]["details"]["biography"]["value"]?.ToString(), nameof(mapping.Description), onlyNulls);
+            UpdateIfDifferent(mapping, pack["system"]["details"]["gmnotes"]["value"]?.ToString(), nameof(mapping.GmNotes), onlyNulls);
             UpdateIfDifferent(mapping, pack["system"]["details"]["species"]["value"]?.ToString(), nameof(mapping.Species), onlyNulls);
             UpdateIfDifferent(mapping, pack["system"]["details"]["gender"]["value"]?.ToString(), nameof(mapping.Gender), onlyNulls);
 
@@ -133,6 +134,7 @@ namespace WFRP4e.Translator.Packs
             UpdateIfDifferent(mapping, babeleEntry["description"].ToString(), nameof(mapping.Description), false);
             UpdateIfDifferent(mapping, babeleEntry["species"]?.ToString(), nameof(mapping.Species), false);
             UpdateIfDifferent(mapping, babeleEntry["gender"]?.ToString(), nameof(mapping.Gender), false);
+            UpdateIfDifferent(mapping, babeleEntry["gmnotes"]?.ToString(), nameof(mapping.GmNotes), false);
 
             var items = (JObject)babeleEntry["items"];
             //var newMappingItems = new List<Entry>();

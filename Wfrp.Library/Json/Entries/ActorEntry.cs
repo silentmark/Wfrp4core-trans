@@ -11,5 +11,7 @@ namespace WFRP4e.Translator.Json.Entries
         public string Species { get; set; }
 
         public string Gender { get; set; }
+
+        public string GmNotes { get; set; }
     }
 }

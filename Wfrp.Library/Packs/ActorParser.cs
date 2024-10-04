@@ -33,6 +33,7 @@ namespace WFRP4e.Translator.Packs
 
             pack["system"]["details"]["species"]["value"] = mapping.Species;
             pack["system"]["details"]["gender"]["value"] = mapping.Gender;
+            pack["system"]["details"]["gmnotes"]["value"] = mapping.GmNotes;
             pack["name"] = mapping.Name;
             if (pack["token"] != null)
             {

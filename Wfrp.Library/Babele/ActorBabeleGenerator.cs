@@ -22,6 +22,10 @@ namespace WFRP4e.Translator.Packs
 
             entry["gender"] = mapping.Gender ?? " ";
             entry["species"] = mapping.Species ?? string.Empty;
+            if (!string.IsNullOrWhiteSpace(mapping.GmNotes))
+            {
+                entry["gmdescription"] = mapping.GmNotes;
+            }
 
             var jItem = new JObject();
             entry["items"] = jItem;
@@ -75,6 +79,10 @@ namespace WFRP4e.Translator.Packs
 
             entry["species"] = mapping.Species ?? " ";
             entry["gender"] = mapping.Gender ?? " ";
+            if (!string.IsNullOrWhiteSpace(mapping.GmNotes))
+            {
+                entry["gmnotes"] = mapping.GmNotes;
+            }
 
             var jItem = entry["items"] as JObject ?? new JObject();
             foreach (var item in mapping.Items)
