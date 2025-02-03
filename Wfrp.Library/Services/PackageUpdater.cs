@@ -385,6 +385,7 @@ namespace Wfrp.Library.Services
 
                     using FileStream fs = File.Open(babeleTranslationPath, FileMode.Create);
                     using StreamWriter sw = new StreamWriter(fs);
+                    sw.NewLine = "\n";
                     using JsonTextWriter jw = new JsonTextWriter(sw);
 
                     jw.Formatting = Formatting.Indented;
@@ -532,12 +533,13 @@ namespace Wfrp.Library.Services
                 }
                 using FileStream fs = File.Open(babeleLocationPl + "\\" + babeleName + ".json", FileMode.Create);
                 using StreamWriter sw = new StreamWriter(fs);
+                sw.NewLine = "\n";
                 using JsonTextWriter jw = new JsonTextWriter(sw);
-
+                
                 jw.Formatting = Formatting.Indented;
                 jw.IndentChar = ' ';
                 jw.Indentation = 4;
-
+                
                 babelePl.WriteTo(jw);
             }
         }

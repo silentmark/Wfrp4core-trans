@@ -46,6 +46,14 @@ namespace WFRP4e.Translator.Packs
             {
                 pack["system"]["symptoms"]["value"] = mapping.Symptoms;
             }
+            if (pack["system"]?["duration"]?["text"] != null)
+            {
+                pack["system"]["duration"]["text"] = mapping.DurationText;
+            }
+            if (pack["system"]?["incubation"]?["text"] != null)
+            {
+                pack["system"]["incubation"]["text"] = mapping.IncubationText;
+            }
         }
     }
 }

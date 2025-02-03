@@ -18,6 +18,8 @@ namespace WFRP4e.Translator.Packs
             UpdateIfDifferent(mapping, pack["system"]?["incubation"]?["unit"]?.ToString(), nameof(mapping.IncubationUnit), onlyNulls);
             UpdateIfDifferent(mapping, pack["system"]?["permanent"]?["value"]?.ToString(), nameof(mapping.Permanent), onlyNulls);
             UpdateIfDifferent(mapping, pack["system"]?["symptoms"]?["value"]?.ToString(), nameof(mapping.Symptoms), onlyNulls);
+            UpdateIfDifferent(mapping, pack["system"]?["duration"]?["text"]?.ToString(), nameof(mapping.DurationText), onlyNulls);
+            UpdateIfDifferent(mapping, pack["system"]?["incubation"]?["text"]?.ToString(), nameof(mapping.IncubationText), onlyNulls);
         }
 
         public void UpdateEntryFromBabele(JObject pack, DiseaseEntry mapping)
@@ -30,6 +32,8 @@ namespace WFRP4e.Translator.Packs
             UpdateIfDifferent(mapping, pack["contraction"]?.ToString(), nameof(mapping.Contraction), false);
             UpdateIfDifferent(mapping, pack["symptoms"]?.ToString(), nameof(mapping.Symptoms), false);
             UpdateIfDifferent(mapping, pack["permanent"]?.ToString(), nameof(mapping.Permanent), false);
+            UpdateIfDifferent(mapping, pack["duration_text"]?.ToString(), nameof(mapping.DurationText), false);
+            UpdateIfDifferent(mapping, pack["incubation_text"]?.ToString(), nameof(mapping.IncubationText), false);
         }
     }
 }

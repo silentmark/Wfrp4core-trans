@@ -23,6 +23,8 @@ namespace WFRP4e.Translator.Packs
             entity["incubation_unit"] = mapping.IncubationUnit ?? " ";
             entity["symptoms"] = mapping.Symptoms ?? " ";
             entity["permanent"] = mapping.Permanent ?? " ";
+            entity["duration_text"] = mapping.DurationText ?? " ";
+            entity["incubation_text"] = mapping.IncubationText ?? " ";
         }
     }
 }

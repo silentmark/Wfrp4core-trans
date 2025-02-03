@@ -32,6 +32,9 @@ namespace WFRP4e.Translator.Json.Entries
                         ((DiseaseEntry)newSubEntry).Symptoms = disease.Symptoms;
                         ((DiseaseEntry)newSubEntry).Duration = disease.Duration;
                         ((DiseaseEntry)newSubEntry).DurationUnit = disease.DurationUnit;
+                        ((DiseaseEntry)newSubEntry).Permanent = disease.Permanent;
+                        ((DiseaseEntry)newSubEntry).DurationText = disease.DurationText;
+                        ((DiseaseEntry)newSubEntry).IncubationText = disease.IncubationText;
                         break;
                     }
                 case CareerEntry career:
@@ -69,6 +72,17 @@ namespace WFRP4e.Translator.Json.Entries
                         ((PrayerEntry)newSubEntry).Target = prayer.Target;
                         ((PrayerEntry)newSubEntry).Duration = prayer.Duration;
                         ((PrayerEntry)newSubEntry).God = prayer.God;
+                        break;
+                    }
+                case TemplateEntry template:
+                    {
+                        ((TemplateEntry)newSubEntry).Skills = template.Skills.ToList();
+                        ((TemplateEntry)newSubEntry).Talents = template.Talents.ToList();
+                        ((TemplateEntry)newSubEntry).Traits = template.Traits.ToList();
+                        ((TemplateEntry)newSubEntry).Options = template.Options.Select(x => new TemplateOption() { Id = x.Id, Name = x.Name }).ToList();
+                        ((TemplateEntry)newSubEntry).AlterNamePre = template.AlterNamePre;
+                        ((TemplateEntry)newSubEntry).AlterNamePost = template.AlterNamePost;
+                        ((TemplateEntry)newSubEntry).GmDescription = template.GmDescription;
                         break;
                     }
             }

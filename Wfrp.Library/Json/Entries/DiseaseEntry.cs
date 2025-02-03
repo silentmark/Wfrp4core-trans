@@ -16,5 +16,9 @@
         public string IncubationUnit { get; set; }
 
         public string Permanent { get; set; }
+
+        public string DurationText { get; set; }
+
+        public string IncubationText { get; set; }
     }
 }
