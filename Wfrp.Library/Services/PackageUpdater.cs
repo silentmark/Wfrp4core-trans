@@ -383,16 +383,17 @@ namespace Wfrp.Library.Services
                         }
                     }
 
-                    using FileStream fs = File.Open(babeleTranslationPath, FileMode.Create);
-                    using StreamWriter sw = new StreamWriter(fs);
-                    sw.NewLine = "\n";
-                    using JsonTextWriter jw = new JsonTextWriter(sw);
+                    using (FileStream fs = File.Open(babeleTranslationPath, FileMode.Create))
+                    {
+                        using StreamWriter sw = new StreamWriter(fs);
+                        using JsonTextWriter jw = new JsonTextWriter(sw);
 
-                    jw.Formatting = Formatting.Indented;
-                    jw.IndentChar = ' ';
-                    jw.Indentation = 4;
-
-                    babeleTranslationObj.WriteTo(jw);
+                        jw.Formatting = Formatting.Indented;
+                        jw.IndentChar = ' ';
+                        jw.Indentation = 4;
+                        babeleTranslationObj.WriteTo(jw);
+                    }
+                    File.AppendAllText(babeleTranslationPath, Environment.NewLine);
                 }
             }
         }
@@ -493,14 +494,14 @@ namespace Wfrp.Library.Services
                     var babeleEntry = (JObject)property.Value;
 
                     var babeleEntryPl = ((JObject)entriesPl[property.Name]);
-                    if (babeleEntryPl != null) { 
-                    foreach (var propertyPl in babeleEntryPl.Properties().ToList())
-                    {
-                        if (babeleEntry[propertyPl.Name] == null)
+                    if (babeleEntryPl != null) {
+                        foreach (var propertyPl in babeleEntryPl.Properties().ToList())
                         {
-                            OnProgressUpdated($"Nie znaleziono tłumaczenia dla {property.Name}");
-                            babeleEntryPl.Remove(property.Name);
-                        }
+                            if (babeleEntry[propertyPl.Name] == null)
+                            {
+                                OnProgressUpdated($"Nie znaleziono tłumaczenia dla {property.Name}");
+                                babeleEntryPl.Remove(property.Name);
+                            }
                             if ((babeleEntry[propertyPl.Name] as JObject) != null)
                             {
                                 var subItems = babeleEntry[propertyPl.Name].Value<JObject>();
@@ -531,16 +532,17 @@ namespace Wfrp.Library.Services
                         }
                     }
                 }
-                using FileStream fs = File.Open(babeleLocationPl + "\\" + babeleName + ".json", FileMode.Create);
-                using StreamWriter sw = new StreamWriter(fs);
-                sw.NewLine = "\n";
-                using JsonTextWriter jw = new JsonTextWriter(sw);
-                
-                jw.Formatting = Formatting.Indented;
-                jw.IndentChar = ' ';
-                jw.Indentation = 4;
-                
-                babelePl.WriteTo(jw);
+                using (FileStream fs = File.Open(babeleLocationPl + "\\" + babeleName + ".json", FileMode.Create))
+                {
+                    using StreamWriter sw = new StreamWriter(fs);
+                    using JsonTextWriter jw = new JsonTextWriter(sw);
+
+                    jw.Formatting = Formatting.Indented;
+                    jw.IndentChar = ' ';
+                    jw.Indentation = 4;
+                    babelePl.WriteTo(jw);
+                }
+                File.AppendAllText(babeleLocationPl + "\\" + babeleName + ".json", Environment.NewLine);
             }
         }
 
