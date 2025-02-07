@@ -8,13 +8,14 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WFRP4e.Translator.Json;
-using WFRP4e.Translator.Packs;
 using System.Reflection;
 using DeepL;
 using WFRP4e.Translator.Json.Entries;
 using System.Text;
 using Wfrp.Library.Services;
 using Config = WFRP4e.Translator.Utilities.Config;
+using Wfrp.Library.Json.Entries;
+using Wfrp.Library.Json.Readers;
 
 namespace WFRP4e.Translator
 {

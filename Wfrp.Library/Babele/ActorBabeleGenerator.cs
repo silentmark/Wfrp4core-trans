@@ -1,4 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
+using Wfrp.Library.Babele;
+using Wfrp.Library.Json.Entries;
+using Wfrp.Library.Json.Readers;
 using Wfrp.Library.Services;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;

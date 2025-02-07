@@ -6,10 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using WFRP4e.Translator.Json.Entries;
 using WFRP4e.Translator.Json;
-using WFRP4e.Translator.Packs;
 using Newtonsoft.Json.Linq;
 using System.Windows.Markup;
 using System.Numerics;
+using Wfrp.Library.Json.Entries;
+using Wfrp.Library.Babele;
+using Wfrp.Library.Json.Readers;
 
 namespace Wfrp.Library.Services
 {

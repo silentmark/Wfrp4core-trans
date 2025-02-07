@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
-using System.IO;
-using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using Wfrp.Library.Json.Entries;
+using Wfrp.Library.Json.Readers;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;
 
-namespace WFRP4e.Translator.Packs
+namespace Wfrp.Library.Packs
 {
     [FoundryType("skill")]
     [FoundryType("money")]
@@ -25,6 +21,10 @@ namespace WFRP4e.Translator.Packs
             var id = pack.Value<string>("_id");
             pack["name"] = mapping.Name;
             pack["system"]["description"]["value"] = mapping.Description;
+            if (mapping is ItemEntry itemEntry && !string.IsNullOrEmpty(itemEntry.GmNotes))
+            {
+                pack["system"]["gmdescription"]["value"] = itemEntry.GmNotes;
+            }
             if (pack["flags"] == null)
             {
                 pack["flags"] = new JObject();
@@ -71,7 +71,7 @@ namespace WFRP4e.Translator.Packs
                         var jArr = effect["scriptData"] as JArray;
                         foreach (var script in mappingEffect.ScriptData)
                         {
-                            JObject jObj = jArr.OfType<JObject>().FirstOrDefault(x => x["id"].ToString() == script.FoundryId);
+                            var jObj = jArr.OfType<JObject>().FirstOrDefault(x => x["id"].ToString() == script.FoundryId);
                             if (jObj == null)
                             {
                                 jObj["script"] = script.Script;

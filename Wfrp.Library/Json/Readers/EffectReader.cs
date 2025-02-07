@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Wfrp.Library.Json.Readers;
 using WFRP4e.Translator.Json.Entries;
 
 namespace WFRP4e.Translator.Packs

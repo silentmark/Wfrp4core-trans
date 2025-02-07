@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using WFRP4e.Translator.Json.Entries;
 
-namespace WFRP4e.Translator.Json.Entries
+namespace Wfrp.Library.Json.Entries
 {
     public class ItemEntry : BaseEntry
     {
-        public List<EffectEntry> Effects { get; set; } = new List<EffectEntry>();
+        public List<EffectEntry> Effects { get; set; } = [];
+        public string GmNotes { get; set; }
 
         internal static void CloneItem(ItemEntry compendiumObject, ItemEntry newSubEntry)
         {
@@ -16,6 +16,10 @@ namespace WFRP4e.Translator.Json.Entries
                 newSubEntry.Name = compendiumObject.Name;
             }
             newSubEntry.Description = compendiumObject.Description;
+            if (!string.IsNullOrEmpty(compendiumObject.GmNotes))
+            {
+                newSubEntry.GmNotes = compendiumObject.GmNotes;
+            }
             switch (compendiumObject)
             {
                 case TalentEntry talent:

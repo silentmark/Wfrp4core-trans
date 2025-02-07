@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Linq;
+using Wfrp.Library.Babele;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;
 

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
-using System.IO;
-using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using Wfrp.Library.Json.Entries;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;
 
-namespace WFRP4e.Translator.Packs
+namespace Wfrp.Library.Babele
 {
     [FoundryType("skill")]
     [FoundryType("money")]
@@ -23,11 +18,14 @@ namespace WFRP4e.Translator.Packs
             entry["id"] = mapping.FoundryId;
             entry["name"] = mapping.Name;
             entry["description"] = mapping.Description ?? " ";
+            if (mapping is ItemEntry itemEntry && !string.IsNullOrWhiteSpace(itemEntry.GmNotes))
+            {
+                entry["gmdescription"] = itemEntry.GmNotes;
+            }
             entry["originalName"] = originalDbEntity["name"].ToString();
             entry["sourceId"] = mapping.OriginFoundryId ?? " ";
-            if (mapping is ItemEntry)
+            if (mapping is ItemEntry item)
             {
-                var item = (ItemEntry)mapping;
                 if (item.Effects?.Count > 0)
                 {
                     var jEffects = new JObject();
@@ -65,9 +63,11 @@ namespace WFRP4e.Translator.Packs
                             jEffects[effect.FoundryId]["scriptData"] = jArrScripts;
                             foreach (var script in effect.ScriptData)
                             {
-                                var jScript = new JObject();
-                                jScript["id"] = effect.FoundryId;
-                                jScript["name"] = script.Name;
+                                var jScript = new JObject
+                                {
+                                    ["id"] = effect.FoundryId,
+                                    ["name"] = script.Name
+                                };
                                 jArrScripts.Add(jScript);
                                 if (!string.IsNullOrEmpty(script.Script))
                                 {

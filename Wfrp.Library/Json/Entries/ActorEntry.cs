@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+using WFRP4e.Translator.Json.Entries;
 
-namespace WFRP4e.Translator.Json.Entries
+namespace Wfrp.Library.Json.Entries
 {
     public class ActorEntry : BaseEntry
     {
         [JsonConverter(typeof(ItemEntryJsonConverter))]
-        public List<Entry> Items { get; set; } = new List<Entry>();
+        public List<Entry> Items { get; set; } = [];
 
         public string Species { get; set; }
 

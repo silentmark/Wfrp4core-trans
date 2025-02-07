@@ -1,15 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using Wfrp.Library.Json.Entries;
+using Wfrp.Library.Json.Readers;
 using WFRP4e.Translator.Json.Entries;
-using WFRP4e.Translator.Packs;
 
-namespace WFRP4e.Translator.Json
+namespace Wfrp.Library.Json
 {
     public class ItemEntryJsonConverter : JsonConverter
     {
@@ -17,10 +12,7 @@ namespace WFRP4e.Translator.Json
         {
         }
 
-        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
-        {
-            serializer.Serialize(writer, value);
-        }
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) => serializer.Serialize(writer, value);
 
         public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
@@ -45,15 +37,9 @@ namespace WFRP4e.Translator.Json
             return result;
         }
 
-        public override bool CanRead
-        {
-            get { return true; }
-        }
+        public override bool CanRead => true;
 
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType.IsArray && objectType.GetElementType().BaseType == typeof(ItemEntry);
-        }
+        public override bool CanConvert(Type objectType) => objectType.IsArray && objectType.GetElementType().BaseType == typeof(ItemEntry);
     }
 
     public class Employee

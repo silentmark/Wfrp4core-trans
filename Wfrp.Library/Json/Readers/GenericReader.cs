@@ -1,12 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Linq;
 using System.Reflection;
-using Wfrp.Library.Services;
+using Wfrp.Library.Json.Entries;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;
+using WFRP4e.Translator.Packs;
 
-namespace WFRP4e.Translator.Packs
+namespace Wfrp.Library.Json.Readers
 {
     public class GenericReader
     {
@@ -14,7 +13,7 @@ namespace WFRP4e.Translator.Packs
         {
             if (onlyNulls)
             {
-                mapping.Name = mapping.Name ?? pack.Value<string>("name");
+                mapping.Name ??= pack.Value<string>("name");
             }
             else
             {
@@ -24,6 +23,7 @@ namespace WFRP4e.Translator.Packs
 
             UpdateIfDifferent(mapping, pack["_id"].ToString(), nameof(mapping.FoundryId), onlyNulls);
             UpdateIfDifferent(mapping, pack["system"]["description"]["value"]?.ToString(), nameof(mapping.Description), onlyNulls);
+            UpdateIfDifferent(mapping, pack["system"]["gmdescription"]["value"]?.ToString(), nameof(mapping.GmNotes), onlyNulls);
 
             if (pack["flags"]?["core"]?["sourceId"]?.ToString() == null)
             {
@@ -55,7 +55,7 @@ namespace WFRP4e.Translator.Packs
                 }
                 new EffectReader().UpdateEntry(effectObject, newEffect, onlyNulls);
             }
-            foreach(var effect in effectsToRemove)
+            foreach (var effect in effectsToRemove)
             {
                 existinEffects.Remove(effect);
             }

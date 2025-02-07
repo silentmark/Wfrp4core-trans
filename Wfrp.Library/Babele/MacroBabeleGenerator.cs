@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Runtime;
+using Wfrp.Library.Babele;
 using WFRP4e.Translator.Json;
 using WFRP4e.Translator.Json.Entries;
 
