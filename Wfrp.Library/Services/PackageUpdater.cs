@@ -1,17 +1,10 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WFRP4e.Translator.Json.Entries;
-using WFRP4e.Translator.Json;
 using Newtonsoft.Json.Linq;
-using System.Windows.Markup;
-using System.Numerics;
-using Wfrp.Library.Json.Entries;
+using System.Text;
 using Wfrp.Library.Babele;
+using Wfrp.Library.Json.Entries;
 using Wfrp.Library.Json.Readers;
+using WFRP4e.Translator.Json.Entries;
 
 namespace Wfrp.Library.Services
 {
@@ -19,13 +12,7 @@ namespace Wfrp.Library.Services
     {
         public static event EventHandler<GenericEventArgs<string>> ProgressUpdated;
 
-        private static void OnProgressUpdated(string message)
-        {
-            if (ProgressUpdated != null)
-            {
-                ProgressUpdated.Invoke(typeof(PackageUpdater), new GenericEventArgs<string>(message));
-            }
-        }
+        private static void OnProgressUpdated(string message) => ProgressUpdated?.Invoke(typeof(PackageUpdater), new GenericEventArgs<string>(message));
 
         public static void InitAllMappings(string sourceJsons, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDictionary)
         {
@@ -39,7 +26,7 @@ namespace Wfrp.Library.Services
                     var type = Path.GetFileName(directory);
                     if (!typeToMappingDictionary.ContainsKey(type))
                     {
-                        typeToMappingDictionary.Add(type, new Dictionary<string, BaseEntry>());
+                        typeToMappingDictionary.Add(type, []);
                     }
                     var dictionary = typeToMappingDictionary[type];
                     var targtetType = GenericReader.GetEntryType(type, typeof(BaseEntry));
@@ -106,16 +93,16 @@ namespace Wfrp.Library.Services
                 }
             }
         }
-        
+
         //TODO: - move this to later phase, to process all modules and packs - right now we are scoped to single pack. 
         private static void UpdateChildItemSourceIds(Dictionary<string, Dictionary<string, JObject>> dic)
         {
             foreach (var dictionaries in dic)
             {
-                foreach (var entry in dictionaries.Value.Where(x => x.Value.Value<string>("type") == "creature"
-                || x.Value.Value<string>("type") == "npc"
-                || x.Value.Value<string>("type") == "character"
-                || x.Value.Value<string>("type") == "vehicle"))
+                foreach (var entry in dictionaries.Value.Where(x => x.Value.Value<string>("type") is "creature"
+                or "npc"
+                or "character"
+                or "vehicle"))
                 {
                     var items = entry.Value.Value<JArray>("items");
                     var entryId = entry.Value["flags"]["core"]["sourceId"].Value<string>();
@@ -141,8 +128,10 @@ namespace Wfrp.Library.Services
                         if (success && newSourceId != sourceId)
                         {
                             OnProgressUpdated($"{entryId} - Aktualizuję sourceId dla elementu: {item.Value<string>("_id")} na {newSourceId}");
-                            item["flags"]["core"] = new JObject();
-                            item["flags"]["core"]["sourceId"] = newSourceId;
+                            item["flags"]["core"] = new JObject
+                            {
+                                ["sourceId"] = newSourceId
+                            };
                         }
 
                         /*
@@ -224,7 +213,7 @@ namespace Wfrp.Library.Services
                     }
                     if (!dic.ContainsKey(compendiumPrefix))
                     {
-                        dic[compendiumPrefix] = new Dictionary<string, JObject>();
+                        dic[compendiumPrefix] = [];
                     }
                     dic[compendiumPrefix][id] = obj;
                     if (obj["flags"] == null)
@@ -236,11 +225,11 @@ namespace Wfrp.Library.Services
                         obj["flags"]["core"] = new JObject();
                     }
                     // TODO: zmienic - inny format source id jest teraz...
-                    if (obj["flags"]["core"]["sourceId"] == null || !obj["flags"]["core"]["sourceId"].ToString().StartsWith(compendiumPrefix + "." + id)) 
+                    if (obj["flags"]["core"]["sourceId"] == null || !obj["flags"]["core"]["sourceId"].ToString().StartsWith(compendiumPrefix + "." + id))
                     {
                         obj["flags"]["core"]["sourceId"] = compendiumPrefix + "." + id;
                     }
-                    
+
 
                     /*
                     {
@@ -286,9 +275,9 @@ namespace Wfrp.Library.Services
                     {
                         continue;
                     }
-                    if (originalObj["type"]?.ToString() == "Item" ||
-                        originalObj["type"]?.ToString() == "Macro" ||
-                        originalObj["type"]?.ToString() == "RollTable")
+                    if (originalObj["type"]?.ToString() is "Item" or
+                        "Macro" or
+                        "RollTable")
                     {
                         continue;
                     }
@@ -300,23 +289,18 @@ namespace Wfrp.Library.Services
                         originalObj["type"].ToString() != "script" &&
                         originalObj["type"].ToString() != "vehicle")
                     {
-                        if (originalObj["type"].ToString() == "ammunition" ||
-                            originalObj["type"].ToString() == "armour" ||
-                            originalObj["type"].ToString() == "weapon" ||
-                            originalObj["type"].ToString() == "container" ||
-                            originalObj["type"].ToString() == "money")
-                        {
-                            babeleFileName = $"{module}.trapping.{module}.{packName}";
-                        }
-                        else
-                        {
-                            babeleFileName = $"{module}.{originalObj["type"]}.{module}.{packName}";
-                        }
+                        babeleFileName = originalObj["type"].ToString() is "ammunition" or
+                            "armour" or
+                            "weapon" or
+                            "container" or
+                            "money"
+                            ? $"{module}.trapping.{module}.{packName}"
+                            : $"{module}.{originalObj["type"]}.{module}.{packName}";
                     }
 
                     if (!compendiumToEntriesDictionary.ContainsKey(babeleFileName))
                     {
-                        compendiumToEntriesDictionary[babeleFileName] = new Dictionary<string, JObject>();
+                        compendiumToEntriesDictionary[babeleFileName] = [];
                     }
                     var babeleFile = babeleTargetLocation + "\\" + babeleFileName + ".json";
 
@@ -338,7 +322,7 @@ namespace Wfrp.Library.Services
                             {
                                 newBabeleEntry = (JObject)originalBabele["entries"][originalObj["name"].ToString()]
                                     ?? (JObject)originalBabele["entries"][originalObj["_id"].ToString()]
-                                    ?? new JObject();
+                                    ?? [];
                             }
                             var entry = dic[originalSourceId];
                             var readerType = GenericReader.GetEntryType(type, typeof(GenericItemBabeleGenerator));
@@ -364,10 +348,11 @@ namespace Wfrp.Library.Services
                     foreach (var entry in entries)
                     {
                         var key = entry["originalName"]?.ToString();
-                        if (!string.IsNullOrEmpty(key))
+                        if (entries.Count(x => x["originalName"]?.ToString() == key) > 1)
                         {
-                            entry.Remove("originalName");
+                            key = entry["id"].ToString();
                         }
+
                         if (entriesjArr[entry["id"].ToString()] != null)
                         {
                             entriesjArr[entry["id"].ToString()] = entry;
@@ -380,15 +365,28 @@ namespace Wfrp.Library.Services
                             }
                             else
                             {
-                                entriesjArr[entry["name"].ToString()] = entry;
+                                key = entry["name"]?.ToString();
+                                if (entries.Count(x => x["name"]?.ToString() == key) > 1)
+                                {
+                                    key = entry["id"].ToString();
+                                }
+                                entriesjArr[key] = entry;
                             }
                         }
                     }
-
-                    using (FileStream fs = File.Open(babeleTranslationPath, FileMode.Create))
+                    foreach (var property in entriesjArr.OfType<JProperty>().ToList())
                     {
-                        using StreamWriter sw = new StreamWriter(fs);
-                        using JsonTextWriter jw = new JsonTextWriter(sw);
+                        var key = entriesjArr[property.Name]["originalName"]?.ToString();
+                        if (!string.IsNullOrEmpty(key))
+                        {
+                            (entriesjArr[property.Name] as JObject)?.Remove("originalName");
+                        }
+                    }
+
+                    using (var fs = File.Open(babeleTranslationPath, FileMode.Create))
+                    {
+                        using var sw = new StreamWriter(fs);
+                        using var jw = new JsonTextWriter(sw);
 
                         jw.Formatting = Formatting.Indented;
                         jw.IndentChar = ' ';
@@ -495,8 +493,9 @@ namespace Wfrp.Library.Services
                 {
                     var babeleEntry = (JObject)property.Value;
 
-                    var babeleEntryPl = ((JObject)entriesPl[property.Name]);
-                    if (babeleEntryPl != null) {
+                    var babeleEntryPl = (JObject)entriesPl[property.Name];
+                    if (babeleEntryPl != null)
+                    {
                         foreach (var propertyPl in babeleEntryPl.Properties().ToList())
                         {
                             if (babeleEntry[propertyPl.Name] == null)
@@ -534,10 +533,10 @@ namespace Wfrp.Library.Services
                         }
                     }
                 }
-                using (FileStream fs = File.Open(babeleLocationPl + "\\" + babeleName + ".json", FileMode.Create))
+                using (var fs = File.Open(babeleLocationPl + "\\" + babeleName + ".json", FileMode.Create))
                 {
-                    using StreamWriter sw = new StreamWriter(fs);
-                    using JsonTextWriter jw = new JsonTextWriter(sw);
+                    using var sw = new StreamWriter(fs);
+                    using var jw = new JsonTextWriter(sw);
 
                     jw.Formatting = Formatting.Indented;
                     jw.IndentChar = ' ';
@@ -550,7 +549,11 @@ namespace Wfrp.Library.Services
 
         public static void ExtractScripts(string systemLocation, Dictionary<string, Dictionary<string, BaseEntry>> translatedTypeToMappingDictonary)
         {
-            if (string.IsNullOrEmpty(systemLocation)) systemLocation = "C:\\Source-Code\\WFRP\\WFRP4e-FoundryVTT";
+            if (string.IsNullOrEmpty(systemLocation))
+            {
+                systemLocation = "C:\\Source-Code\\WFRP\\WFRP4e-FoundryVTT";
+            }
+
             var scripts = Directory.EnumerateFiles(systemLocation + "\\scripts", "*.js", SearchOption.AllDirectories).ToList();
             foreach (var key in translatedTypeToMappingDictonary.Keys)
             {
@@ -564,7 +567,7 @@ namespace Wfrp.Library.Services
                             {
                                 foreach (var subItem in actor.Items.OfType<ItemEntry>())
                                 {
-                                    foreach (var effect in subItem.Effects.Where(x=>x.ScriptData != null))
+                                    foreach (var effect in subItem.Effects.Where(x => x.ScriptData != null))
                                     {
                                         foreach (var script in effect.ScriptData)
                                         {
@@ -593,7 +596,7 @@ namespace Wfrp.Library.Services
                             {
                                 if (item.Effects != null)
                                 {
-                                    foreach (var effect in item.Effects.Where(x=>x.ScriptData != null))
+                                    foreach (var effect in item.Effects.Where(x => x.ScriptData != null))
                                     {
                                         foreach (var script in effect.ScriptData)
                                         {
@@ -624,10 +627,10 @@ namespace Wfrp.Library.Services
                             }
                     }
                 }
-               
+
 
             }
-            
+
         }
 
         private static void SaveScript(string systemLocation, List<string> scripts, ActorEntry? actor, ItemEntry subItem, string script)
