@@ -224,6 +224,8 @@ namespace WFRP4e.Translator
                     }
                     if (itemJson["type"]?.ToString() == "Item" ||
                         itemJson["type"]?.ToString() == "RollTable" ||
+                        itemJson["type"]?.ToString() == "JournalEntry" ||
+                        itemJson["type"]?.ToString() == "Scene" ||
                         itemJson["type"]?.ToString() == "Macro")
                     {
                         continue;

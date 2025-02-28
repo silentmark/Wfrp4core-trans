@@ -23,7 +23,7 @@ namespace WFRP4e.Translator.Packs
             entity["skills"] = JArray.FromObject(mapping.Skills ?? new List<string>());
             entity["talents"] = JArray.FromObject(mapping.Talents ?? new List<string>());
             entity["traits"] = JArray.FromObject(mapping.Traits ?? new List<string>());
-            entity["options"] = JArray.FromObject(mapping.Options ?? new List<TemplateOption>());
+            entity["trappings"] = JArray.FromObject(mapping.Options ?? new List<TemplateOption>());
         }
     }
 }

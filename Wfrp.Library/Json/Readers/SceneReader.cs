@@ -12,13 +12,23 @@ namespace WFRP4e.Translator.Packs
     {
         public void UpdateEntry(JObject pack, SceneEntry mapping, bool onlyNulls = false)
         {
+            var moduleNames = new[] {
+                "wfrp4e-core",
+                "wfrp4e-starter-set",
+                "wfrp4e-rnhd",
+                "wfrp4e-eis"
+            };
             mapping.Name = pack.Value<string>("name");
             mapping.Type = "scene";
             UpdateIfDifferent(mapping, pack["_id"].ToString(), nameof(mapping.FoundryId), onlyNulls);
             UpdateIfDifferent(mapping, pack["flags"]["core"]["sourceId"].ToString(), nameof(mapping.OriginFoundryId), onlyNulls);
-            if (pack["flags"]["wfrp4e-core"]?["scene-note"] != null)
+
+            foreach (var moduleName in moduleNames)
             {
-                UpdateIfDifferent(mapping, pack["flags"]["wfrp4e-core"]["scene-note"].ToString(), nameof(mapping.SceneNote), onlyNulls);
+                if (pack["flags"][moduleName]?["scene-note"] != null)
+                {
+                    UpdateIfDifferent(mapping, pack["flags"][moduleName]["scene-note"].ToString(), nameof(mapping.SceneNote), onlyNulls);
+                }
             }
             if (pack["notes"] != null)
             {

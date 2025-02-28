@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Wfrp.Library.Packs;
 using WFRP4e.Translator.Json;
@@ -44,6 +45,9 @@ namespace WFRP4e.Translator.Packs
                     }
                 }
             }
+
+            Debugger.Break();
+
             pack["flags"]["wfrp4e-core"]["scene-note"] = mapping.SceneNote;
         }
     }
