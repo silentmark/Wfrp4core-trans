@@ -47,8 +47,6 @@ namespace WFRP4e.Translator.Packs
             }
 
             Debugger.Break();
-
-            pack["flags"]["wfrp4e-core"]["scene-note"] = mapping.SceneNote;
         }
     }
 }

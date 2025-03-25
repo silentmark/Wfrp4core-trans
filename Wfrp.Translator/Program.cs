@@ -230,6 +230,12 @@ namespace WFRP4e.Translator
                     {
                         continue;
                     }
+                    if (itemJson["type"]?.ToString() == "wfrp4e-archives3.armour")
+                    {
+                        itemJson["type"] = "armour";
+                        Console.WriteLine("TYP Przedmiotu zrzutowany na: armour z wfrp4e-archives3.armour: " + itemJson["_id"] + " " + itemJson["name"]);
+                    }
+
                     var id = itemJson.GetValue("_id").Value<string>();
                     var type = GenericReader.GetTypeFromJson(itemJson);
                     var targtetType = GenericReader.GetEntryType(type, typeof(BaseEntry));

@@ -22,14 +22,6 @@ namespace WFRP4e.Translator.Packs
             mapping.Type = "scene";
             UpdateIfDifferent(mapping, pack["_id"].ToString(), nameof(mapping.FoundryId), onlyNulls);
             UpdateIfDifferent(mapping, pack["flags"]["core"]["sourceId"].ToString(), nameof(mapping.OriginFoundryId), onlyNulls);
-
-            foreach (var moduleName in moduleNames)
-            {
-                if (pack["flags"][moduleName]?["scene-note"] != null)
-                {
-                    UpdateIfDifferent(mapping, pack["flags"][moduleName]["scene-note"].ToString(), nameof(mapping.SceneNote), onlyNulls);
-                }
-            }
             if (pack["notes"] != null)
             {
                 var arr = (JArray)pack["notes"];
