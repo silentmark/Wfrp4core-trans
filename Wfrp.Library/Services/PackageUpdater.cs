@@ -473,8 +473,8 @@ namespace Wfrp.Library.Services
 
         public static void CompareBabeleJsonFiles(string babeleLocationEn, string babeleLocationPl)
         {
-            var babeleJsons = Directory.EnumerateFiles(babeleLocationEn, "*.json", SearchOption.AllDirectories).ToList();
-            var babeleJsonsPl = Directory.EnumerateFiles(babeleLocationPl, "*.json", SearchOption.AllDirectories).ToList();
+            var babeleJsons = Directory.EnumerateFiles(babeleLocationEn, "*.json", SearchOption.AllDirectories).Where(x=>!x.EndsWith("en.json")).ToList();
+            var babeleJsonsPl = Directory.EnumerateFiles(babeleLocationPl, "*.json", SearchOption.AllDirectories).Where(x=> !x.EndsWith("en.json")).ToList();
             babeleJsons.Reverse();
             foreach (var babelePath in babeleJsons)
             {
