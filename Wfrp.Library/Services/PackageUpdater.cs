@@ -193,6 +193,14 @@ namespace Wfrp.Library.Services
                             }
                         }
                     }
+                    if (obj.ContainsKey("results"))
+                    {
+                        var items = obj["results"];
+                        foreach (JObject item in items)
+                        {
+                            item.Remove("_stats");
+                        }
+                    }
                     if (obj.ContainsKey("pages"))
                     {
                         var items = obj["pages"];
@@ -229,6 +237,10 @@ namespace Wfrp.Library.Services
                     {
                         obj["flags"]["core"]["sourceId"] = compendiumPrefix + "." + id;
                     }
+                    if (obj["flags"]["exportSource"] != null)
+                    {
+                        (obj["flags"] as JObject).Remove("exportSource");
+                    }
 
 
                     /*
@@ -248,7 +260,7 @@ namespace Wfrp.Library.Services
             }
         }
 
-        public static void GenerateBabeleJsonFiles(string packsPath, string babeleTargetLocation, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDictionary)
+        public static void GenerateBabeleJsonFiles(string packsPath, string babeleTargetLocation, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDictionary, string babeleLocationPl)
         {
             var compendiumToEntriesDictionary = new Dictionary<string, Dictionary<string, JObject>>();
 
@@ -339,6 +351,11 @@ namespace Wfrp.Library.Services
             foreach (var babeleFile in compendiumToEntriesDictionary)
             {
                 var babeleTranslationPath = babeleTargetLocation + "\\" + babeleFile.Key + ".json";
+                if (!File.Exists(babeleTranslationPath) && babeleFile.Value.Count > 0)
+                {
+                    File.Create(babeleTranslationPath).Close();
+                    File.WriteAllText(babeleTranslationPath, "{ entries: {} }");
+                }
                 if (File.Exists(babeleTranslationPath))
                 {
                     var babeleTranslationObj = JObject.Parse(File.ReadAllText(babeleTranslationPath));
@@ -400,7 +417,7 @@ namespace Wfrp.Library.Services
 
         public static void GenerateJsonFilesFromBabele(string sourceJsons, string babeleLocation, Dictionary<string, Dictionary<string, BaseEntry>> typeToMappingDictonary)
         {
-            var babeleJsons = Directory.EnumerateFiles(babeleLocation, "*.json", SearchOption.AllDirectories).ToList();
+            var babeleJsons = Directory.EnumerateFiles(babeleLocation, "*.json", SearchOption.AllDirectories).Where(x => !x.EndsWith("en.json")).ToList();
             foreach (var babelePath in babeleJsons)
             {
                 var babeleName = Path.GetFileNameWithoutExtension(babelePath);
@@ -486,7 +503,9 @@ namespace Wfrp.Library.Services
                 var babele = JObject.Parse(File.ReadAllText(babelePath));
                 var entries = (JObject)babele["entries"];
 
-                var babelePl = JObject.Parse(File.ReadAllText(babeleJsonsPl.First(x => x.Contains(babeleName))));
+                var fileName = babeleJsonsPl.FirstOrDefault(x => x.Contains(babeleName));
+                if (fileName == null) continue;
+                var babelePl = JObject.Parse(File.ReadAllText(fileName));
                 var entriesPl = (JObject)babelePl["entries"];
 
                 foreach (var property in entries.Properties())

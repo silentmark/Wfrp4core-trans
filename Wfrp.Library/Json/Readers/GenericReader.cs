@@ -29,7 +29,36 @@ namespace Wfrp.Library.Json.Readers
             {
                 if (!string.IsNullOrEmpty(mapping.OriginFoundryId))
                 {
-                    Console.WriteLine($"THIS SHIT HAS TO BE FIXED: {mapping.OriginFoundryId} - {pack.Parent.Parent.Parent["flags"]["core"]["sourceId"]} - {pack.Parent.Parent.Parent["name"]}");
+                    if (mapping.OriginFoundryId.ToLower().Contains("actor")
+                        || (pack.Parent?.Parent?.Parent?["flags"]?["core"]?["sourceId"]?.ToString()?.Contains("actor") ?? false))
+                    {
+                        var otherPotentialItem =
+                            Mappings.OriginalTypeToMappingDictonary[mapping.Type].Values.Where(x => x.Name == mapping.Name).ToList();
+                        if (otherPotentialItem.Count == 1)
+                        {
+                            mapping.OriginFoundryId = otherPotentialItem[0].OriginFoundryId;
+                        }
+                        else if (otherPotentialItem.Count > 1)
+                        {
+                            Console.WriteLine($"THIS SHIT HAS TO BE FIXED: {mapping.Name} - {mapping.Name} - {string.Join(", ", otherPotentialItem.Select(x => x.OriginFoundryId))}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"THIS SHIT HAS TO BE FIXED: {mapping.OriginFoundryId} - {pack.Parent.Parent.Parent["flags"]["core"]["sourceId"]} - {pack.Parent.Parent.Parent["name"]}");
+                    }
+                }
+                else
+                {
+                    var otherPotentialItem = Mappings.OriginalTypeToMappingDictonary[mapping.Type].Values.Where(x => x.Name == mapping.Name).ToList();
+                    if (otherPotentialItem.Count == 1)
+                    {
+                        mapping.OriginFoundryId = otherPotentialItem[0].OriginFoundryId;
+                    }
+                    else if (otherPotentialItem.Count > 1)
+                    {
+                        Console.WriteLine($"THIS SHIT HAS TO BE FIXED: {mapping.Name} - {mapping.Name} - {string.Join(", ", otherPotentialItem.Select(x => x.OriginFoundryId))}");
+                    }
                 }
             }
             else
@@ -66,6 +95,7 @@ namespace Wfrp.Library.Json.Readers
         {
             mapping.Name = babeleEntry.Value<string>("name");
             UpdateIfDifferent(mapping, babeleEntry.Value<string>("description"), nameof(mapping.Description), false);
+            UpdateIfDifferent(mapping, babeleEntry.Value<string>("gmdescription"), nameof(mapping.GmNotes), false);
 
             var effects = (JObject)babeleEntry["effects"];
             var existinEffects = mapping.Effects;
