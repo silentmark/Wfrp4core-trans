@@ -105,7 +105,7 @@ namespace WFRP4e.Translator
 
                 if (input.KeyChar == '1')
                 {
-                    foreach(var module in Config.PacksPath.Split(';'))
+                    foreach (var module in Config.PacksPath.Split(';'))
                     {
                         UpdateJsonMappingFiles(module, Config.SourceJsonsEn, Mappings.OriginalTypeToMappingDictonary, Config.SourceJsonsPl, Mappings.TranslatedTypeToMappingDictonary);
                     }
@@ -135,6 +135,13 @@ namespace WFRP4e.Translator
                     foreach (var module in Config.PacksPath.Split(';'))
                     {
                         PackageUpdater.GenerateBabeleJsonFiles(module, Config.BabeleLocationPl, Mappings.TranslatedTypeToMappingDictonary, Config.BabeleLocationPl);
+                    }
+                }
+                else if (input.KeyChar == '7')
+                {
+                    foreach (var module in Config.PacksPath.Split(';'))
+                    {
+                        PackageUpdater.CombineItemJsons(module, Config.BabeleLocationPl);
                     }
                 }
             }

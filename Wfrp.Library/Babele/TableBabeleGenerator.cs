@@ -25,7 +25,17 @@ namespace WFRP4e.Translator.Packs
                 var packItem = originalDbEntity["results"].ToList().FirstOrDefault(x => x?["_id"].Value<string>() == result.FoundryId) as JObject;
                 if (packItem != null)
                 {
-                    jRes[packItem["range"][0].ToString() + "-" + packItem["range"][1].ToString()] = result.Name;
+                    if (!string.IsNullOrEmpty(result.Name) && !string.IsNullOrEmpty(result.Description))
+                    {
+                        var resEntry = new JObject();
+                        resEntry["name"] = result.Name;
+                        resEntry["description"] = result.Description;
+                        jRes[packItem["range"][0].ToString() + "-" + packItem["range"][1].ToString()] = resEntry;
+                    }
+                    else
+                    {
+                        jRes[packItem["range"][0].ToString() + "-" + packItem["range"][1].ToString()] = string.IsNullOrEmpty(result.Description) ? result.Name : result.Description;
+                    }
                 }
             }
             entity["results"] = jRes;

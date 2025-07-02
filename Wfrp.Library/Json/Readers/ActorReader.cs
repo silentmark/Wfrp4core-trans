@@ -120,6 +120,10 @@ namespace WFRP4e.Translator.Packs
                         else
                         {
                             var newSubEntry = mapping.Items.FirstOrDefault(x=>x.FoundryId == itemId) ?? (ItemEntry)GetEntryType(type, typeof(ItemEntry)).GetConstructor(new Type[] { }).Invoke(new object[] { });
+                            if (newSubEntry is ReferenceEntry)
+                            {
+                                continue;
+                            }
                             newSubEntry.Type = type;
                             newMappingItems.Add(newSubEntry);
                             method.Invoke(reader, new object[] { item, newSubEntry, onlyNulls });

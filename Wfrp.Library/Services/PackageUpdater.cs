@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using Wfrp.Library.Babele;
 using Wfrp.Library.Json.Entries;
@@ -537,7 +538,7 @@ namespace Wfrp.Library.Services
                                     if ((subItems[subPropertyPl.Name] as JObject) != null)
                                     {
                                         var subSubItems = subItems[subPropertyPl.Name].Value<JObject>();
-                                        var subSubItemsPl = subItemsPl[subPropertyPl.Name].Value<JObject>();
+                                        var subSubItemsPl = subItemsPl[subPropertyPl.Name] is JObject ? subItemsPl[subPropertyPl.Name].Value<JObject>() : subItems[subPropertyPl.Name].DeepClone() as JObject;
                                         foreach (var subSubPropertyPl in subSubItemsPl.Properties().ToList())
                                         {
                                             if (subSubItems[subSubPropertyPl.Name] == null)
@@ -665,6 +666,63 @@ namespace Wfrp.Library.Services
                     fileContent = "//*** " + subItem.Name + (actor != null ? " - " + actor.Name : "") + Environment.NewLine + fileContent;
                     File.WriteAllText(newFilePath, fileContent);
                 }
+            }
+        }
+
+        public static void CombineItemJsons(string module, string babeleLocationPl)
+        {
+            var babeleJsonsPl = Directory.EnumerateFiles(babeleLocationPl, "*.json", SearchOption.AllDirectories).Where(x => x.EndsWith("items.json")).ToList();
+
+            var combinedItems = new JObject();
+            var combinedMappings = new JObject();
+            var combinedFolders = new JObject();
+            var combinedBabele = new JObject
+            {
+                ["mapping"] = combinedMappings,
+                ["folders"] = combinedFolders,
+                ["entries"] = combinedItems
+            };
+
+            var moduleName = Path.GetFileName(module);
+            foreach (var babelePath in babeleJsonsPl.Where(x => x.Contains("." +  moduleName + ".")))
+            {
+                var babeleName = Path.GetFileNameWithoutExtension(babelePath);
+                var babele = JObject.Parse(File.ReadAllText(babelePath));
+                if (babele["label"] != null)
+                {
+                    combinedBabele["label"] = babele["label"].DeepClone();
+                }
+                var folders = babele["folders"] as JObject;
+                var mapping = (JObject)babele["mapping"];
+                var entries = (JObject)babele["entries"];
+
+                foreach (var property in entries.Properties())
+                {
+                    combinedItems[property.Name] = property.Value.DeepClone();
+                }
+                if (mapping != null)
+                {
+                    foreach (var property in mapping.Properties())
+                    {
+                        combinedMappings[property.Name] = property.Value.DeepClone();
+                    }
+                }
+                if (folders != null)
+                {
+                    foreach (var property in folders.Properties())
+                    {
+                        combinedFolders[property.Name] = property.Value.DeepClone();
+                    }
+                }
+            }
+            using (var fs = File.Open(babeleLocationPl + "\\" + moduleName + ".items.json", FileMode.Create))
+            {
+                using var sw = new StreamWriter(fs);
+                using var jw = new JsonTextWriter(sw);
+                jw.Formatting = Formatting.Indented;
+                jw.IndentChar = ' ';
+                jw.Indentation = 4;
+                combinedBabele.WriteTo(jw);
             }
         }
     }

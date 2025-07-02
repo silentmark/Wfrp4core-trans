@@ -12,8 +12,10 @@ namespace WFRP4e.Translator.Packs
             result.Name = onlyNulls ? (result.Name ?? jObj.Value<string>("text")) : jObj.Value<string>("text");
             if (string.IsNullOrEmpty(result.Name))
             {
-                result.Name = onlyNulls ? (result.Name ?? jObj.Value<string>("description")) : jObj.Value<string>("description");
+                result.Name = onlyNulls ? (result.Name ?? jObj.Value<string>("name")) : jObj.Value<string>("name");
             }
+
+            result.Description = onlyNulls ? (result.Description ?? jObj.Value<string>("description")) : jObj.Value<string>("description");
             result.Type = "tableResult";
             GenericReader.UpdateIfDifferent(result, jObj["_id"].ToString(), nameof(result.FoundryId), onlyNulls);
             GenericReader.UpdateIfDifferent(result, jObj["documentUuid"]?.ToString(), nameof(result.DocumentUuid), onlyNulls);
